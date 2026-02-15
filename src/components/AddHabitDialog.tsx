@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,27 +7,36 @@ import { useHabits } from "@/hooks/useHabits";
 
 const ICONS = ["💪", "📖", "📚", "🏃", "🧘", "💻", "🎵", "🥗", "💤", "🌊"];
 
-export const AddHabitDialog = () => {
+
+interface AddHabitDialogProps {
+  children?: React.ReactNode;
+}
+
+export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("💪");
-  const [goalMinutes, setGoalMinutes] = useState("");
+  const [goalMinutes, setGoalMinutes] = useState("30");
   const { addHabit } = useHabits();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addHabit.mutate(
       { name, icon, goal_minutes: parseInt(goalMinutes) || 0 },
-      { onSuccess: () => { setOpen(false); setName(""); setGoalMinutes(""); } }
+      { onSuccess: () => { setOpen(false); setName(""); setGoalMinutes("30"); } }
     );
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="text-primary gap-2">
-          <Plus className="w-4 h-4" /> Novo Hábito
-        </Button>
+        {children ? (
+          children
+        ) : (
+          <Button variant="ghost" className="text-primary gap-2">
+            <Plus className="w-4 h-4" /> Novo Hábito
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -43,9 +52,8 @@ export const AddHabitDialog = () => {
                   type="button"
                   key={i}
                   onClick={() => setIcon(i)}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${
-                    icon === i ? "bg-primary/20 ring-2 ring-primary" : "bg-secondary hover:bg-muted"
-                  }`}
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${icon === i ? "bg-primary/20 ring-2 ring-primary" : "bg-secondary hover:bg-muted"
+                    }`}
                 >
                   {i}
                 </button>

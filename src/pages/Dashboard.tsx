@@ -6,7 +6,7 @@ import { Layout } from "@/components/Layout";
 import { HabitCard } from "@/components/HabitCard";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { ProgressCircle } from "@/components/ProgressCircle";
-import { Flame, Users } from "lucide-react";
+import { Flame, Users, Plus } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 const Dashboard = () => {
@@ -112,10 +112,20 @@ const Dashboard = () => {
             />
           ))}
           {habits.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg">Nenhum hábito ainda</p>
-              <p className="text-sm">Clique em "Novo Hábito" para começar!</p>
-            </div>
+            <AddHabitDialog>
+              <div className="w-full py-12 border-2 border-dashed border-primary/30 rounded-xl flex flex-col items-center justify-center text-center hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Plus className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Comece sua jornada!</h3>
+                <p className="text-muted-foreground max-w-sm mb-6">
+                  Você ainda não tem hábitos cadastrados. Que tal criar o seu primeiro agora mesmo?
+                </p>
+                <div className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-all">
+                  Criar Novo Hábito
+                </div>
+              </div>
+            </AddHabitDialog>
           )}
         </div>
 
