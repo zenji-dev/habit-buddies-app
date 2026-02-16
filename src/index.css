@@ -88,11 +88,11 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-300;
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-300;
     font-family: 'Inter', sans-serif;
   }
 }
@@ -101,6 +101,7 @@
   .gradient-success {
     background: var(--gradient-success);
   }
+
   .gradient-achievement {
     background: var(--gradient-achievement);
   }

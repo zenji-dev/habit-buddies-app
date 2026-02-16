@@ -1,7 +1,8 @@
-import { LayoutDashboard, Users, BarChart3, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Moon, Sun } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/theme-provider";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -13,9 +14,10 @@ const navItems = [
 export const AppSidebar = () => {
   const location = useLocation();
   const { signOut, user } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border min-h-screen p-4">
+    <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border h-screen sticky top-0 p-4 pb-10 overflow-y-auto">
       <div className="flex items-center gap-2 px-3 mb-8">
         <div className="w-8 h-8 rounded-full gradient-success flex items-center justify-center">
           <span className="text-primary-foreground font-bold text-sm">H</span>
@@ -47,18 +49,27 @@ export const AppSidebar = () => {
         })}
       </nav>
 
-      <div className="border-t border-border pt-4 mt-4">
-        <div className="flex items-center gap-3 px-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-            <span className="text-primary font-semibold text-xs">
-              {user?.email?.charAt(0).toUpperCase()}
-            </span>
+      <div className="border-t border-border pt-4 mt-4 space-y-2">
+        <div className="flex items-center justify-between px-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-primary font-semibold text-xs">
+                {user?.email?.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{user?.email?.split("@")[0]}</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{user?.email?.split("@")[0]}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-          </div>
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors"
+            title="Alternar tema"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
+
         <button
           onClick={signOut}
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-secondary w-full transition-colors"
