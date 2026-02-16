@@ -74,33 +74,44 @@ export const useHabits = () => {
 
   const getStreak = (habitId: string): number => {
     if (!checkInsQuery.data) return 0;
-    const habitCheckins = checkInsQuery.data
+
+    // Get unique dates for this habit, sorted descending
+    const habitCheckins = Array.from(new Set(checkInsQuery.data
       .filter((c) => c.habit_id === habitId)
-      .map((c) => c.completed_at)
+      .map((c) => c.completed_at)))
       .sort((a, b) => b.localeCompare(a));
 
     if (habitCheckins.length === 0) return 0;
 
-    let streak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-    for (let i = 0; i < habitCheckins.length; i++) {
-      const checkDate = new Date(habitCheckins[i] + "T00:00:00");
-      const expectedDate = new Date(today);
-      expectedDate.setDate(expectedDate.getDate() - i);
-      expectedDate.setHours(0, 0, 0, 0);
+    const lastCheckinDate = new Date(habitCheckins[0] + "T00:00:00");
+    lastCheckinDate.setHours(0, 0, 0, 0);
 
-      if (checkDate.getTime() === expectedDate.getTime()) {
+    // If last checkin is not today or yesterday, streak is broken
+    if (lastCheckinDate.getTime() < yesterday.getTime()) return 0;
+
+    let streak = 1;
+    let currentDate = lastCheckinDate;
+
+    for (let i = 1; i < habitCheckins.length; i++) {
+      const nextCheckinDate = new Date(habitCheckins[i] + "T00:00:00");
+      nextCheckinDate.setHours(0, 0, 0, 0);
+
+      const expectedDate = new Date(currentDate);
+      expectedDate.setDate(expectedDate.getDate() - 1);
+
+      if (nextCheckinDate.getTime() === expectedDate.getTime()) {
         streak++;
-      } else if (i === 0) {
-        // Allow yesterday
-        expectedDate.setDate(expectedDate.getDate() - 1);
-        if (checkDate.getTime() === expectedDate.getTime()) {
-          streak++;
-        } else break;
-      } else break;
+        currentDate = nextCheckinDate;
+      } else {
+        break;
+      }
     }
+
     return streak;
   };
 

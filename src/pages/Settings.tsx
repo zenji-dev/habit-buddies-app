@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Settings as SettingsIcon, User, Link2, LogOut, Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { StravaActivities } from "@/components/StravaActivities";
 
 const Settings = () => {
   const { user, signOut } = useAuth();
@@ -165,6 +166,10 @@ const Settings = () => {
             </div>
           )}
         </div>
+
+        {stravaConnected && (
+          <StravaActivities />
+        )}
 
         {/* Sign out */}
         <Button variant="outline" onClick={signOut} className="gap-2">

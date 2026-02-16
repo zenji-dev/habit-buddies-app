@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Social from "./pages/Social";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
 import StravaCallback from "./pages/StravaCallback";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
               <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings/strava/callback" element={<ProtectedRoute><StravaCallback /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

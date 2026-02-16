@@ -1,6 +1,7 @@
 import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Moon, Sun } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/theme-provider";
 
@@ -15,6 +16,7 @@ export const AppSidebar = () => {
   const location = useLocation();
   const { signOut, user } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { data: profile } = useProfile();
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border h-screen sticky top-0 p-4 pb-10 overflow-y-auto">
@@ -50,17 +52,32 @@ export const AppSidebar = () => {
       </nav>
 
       <div className="border-t border-border pt-4 mt-4 space-y-2">
-        <div className="flex items-center justify-between px-3">
+        <Link
+          to={`/profile/${user?.id}`}
+          className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-secondary transition-colors group"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-primary font-semibold text-xs">
-                {user?.email?.charAt(0).toUpperCase()}
-              </span>
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors overflow-hidden">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-primary font-semibold text-xs">
+                  {profile?.name?.charAt(0) || user?.email?.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.email?.split("@")[0]}</p>
+              <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                {profile?.name || "Meu Perfil"}
+              </p>
+              <p className="text-[10px] text-muted-foreground truncate italic">
+                {profile?.username ? `@${profile.username}` : user?.email}
+              </p>
             </div>
           </div>
+        </Link>
+        <div className="flex items-center justify-between px-3">
+          <span className="text-xs text-muted-foreground">Tema</span>
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors"

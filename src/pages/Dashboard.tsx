@@ -6,7 +6,8 @@ import { Layout } from "@/components/Layout";
 import { HabitCard } from "@/components/HabitCard";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { ProgressCircle } from "@/components/ProgressCircle";
-import { Flame, Users, Plus } from "lucide-react";
+import { ActivityFeed } from "@/components/ActivityFeed";
+import { Flame, Users, Plus, Activity } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 const Dashboard = () => {
@@ -129,29 +130,38 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Weekly chart + Achievement */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-card rounded-xl border border-border p-4">
-            <h3 className="font-semibold text-foreground mb-4">Meta Semanal</h3>
-            <ResponsiveContainer width="100%" height={150}>
-              <BarChart data={weekData}>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
-                <YAxis hide />
-                <Tooltip />
-                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+        {/* Weekly chart + Feed */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-card rounded-xl border border-border p-4">
+              <h3 className="font-semibold text-foreground mb-4">Meta Semanal</h3>
+              <ResponsiveContainer width="100%" height={150}>
+                <BarChart data={weekData}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis hide />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="gradient-success rounded-xl p-6 text-primary-foreground">
+              <Flame className="w-8 h-8 mb-2 opacity-80" />
+              <h3 className="text-xl font-bold">Próxima Conquista</h3>
+              <p className="text-sm opacity-90 mt-1">
+                Complete 7 dias seguidos de treino para ganhar a insígnia 'Atleta Dedicado'.
+              </p>
+              <p className="text-sm font-semibold mt-3 opacity-80 uppercase tracking-wider">
+                {todayChecked}/{totalHabits} Hábitos HOJE
+              </p>
+            </div>
           </div>
 
-          <div className="gradient-success rounded-xl p-6 text-primary-foreground">
-            <Flame className="w-8 h-8 mb-2 opacity-80" />
-            <h3 className="text-xl font-bold">Próxima Conquista</h3>
-            <p className="text-sm opacity-90 mt-1">
-              Complete 7 dias seguidos de treino para ganhar a insígnia 'Atleta Dedicado'.
-            </p>
-            <p className="text-sm font-semibold mt-3 opacity-80">
-              {todayChecked}/{totalHabits} DIAS COMPLETADOS
-            </p>
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Activity className="w-5 h-5 text-streak" /> Feed de Treinos
+            </h2>
+            <ActivityFeed />
           </div>
         </div>
       </div>

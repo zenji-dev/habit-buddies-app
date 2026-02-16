@@ -9,6 +9,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,11 +20,22 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) toast.error(error.message);
     } else {
+      // Validate username: only letters, numbers and underscores
+      const usernameRegex = /^[a-zA-Z0-9_]+$/;
+      if (!usernameRegex.test(username)) {
+        toast.error("O usuário deve conter apenas letras, números e underscores.");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name },
+          data: {
+            name,
+            username: username.toLowerCase()
+          },
           emailRedirectTo: window.location.origin,
         },
       });
@@ -64,12 +76,24 @@ const Auth = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
-              <Input
-                placeholder="Seu nome"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+              <>
+                <Input
+                  placeholder="Nome de exibição (ex: João Silva)"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
+                  <Input
+                    placeholder="usuário_único"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="pl-7"
+                    required
+                  />
+                </div>
+              </>
             )}
             <Input
               type="email"

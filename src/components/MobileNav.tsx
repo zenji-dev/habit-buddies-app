@@ -1,16 +1,19 @@
-import { LayoutDashboard, Users, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings, User } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/social", label: "Social", icon: Users },
-  { to: "/stats", label: "Stats", icon: BarChart3 },
-  { to: "/settings", label: "Config", icon: Settings },
-];
+import { useAuth } from "@/contexts/AuthContext";
 
 export const MobileNav = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  const navItems = [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/social", label: "Social", icon: Users },
+    { to: "/stats", label: "Stats", icon: BarChart3 },
+    { to: `/profile/${user?.id}`, label: "Perfil", icon: User },
+    { to: "/settings", label: "Config", icon: Settings },
+  ];
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">

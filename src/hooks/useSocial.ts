@@ -33,11 +33,38 @@ export const useSocial = () => {
     enabled: !!user,
   });
 
+  const incomingRequestsQuery = useQuery({
+    queryKey: ["friendRequests", user?.id],
+    queryFn: async () => {
+      const { data: friendships, error } = await supabase
+        .from("friendships")
+        .select("*")
+        .eq("friend_id", user!.id)
+        .eq("status", "pending");
+
+      if (error) throw error;
+      if (!friendships || friendships.length === 0) return [];
+
+      const requesterIds = friendships.map(f => f.user_id);
+      const { data: profiles, error: pError } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("user_id", requesterIds);
+
+      if (pError) throw pError;
+
+      return friendships.map(f => ({
+        ...f,
+        profile: profiles?.find(p => p.user_id === f.user_id)
+      }));
+    },
+    enabled: !!user,
+  });
+
   const feedQuery = useQuery({
     queryKey: ["feed", user?.id],
     queryFn: async () => {
-      if (!friendsQuery.data || friendsQuery.data.length === 0) return [];
-      const friendIds = friendsQuery.data.map((f) => f.user_id);
+      const friendIds = [user!.id, ...(friendsQuery.data?.map((f) => f.user_id) || [])];
 
       const { data, error } = await supabase
         .from("check_ins")
@@ -47,14 +74,12 @@ export const useSocial = () => {
         .limit(20);
       if (error) throw error;
 
-      // Fetch profiles for these check-ins
       const userIds = [...new Set((data || []).map((c) => c.user_id))];
       const { data: profiles } = await supabase
         .from("profiles")
         .select("*")
         .in("user_id", userIds);
 
-      // Fetch kudos counts
       const checkInIds = (data || []).map((c) => c.id);
       const { data: kudos } = await supabase
         .from("kudos")
@@ -88,19 +113,89 @@ export const useSocial = () => {
     },
   });
 
+  const unfriend = useMutation({
+    mutationFn: async (friendUserId: string) => {
+      const { error } = await supabase
+        .from("friendships")
+        .delete()
+        .or(`and(user_id.eq.${user!.id},friend_id.eq.${friendUserId}),and(user_id.eq.${friendUserId},friend_id.eq.${user!.id})`);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      toast.success("Amizade removida.");
+    },
+  });
+
+  const searchUsers = async (query: string) => {
+    if (!query || query.length < 2) return [];
+
+    const searchStr = query.startsWith("@") ? query.slice(1) : query;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .or(`name.ilike.%${searchStr}%,username.ilike.%${searchStr}%`)
+      .neq("user_id", user!.id)
+      .limit(5);
+    if (error) throw error;
+    return data || [];
+  };
+
+  const getUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+    if (error) throw error;
+    return data;
+  };
+
+  const getUserActivities = async (userId: string) => {
+    const { data: activities, error: aErr } = await supabase
+      .from("activities")
+      .select("*")
+      .eq("user_id", userId)
+      .order("start_date", { ascending: false })
+      .limit(10);
+    if (aErr) throw aErr;
+
+    const { data: checkIns, error: cErr } = await supabase
+      .from("check_ins")
+      .select("*, habits(*)")
+      .eq("user_id", userId)
+      .order("completed_at", { ascending: false })
+      .limit(10);
+    if (cErr) throw cErr;
+
+    return { activities, checkIns };
+  };
+
+  const getFriendshipStatus = async (otherUserId: string) => {
+    const { data, error } = await supabase
+      .from("friendships")
+      .select("*")
+      .or(`and(user_id.eq.${user!.id},friend_id.eq.${otherUserId}),and(user_id.eq.${otherUserId},friend_id.eq.${user!.id})`)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  };
+
   const addFriend = useMutation({
-    mutationFn: async (friendEmail: string) => {
-      // Find profile by searching for user
+    mutationFn: async (friendHandle: string) => {
+      const cleanHandle = friendHandle.startsWith("@") ? friendHandle.slice(1) : friendHandle;
+
       const { data: profiles, error: pErr } = await supabase
         .from("profiles")
-        .select("user_id, name")
+        .select("user_id, name, username")
+        .or(`username.eq.${cleanHandle.toLowerCase()},name.eq.${friendHandle}`)
         .neq("user_id", user!.id);
+
       if (pErr) throw pErr;
 
-      // For simplicity, find by name match
-      const friend = profiles?.find((p) =>
-        p.name.toLowerCase().includes(friendEmail.toLowerCase())
-      );
+      const friend = profiles?.[0];
       if (!friend) {
         toast.error("Usuário não encontrado");
         return;
@@ -109,28 +204,67 @@ export const useSocial = () => {
       const { error } = await supabase.from("friendships").insert({
         user_id: user!.id,
         friend_id: friend.user_id,
-        status: "accepted",
+        status: "pending",
       });
+
       if (error) {
         if (error.code === "23505") {
-          toast.info("Já são amigos!");
+          toast.info("Solicitação já enviada!");
           return;
         }
         throw error;
       }
-      toast.success(`${friend.name} adicionado como amigo!`);
+      toast.success(`Solicitação enviada para ${friend.name}!`);
+    },
+  });
+
+  const addFriendById = useMutation({
+    mutationFn: async (targetUserId: string) => {
+      const { error } = await supabase.from("friendships").insert({
+        user_id: user!.id,
+        friend_id: targetUserId,
+        status: "pending",
+      });
+      if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+      toast.success("Solicitação enviada!");
+    },
+  });
+
+  const handleRequest = useMutation({
+    mutationFn: async ({ requestId, status }: { requestId: string; status: "accepted" | "rejected" }) => {
+      const { error } = await supabase
+        .from("friendships")
+        .update({ status })
+        .eq("id", requestId);
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+      if (variables.status === "accepted") {
+        toast.success("Solicitação aceita!");
+      } else {
+        toast.info("Solicitação recusada.");
+      }
     },
   });
 
   return {
     friends: friendsQuery.data || [],
+    incomingRequests: incomingRequestsQuery.data || [],
     feed: feedQuery.data || [],
-    isLoading: friendsQuery.isLoading || feedQuery.isLoading,
+    isLoading: friendsQuery.isLoading || feedQuery.isLoading || incomingRequestsQuery.isLoading,
     giveKudos,
     addFriend,
+    addFriendById,
+    handleRequest,
+    unfriend,
+    searchUsers,
+    getUserProfile,
+    getUserActivities,
+    getFriendshipStatus,
   };
 };
