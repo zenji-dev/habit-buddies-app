@@ -22,7 +22,10 @@ import {
     History,
     Edit,
     Save,
-    X
+    X,
+    Instagram,
+    Twitter,
+    Link as LinkIcon
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,6 +54,8 @@ const Profile = () => {
     const [editName, setEditName] = useState("");
     const [editBio, setEditBio] = useState("");
     const [editAvatar, setEditAvatar] = useState("");
+    const [editInstagram, setEditInstagram] = useState("");
+    const [editTwitter, setEditTwitter] = useState("");
     const [isSaving, setIsSaving] = useState(false);
 
     const isOwner = currentUser?.id === id;
@@ -68,6 +73,8 @@ const Profile = () => {
             setEditName(p.name || "");
             setEditBio(p.bio || "");
             setEditAvatar(p.avatar_url || "");
+            setEditInstagram(p.instagram_url || "");
+            setEditTwitter(p.twitter_url || "");
             setActivities(acts.activities);
             setCheckIns(acts.checkIns);
             setStatus(s);
@@ -96,6 +103,8 @@ const Profile = () => {
                     name: editName.trim(),
                     bio: editBio.trim(),
                     avatar_url: editAvatar.trim(),
+                    instagram_url: editInstagram.trim() || null,
+                    twitter_url: editTwitter.trim() || null,
                     updated_at: new Date().toISOString()
                 })
                 .eq("user_id", currentUser!.id);
@@ -103,7 +112,14 @@ const Profile = () => {
             if (error) throw error;
 
             toast.success("Perfil atualizado!");
-            setProfile({ ...profile, name: editName, bio: editBio, avatar_url: editAvatar });
+            setProfile({
+                ...profile,
+                name: editName,
+                bio: editBio,
+                avatar_url: editAvatar,
+                instagram_url: editInstagram,
+                twitter_url: editTwitter
+            });
             setIsEditing(false);
         } catch (err) {
             console.error(err);
@@ -174,6 +190,26 @@ const Profile = () => {
                                         placeholder="URL do Avatar"
                                         className="text-xs bg-background"
                                     />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="relative">
+                                            <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <Input
+                                                value={editInstagram}
+                                                onChange={e => setEditInstagram(e.target.value)}
+                                                placeholder="Link Instagram"
+                                                className="pl-9 text-xs bg-background"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <Input
+                                                value={editTwitter}
+                                                onChange={e => setEditTwitter(e.target.value)}
+                                                placeholder="Link X (Twitter)"
+                                                className="pl-9 text-xs bg-background"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <>
@@ -183,7 +219,11 @@ const Profile = () => {
                                             <span className="text-primary font-bold text-lg">@{profile.username}</span>
                                         )}
                                     </div>
-                                    <p className="text-muted-foreground text-sm">Membro desde {new Date(profile.created_at).toLocaleDateString()}</p>
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-1">
+                                        <p className="text-muted-foreground text-sm flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" /> Membro desde {new Date(profile.created_at).toLocaleDateString()}
+                                        </p>
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -230,24 +270,47 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <div className="mt-8 relative">
-                        {isEditing ? (
-                            <Textarea
-                                value={editBio}
-                                onChange={e => setEditBio(e.target.value)}
-                                placeholder="Conte um pouco sobre você..."
-                                className="bg-background min-h-[100px]"
-                            />
-                        ) : (
-                            profile.bio ? (
-                                <p className="text-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4 py-2 bg-secondary/30 rounded-r-lg">
-                                    "{profile.bio}"
-                                </p>
-                            ) : isOwner ? (
-                                <button onClick={() => setIsEditing(true)} className="text-sm text-muted-foreground hover:text-primary transition-colors italic">
-                                    + Adicionar uma bio ao seu perfil
-                                </button>
-                            ) : null
+                    <div className="mt-8 relative flex flex-wrap items-center gap-6">
+                        <div className="flex-1">
+                            {isEditing ? (
+                                <Textarea
+                                    value={editBio}
+                                    onChange={e => setEditBio(e.target.value)}
+                                    placeholder="Conte um pouco sobre você..."
+                                    className="bg-background min-h-[100px]"
+                                />
+                            ) : (
+                                profile.bio ? (
+                                    <p className="text-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4 py-2 bg-secondary/30 rounded-r-lg">
+                                        "{profile.bio}"
+                                    </p>
+                                ) : isOwner ? (
+                                    <button onClick={() => setIsEditing(true)} className="text-sm text-muted-foreground hover:text-primary transition-colors italic">
+                                        + Adicionar uma bio ao seu perfil
+                                    </button>
+                                ) : null
+                            )}
+                        </div>
+
+                        {!isEditing && (profile.instagram_url || profile.twitter_url) && (
+                            <div className="flex gap-3">
+                                {profile.instagram_url && (
+                                    <Button variant="secondary" size="sm" className="gap-2 rounded-full font-bold shadow-sm hover:scale-105 transition-transform" asChild>
+                                        <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer">
+                                            <Instagram className="w-4 h-4 text-pink-500" />
+                                            Instagram
+                                        </a>
+                                    </Button>
+                                )}
+                                {profile.twitter_url && (
+                                    <Button variant="secondary" size="sm" className="gap-2 rounded-full font-bold shadow-sm hover:scale-105 transition-transform" asChild>
+                                        <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer">
+                                            <Twitter className="w-4 h-4 text-sky-500" />
+                                            Twitter / X
+                                        </a>
+                                    </Button>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

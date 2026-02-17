@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { Onboarding } from "@/components/Onboarding";
+import { useProfile } from "@/hooks/useProfile";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Social from "./pages/Social";
@@ -17,9 +19,26 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Carregando...</div></div>;
+  const { user, loading: authLoading } = useAuth();
+  const { data: profile, isLoading: profileLoading, refetch } = useProfile();
+
+  if (authLoading || (user && profileLoading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground font-medium animate-pulse">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) return <Navigate to="/" replace />;
+
+  if (profile && !profile.onboarded) {
+    return <Onboarding onComplete={() => refetch()} />;
+  }
+
   return <>{children}</>;
 };
 
