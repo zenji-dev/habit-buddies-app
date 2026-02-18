@@ -50,6 +50,71 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_members: {
+        Row: {
+          challenge_id: string
+          id: string
+          invited_by: string | null
+          joined_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_members_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          duration_days: number
+          id: string
+          start_date: string
+          target_habit: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          duration_days: number
+          id?: string
+          start_date: string
+          target_habit?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          duration_days?: number
+          id?: string
+          start_date?: string
+          target_habit?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       check_ins: {
         Row: {
           completed_at: string
@@ -81,6 +146,38 @@ export type Database = {
             columns: ["habit_id"]
             isOneToOne: false
             referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_logs: {
+        Row: {
+          challenge_id: string
+          created_at: string | null
+          id: string
+          log_date: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string | null
+          id?: string
+          log_date?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string | null
+          id?: string
+          log_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_logs_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
         ]

@@ -8,6 +8,8 @@ import { DashboardMetrics } from "@/components/DashboardMetrics";
 import { WeeklyStreak } from "@/components/WeeklyStreak";
 import { TodayHabitsList } from "@/components/TodayHabitsList";
 import { MonthlyChallenge } from "@/components/MonthlyChallenge";
+import { PartyChallenge } from "@/components/PartyChallenge";
+import { ChallengeInvites } from "@/components/ChallengeInvites";
 import { DashboardActivityLog } from "@/components/DashboardActivityLog";
 import { Search, Bell, Plus } from "lucide-react";
 import { format } from "date-fns";
@@ -116,6 +118,8 @@ const Dashboard = () => {
 
           {/* Right Column (1/3) */}
           <div className="space-y-8">
+            <ChallengeInvites />
+            <PartyChallenge />
             <MonthlyChallenge currentDay={24} totalDays={30} />
             <DashboardActivityLog activity={feed} />
           </div>
