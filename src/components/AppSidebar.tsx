@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, Users, Settings, LogOut, Moon, Sun, Calendar } from "lucide-react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -7,8 +7,8 @@ import { useTheme } from "@/components/theme-provider";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/calendar", label: "Calendário", icon: Calendar },
   { to: "/social", label: "Social", icon: Users },
-  { to: "/stats", label: "Estatísticas", icon: BarChart3 },
   { to: "/settings", label: "Configurações", icon: Settings },
 ];
 

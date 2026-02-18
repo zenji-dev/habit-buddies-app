@@ -88,7 +88,7 @@ export const Onboarding = ({ onComplete }: { onComplete: () => void }) => {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-card w-full max-w-md rounded-2xl border border-border p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 italic text-primary-foreground font-black text-2xl">
+                    <div className="w-16 h-16 rounded-2xl gradient-success flex items-center justify-center mx-auto mb-4 italic text-primary-foreground font-black text-2xl">
                         H
                     </div>
                     <h2 className="text-2xl font-black text-foreground">Bem-vindo ao HabitTracker!</h2>
