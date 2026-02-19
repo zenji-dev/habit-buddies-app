@@ -11,17 +11,27 @@ import { MonthlyChallenge } from "@/components/MonthlyChallenge";
 import { PartyChallenge } from "@/components/PartyChallenge";
 import { ChallengeInvites } from "@/components/ChallengeInvites";
 import { DashboardActivityLog } from "@/components/DashboardActivityLog";
-import { Search, Bell, Plus } from "lucide-react";
+import { usePartyChallenge } from "@/hooks/usePartyChallenge";
+import { Search, Bell, Plus, Users } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const { habits, isLoading, checkIn, getStreak, isCheckedToday, checkIns } = useHabits();
   const { friends, feed } = useSocial();
+  const { invites } = usePartyChallenge();
+
+  const invitesCount = invites?.length || 0;
 
   const todayChecked = habits.filter((h) => isCheckedToday(h.id)).length;
   const totalHabitsCount = habits.length;
@@ -75,9 +85,31 @@ const Dashboard = () => {
                 className="pl-10 bg-card border-border w-64 h-10 rounded-xl"
               />
             </div>
-            <Button variant="ghost" size="icon" className="rounded-xl hover:bg-secondary">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-secondary relative">
+                  <Bell className="w-5 h-5 text-muted-foreground" />
+                  {invitesCount > 0 && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background animate-pulse" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0 bg-card border-border shadow-2xl rounded-2xl overflow-hidden" align="end">
+                <div className="p-4 border-b border-border bg-secondary/20">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-foreground">Notificações</h3>
+                    {invitesCount > 0 && (
+                      <Badge variant="destructive" className="text-[10px] h-4 px-1.5 font-bold">
+                        {invitesCount} novo{invitesCount > 1 ? 's' : ''}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="p-2 bg-card">
+                  <ChallengeInvites />
+                </div>
+              </PopoverContent>
+            </Popover>
             <AddHabitDialog>
               <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-4 h-10">
                 <Plus className="w-4 h-4" /> Novo Hábito
@@ -118,7 +150,6 @@ const Dashboard = () => {
 
           {/* Right Column (1/3) */}
           <div className="space-y-8">
-            <ChallengeInvites />
             <PartyChallenge />
             <MonthlyChallenge currentDay={24} totalDays={30} />
             <DashboardActivityLog activity={feed} />
