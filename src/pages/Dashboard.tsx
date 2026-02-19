@@ -11,8 +11,9 @@ import { MonthlyChallenge } from "@/components/MonthlyChallenge";
 import { PartyChallenge } from "@/components/PartyChallenge";
 import { ChallengeInvites } from "@/components/ChallengeInvites";
 import { DashboardActivityLog } from "@/components/DashboardActivityLog";
+import { MyHabitsDialog } from "@/components/MyHabitsDialog";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
-import { Search, Bell, Plus, Users } from "lucide-react";
+import { Search, Bell, Plus, Users, Settings2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
@@ -110,11 +111,18 @@ const Dashboard = () => {
                 </div>
               </PopoverContent>
             </Popover>
-            <AddHabitDialog>
-              <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-4 h-10">
-                <Plus className="w-4 h-4" /> Novo Hábito
-              </Button>
-            </AddHabitDialog>
+            <div className="flex items-center gap-2">
+              <MyHabitsDialog>
+                <Button variant="outline" className="gap-2 border-border hover:bg-secondary text-muted-foreground hover:text-foreground font-bold rounded-xl px-4 h-10 transition-all">
+                  <Settings2 className="w-4 h-4" /> Meus Hábitos
+                </Button>
+              </MyHabitsDialog>
+              <AddHabitDialog>
+                <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-4 h-10 shadow-lg shadow-primary/20">
+                  <Plus className="w-4 h-4" /> Novo Hábito
+                </Button>
+              </AddHabitDialog>
+            </div>
           </div>
         </div>
 

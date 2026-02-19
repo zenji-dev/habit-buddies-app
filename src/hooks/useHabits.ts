@@ -123,6 +123,21 @@ export const useHabits = () => {
     );
   };
 
+  const deleteHabit = useMutation({
+    mutationFn: async (habitId: string) => {
+      const { error } = await supabase
+        .from("habits")
+        .delete()
+        .eq("id", habitId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["check_ins"] });
+      toast.success("Hábito removido com sucesso!");
+    },
+  });
+
   return {
     habits: habitsQuery.data || [],
     checkIns: checkInsQuery.data || [],
@@ -131,5 +146,6 @@ export const useHabits = () => {
     checkIn,
     getStreak,
     isCheckedToday,
+    deleteHabit,
   };
 };
