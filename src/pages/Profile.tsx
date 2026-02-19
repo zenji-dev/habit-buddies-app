@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useSocial } from "@/hooks/useSocial";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,7 +35,7 @@ import { toast } from "sonner";
 const Profile = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { user: currentUser } = useAuth();
+    const { userId: currentUserId } = useAuth();
     const {
         getUserProfile,
         getUserActivities,
@@ -63,7 +63,7 @@ const Profile = () => {
     const [uploading, setUploading] = useState(false);
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
-    const isOwner = currentUser?.id === id;
+    const isOwner = currentUserId === id;
 
     const loadData = async () => {
         if (!id) return;
@@ -112,7 +112,7 @@ const Profile = () => {
                     twitter_url: editTwitter.trim() || null,
                     updated_at: new Date().toISOString()
                 })
-                .eq("user_id", currentUser!.id);
+                .eq("user_id", currentUserId!);
 
             if (error) throw error;
 
@@ -144,7 +144,7 @@ const Profile = () => {
             const file = event.target.files[0];
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `${currentUser!.id}/${fileName}`;
+            const filePath = `${currentUserId!}/${fileName}`;
 
             let { error: uploadError } = await supabase.storage
                 .from('avatars')

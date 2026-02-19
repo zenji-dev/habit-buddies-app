@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 
 const StravaCallback = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { userId } = useAuth();
 
     useEffect(() => {
         const handleCallback = async () => {
@@ -20,7 +20,7 @@ const StravaCallback = () => {
                 return;
             }
 
-            if (!code || !user) {
+            if (!code || !userId) {
                 return;
             }
 
@@ -52,7 +52,7 @@ const StravaCallback = () => {
 
                 // Save to Supabase
                 const { error: dbError } = await supabase.from("strava_tokens").upsert({
-                    user_id: user.id,
+                    user_id: userId,
                     access_token: data.access_token,
                     refresh_token: data.refresh_token,
                     expires_at: data.expires_at,
@@ -72,7 +72,7 @@ const StravaCallback = () => {
         };
 
         handleCallback();
-    }, [searchParams, navigate, user]);
+    }, [searchParams, navigate, userId]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background">

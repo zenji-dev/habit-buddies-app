@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Settings as SettingsIcon, User, Link2, LogOut, Moon, Sun, Monitor } from "lucide-react";
+import { Settings as SettingsIcon, User as UserIcon, Link2, LogOut, Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { StravaActivities } from "@/components/StravaActivities";
 
 const Settings = () => {
-  const { user, signOut } = useAuth();
+  const { userId, signOut } = useAuth();
+  const { user } = useUser();
   const { theme, setTheme } = useTheme();
   const { data: profile, refetch } = useProfile();
   const [name, setName] = useState("");
@@ -73,15 +74,15 @@ const Settings = () => {
         {/* Profile */}
         <div className="bg-card rounded-xl border border-border p-6">
           <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <User className="w-4 h-4" /> Perfil
+            <UserIcon className="w-4 h-4" /> Perfil
           </h2>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary">
-              {(profile?.name || user?.email || "?").charAt(0).toUpperCase()}
+              {(profile?.name || user?.primaryEmailAddress?.emailAddress || "?").charAt(0).toUpperCase()}
             </div>
             <div>
               <p className="font-semibold text-foreground">{profile?.name || "Sem nome"}</p>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
+              <p className="text-sm text-muted-foreground">{user?.primaryEmailAddress?.emailAddress}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -172,7 +173,7 @@ const Settings = () => {
         )}
 
         {/* Sign out */}
-        <Button variant="outline" onClick={signOut} className="gap-2">
+        <Button variant="outline" onClick={() => signOut()} className="gap-2">
           <LogOut className="w-4 h-4" /> Sair da conta
         </Button>
       </div>

@@ -1,26 +1,28 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Camera, User } from "lucide-react";
 
 export const Onboarding = ({ onComplete }: { onComplete: () => void }) => {
-    const { user } = useAuth();
+    const { userId } = useAuth();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
 
+    const [uploading, setUploading] = useState(false);
+
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!user) return;
+            if (!userId) return;
             const { data, error } = await supabase
                 .from("profiles")
                 .select("name, username, avatar_url")
-                .eq("user_id", user.id)
+                .eq("user_id", userId)
                 .single();
 
             if (data) {
@@ -31,7 +33,43 @@ export const Onboarding = ({ onComplete }: { onComplete: () => void }) => {
             setLoading(false);
         };
         fetchProfile();
-    }, [user]);
+    }, [userId]);
+
+    const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            if (!event.target.files || event.target.files.length === 0) {
+                return;
+            }
+
+            setUploading(true);
+            const file = event.target.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${userId}/${fileName}`;
+
+            let { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, {
+                    upsert: true
+                });
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+            const { data } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            setAvatarUrl(data.publicUrl);
+            toast.success("Imagem carregada com sucesso!");
+        } catch (error: any) {
+            console.error(error);
+            toast.error("Erro ao fazer upload da imagem: " + error.message);
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,14 +88,14 @@ export const Onboarding = ({ onComplete }: { onComplete: () => void }) => {
         try {
             const { error } = await supabase
                 .from("profiles")
-                .update({
+                .upsert({
+                    user_id: userId!,
                     name: name.trim(),
                     username: username.toLowerCase().trim(),
                     avatar_url: avatarUrl.trim() || null,
                     onboarded: true,
                     updated_at: new Date().toISOString()
-                })
-                .eq("user_id", user!.id);
+                });
 
             if (error) {
                 if (error.code === '23505') {
@@ -98,18 +136,32 @@ export const Onboarding = ({ onComplete }: { onComplete: () => void }) => {
                 <form onSubmit={handleSave} className="space-y-6">
                     <div className="flex flex-col items-center mb-6">
                         <div className="relative group cursor-pointer">
-                            <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center overflow-hidden border-2 border-primary/20 group-hover:border-primary transition-colors">
-                                {avatarUrl ? (
-                                    <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
-                                ) : (
-                                    <User className="w-10 h-10 text-muted-foreground" />
-                                )}
-                            </div>
-                            <div className="absolute bottom-0 right-0 p-1.5 bg-primary rounded-full text-primary-foreground shadow-lg">
-                                <Camera className="w-4 h-4" />
-                            </div>
+                            <label htmlFor="avatar-upload" className="block relative cursor-pointer">
+                                <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center overflow-hidden border-2 border-primary/20 group-hover:border-primary transition-colors">
+                                    {uploading ? (
+                                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                    ) : avatarUrl ? (
+                                        <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="w-10 h-10 text-muted-foreground" />
+                                    )}
+                                </div>
+                                <div className="absolute bottom-0 right-0 p-1.5 bg-primary rounded-full text-primary-foreground shadow-lg group-hover:scale-110 transition-transform">
+                                    <Camera className="w-4 h-4" />
+                                </div>
+                                <input
+                                    id="avatar-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleAvatarUpload}
+                                    disabled={uploading}
+                                />
+                            </label>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold tracking-wider">Foto de Perfil (Opcional)</p>
+                        <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold tracking-wider">
+                            {uploading ? "Carregando..." : "Toque na foto para alterar (Opcional)"}
+                        </p>
                     </div>
 
                     <div className="space-y-4">
@@ -137,19 +189,9 @@ export const Onboarding = ({ onComplete }: { onComplete: () => void }) => {
                                 />
                             </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Link da foto (Avatar)</label>
-                            <Input
-                                placeholder="https://exemplo.com/foto.jpg"
-                                value={avatarUrl}
-                                onChange={e => setAvatarUrl(e.target.value)}
-                                className="bg-secondary/50 border-transparent focus:border-primary/30 h-12"
-                            />
-                        </div>
                     </div>
 
-                    <Button type="submit" className="w-full h-12 font-bold shadow-lg shadow-primary/20" disabled={saving}>
+                    <Button type="submit" className="w-full h-12 font-bold shadow-lg shadow-primary/20" disabled={saving || uploading}>
                         {saving ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                         Concluir Configuração
                     </Button>

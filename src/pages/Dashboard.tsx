@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useHabits } from "@/hooks/useHabits";
 import { useProfile } from "@/hooks/useProfile";
 import { useSocial } from "@/hooks/useSocial";
@@ -27,7 +26,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const Dashboard = () => {
-  const { user } = useAuth();
   const { data: profile } = useProfile();
   const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
   const { friends, feed } = useSocial();
@@ -141,22 +139,10 @@ const Dashboard = () => {
         {/* Top Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">Daily Overview</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Visão Geral</h1>
             <div className="hidden sm:flex bg-card border border-border px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground items-center gap-2 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-primary/80"></span>
               {format(new Date(), "EEEE, MMM d", { locale: ptBR })}
-            </div>
-          </div>
-
-          <div className="flex-1 max-w-md hidden lg:block mx-4">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              <Input
-                placeholder="Buscar hábitos..."
-                className="bg-card border-border focus:border-primary/50 pl-10 h-11 rounded-xl shadow-sm transition-all text-sm"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
             </div>
           </div>
 
@@ -164,10 +150,10 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-card text-muted-foreground hover:text-foreground relative w-10 h-10 border border-transparent hover:border-border transition-all">
-                    <Bell className="w-5 h-5" />
+                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-card text-muted-foreground hover:text-foreground relative w-12 h-12 border border-transparent hover:border-border transition-all">
+                    <Bell className="w-6 h-6" />
                     {invitesCount > 0 && (
-                      <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
+                      <span className="absolute top-2.5 right-2.5 w-3 h-3 bg-primary rounded-full border-2 border-background animate-pulse" />
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -177,7 +163,7 @@ const Dashboard = () => {
                       <h3 className="text-sm font-bold text-foreground">Notificações</h3>
                       {invitesCount > 0 && (
                         <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] h-5 px-1.5 font-bold">
-                          {invitesCount} new
+                          {invitesCount} novas
                         </Badge>
                       )}
                     </div>
@@ -189,9 +175,14 @@ const Dashboard = () => {
               </Popover>
 
               <MyHabitsDialog>
-                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-card text-muted-foreground hover:text-foreground w-10 h-10 border border-transparent hover:border-border transition-all" title="Gerenciar Hábitos">
-                  <Settings2 className="w-5 h-5" />
-                </Button>
+                <div>
+                  <Button className="hidden sm:flex gap-2 bg-secondary hover:bg-secondary/80 text-foreground font-bold rounded-xl px-5 h-11 shadow-sm hover:shadow-md hover:scale-105 transition-all border border-border/50">
+                    <Settings2 className="w-5 h-5" /> Meus Hábitos
+                  </Button>
+                  <Button variant="ghost" size="icon" className="sm:hidden rounded-xl hover:bg-card text-muted-foreground hover:text-foreground w-10 h-10 border border-transparent hover:border-border transition-all">
+                    <Settings2 className="w-5 h-5" />
+                  </Button>
+                </div>
               </MyHabitsDialog>
             </div>
 

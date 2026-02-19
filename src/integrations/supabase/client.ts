@@ -8,7 +8,24 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+let clerkToken: string | null = null;
+
+export const setClerkToken = (token: string | null) => {
+  clerkToken = token;
+};
+
+const customFetch = async (url: RequestInfo | URL, options?: RequestInit) => {
+  const headers = new Headers(options?.headers);
+  if (clerkToken) {
+    headers.set("Authorization", `Bearer ${clerkToken}`);
+  }
+  return fetch(url, { ...options, headers });
+};
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  global: {
+    fetch: customFetch,
+  },
   auth: {
     storage: localStorage,
     persistSession: true,

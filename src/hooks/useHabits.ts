@@ -1,45 +1,45 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
 export const useHabits = () => {
-  const { user } = useAuth();
+  const { userId } = useAuth();
   const queryClient = useQueryClient();
 
   const habitsQuery = useQuery({
-    queryKey: ["habits", user?.id],
+    queryKey: ["habits", userId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("habits")
         .select("*")
-        .eq("user_id", user!.id)
+        .eq("user_id", userId!)
         .order("created_at");
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!userId,
   });
 
   const checkInsQuery = useQuery({
-    queryKey: ["check_ins", user?.id],
+    queryKey: ["check_ins", userId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("check_ins")
         .select("*")
-        .eq("user_id", user!.id)
+        .eq("user_id", userId!)
         .order("completed_at", { ascending: false });
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!userId,
   });
 
   const addHabit = useMutation({
     mutationFn: async ({ name, icon, goal_minutes }: { name: string; icon: string; goal_minutes?: number }) => {
       const { error } = await supabase.from("habits").insert({
-        user_id: user!.id,
+        user_id: userId!,
         name,
         icon,
         goal_minutes: goal_minutes || 0,
@@ -56,7 +56,7 @@ export const useHabits = () => {
     mutationFn: async (habitId: string) => {
       const completed_at = format(new Date(), "yyyy-MM-dd"); // Use local date
       const { error } = await supabase.from("check_ins").insert({
-        user_id: user!.id,
+        user_id: userId!,
         habit_id: habitId,
         completed_at,
       });
@@ -149,7 +149,7 @@ export const useHabits = () => {
       const { error } = await supabase
         .from("check_ins")
         .delete()
-        .eq("user_id", user!.id)
+        .eq("user_id", userId!)
         .eq("habit_id", habitId)
         .eq("completed_at", today);
       if (error) throw error;

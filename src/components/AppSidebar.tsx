@@ -1,12 +1,12 @@
 import { LayoutDashboard, Users, Settings, LogOut, Moon, Sun, Calendar } from "lucide-react";
 import { NavLink, Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { useProfile } from "@/hooks/useProfile";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/theme-provider";
 
 const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Início", icon: LayoutDashboard },
   { to: "/calendar", label: "Calendário", icon: Calendar },
   { to: "/social", label: "Social", icon: Users },
   { to: "/settings", label: "Configurações", icon: Settings },
@@ -14,7 +14,8 @@ const navItems = [
 
 export const AppSidebar = () => {
   const location = useLocation();
-  const { signOut, user } = useAuth();
+  const { signOut, userId } = useAuth();
+  const { user } = useUser();
   const { theme, setTheme } = useTheme();
   const { data: profile } = useProfile();
 
@@ -52,7 +53,7 @@ export const AppSidebar = () => {
 
       <div className="border-t border-sidebar-border pt-6 mt-6 space-y-4">
         <Link
-          to={`/profile/${user?.id}`}
+          to={`/profile/${userId}`}
           className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-secondary/50 transition-colors group border border-transparent hover:border-sidebar-border"
         >
           <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-primary transition-colors flex-shrink-0">
@@ -60,7 +61,7 @@ export const AppSidebar = () => {
               <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
             ) : (
               <span className="text-muted-foreground font-bold text-sm group-hover:text-foreground">
-                {profile?.name?.charAt(0) || user?.email?.charAt(0).toUpperCase()}
+                {profile?.name?.charAt(0) || user?.primaryEmailAddress?.emailAddress?.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
@@ -69,7 +70,7 @@ export const AppSidebar = () => {
               {profile?.name || "Meu Perfil"}
             </p>
             <p className="text-[10px] text-muted-foreground truncate italic">
-              {profile?.username ? `@${profile.username}` : user?.email}
+              {profile?.username ? `@${profile.username}` : user?.primaryEmailAddress?.emailAddress}
             </p>
           </div>
         </Link>
@@ -86,7 +87,7 @@ export const AppSidebar = () => {
         </div>
 
         <button
-          onClick={signOut}
+          onClick={() => signOut()}
           className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 w-full transition-colors"
         >
           <LogOut className="w-4 h-4" />

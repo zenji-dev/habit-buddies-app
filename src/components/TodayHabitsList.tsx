@@ -54,14 +54,14 @@ const HabitItem = ({
                         </span>
                     ) : (
                         <span className="text-[10px] font-bold text-muted-foreground bg-secondary px-2 py-1 rounded-md">
-                            Running
+                            Em andamento
                         </span>
                     )}
                 </div>
 
                 <p className="text-xs text-muted-foreground font-medium mb-3 flex items-center gap-2">
                     <span className={cn("w-1.5 h-1.5 rounded-full", isChecked ? "bg-primary" : "bg-muted-foreground/50")}></span>
-                    {goalMinutes > 0 ? `Target: ${goalMinutes}m` : "Daily Goal"} <span className="text-border mx-1">|</span> Streak: {streak} days
+                    {goalMinutes > 0 ? `Meta: ${goalMinutes}m` : "Meta Diária"} <span className="text-border mx-1">|</span> Sequência: {streak} dias
                 </p>
 
                 {/* Progress Bar */}
@@ -151,8 +151,8 @@ export const TodayHabitsList = ({
                                 <Plus className="w-8 h-8 transition-transform group-hover:rotate-90" />
                             </button>
                         </AddHabitDialog>
-                        <h3 className="text-foreground font-bold mb-1">No habits found</h3>
-                        <p className="text-muted-foreground text-sm">Add a new habit to start your journey!</p>
+                        <h3 className="text-foreground font-bold mb-1">Nenhum hábito encontrado</h3>
+                        <p className="text-muted-foreground text-sm">Adicione um novo hábito para começar sua jornada!</p>
                     </div>
                 )}
             </div>

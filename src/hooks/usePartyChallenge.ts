@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -36,18 +36,18 @@ interface PartyChallenge {
 }
 
 export const usePartyChallenge = () => {
-    const { user } = useAuth();
+    const { userId } = useAuth();
     const queryClient = useQueryClient();
     const today = format(new Date(), "yyyy-MM-dd");
 
     const challengeQuery = useQuery({
-        queryKey: ["partyChallenge", user?.id],
+        queryKey: ["partyChallenge", userId],
         queryFn: async (): Promise<PartyChallenge | null> => {
             // 1. Find active challenge memberships (accepted)
             const { data: memberships, error: mErr } = await supabase
                 .from("challenge_members")
                 .select("challenge_id")
-                .eq("user_id", user!.id)
+                .eq("user_id", userId!)
                 .eq("status", "accepted");
 
             if (mErr) throw mErr;
@@ -105,7 +105,7 @@ export const usePartyChallenge = () => {
                 status: allMembers?.find(m => m.user_id === p.user_id)?.status || 'accepted'
             }));
 
-            members.sort((a, b) => (a.user_id === user!.id ? -1 : 1));
+            members.sort((a, b) => (a.user_id === userId! ? -1 : 1));
 
             const startDate = new Date(activeChallenge.start_date);
             const diffTime = new Date(today).getTime() - startDate.getTime();
@@ -120,19 +120,19 @@ export const usePartyChallenge = () => {
                 created_by: activeChallenge.created_by,
                 currentDay: Math.min(currentDay, activeChallenge.duration_days),
                 members,
-                userCheckedInToday: checkedInUserIds.has(user!.id),
+                userCheckedInToday: checkedInUserIds.has(userId!),
             };
         },
-        enabled: !!user,
+        enabled: !!userId,
     });
 
     const invitesQuery = useQuery({
-        queryKey: ["partyInvites", user?.id],
+        queryKey: ["partyInvites", userId],
         queryFn: async (): Promise<ChallengeInvite[]> => {
             const { data: invites, error } = await supabase
                 .from("challenge_members")
                 .select("id, challenge_id, invited_by, challenges(title, target_habit)")
-                .eq("user_id", user!.id)
+                .eq("user_id", userId!)
                 .eq("status", "pending");
 
             if (error) throw error;
@@ -152,7 +152,7 @@ export const usePartyChallenge = () => {
                 invited_by_profile: profiles?.find(p => p.user_id === invite.invited_by) || null
             }));
         },
-        enabled: !!user,
+        enabled: !!userId,
     });
 
     const friendsToInviteQuery = useQuery({
@@ -162,10 +162,10 @@ export const usePartyChallenge = () => {
             const { data: friendships } = await supabase
                 .from("friendships")
                 .select("*")
-                .or(`user_id.eq.${user!.id},friend_id.eq.${user!.id}`)
+                .or(`user_id.eq.${userId!},friend_id.eq.${userId!}`)
                 .eq("status", "accepted");
 
-            const friendIds = (friendships || []).map(f => f.user_id === user!.id ? f.friend_id : f.user_id);
+            const friendIds = (friendships || []).map(f => f.user_id === userId! ? f.friend_id : f.user_id);
             if (friendIds.length === 0) return [];
 
             // If we have an active challenge, filter out those already in it
@@ -194,7 +194,7 @@ export const usePartyChallenge = () => {
 
             return profiles || [];
         },
-        enabled: !!user,
+        enabled: !!userId,
     });
 
     const createChallenge = useMutation({
@@ -207,7 +207,7 @@ export const usePartyChallenge = () => {
                     target_habit,
                     duration_days,
                     start_date: today,
-                    created_by: user!.id
+                    created_by: userId!
                 })
                 .select()
                 .single();
@@ -217,7 +217,7 @@ export const usePartyChallenge = () => {
             // 2. Add creator
             const { error: creatorErr } = await supabase.from("challenge_members").insert({
                 challenge_id: challenge.id,
-                user_id: user!.id,
+                user_id: userId!,
                 status: "accepted"
             });
 
@@ -229,7 +229,7 @@ export const usePartyChallenge = () => {
                     challenge_id: challenge.id,
                     user_id: fid,
                     status: "pending",
-                    invited_by: user!.id
+                    invited_by: userId!
                 }));
                 const { error: inviteErr } = await supabase.from("challenge_members").insert(inviteEntries);
                 if (inviteErr) throw inviteErr;
@@ -248,7 +248,7 @@ export const usePartyChallenge = () => {
         mutationFn: async (challengeId: string) => {
             const { error } = await supabase.from("daily_logs").insert({
                 challenge_id: challengeId,
-                user_id: user!.id,
+                user_id: userId!,
                 log_date: today,
             });
             if (error && error.code !== "23505") throw error;
@@ -266,7 +266,7 @@ export const usePartyChallenge = () => {
                 challenge_id: challengeQuery.data.id,
                 user_id: friendId,
                 status: "pending",
-                invited_by: user!.id
+                invited_by: userId!
             });
             if (error) throw error;
         },

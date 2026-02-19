@@ -1,17 +1,17 @@
 import { LayoutDashboard, Users, Settings, User, Calendar } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 
 export const MobileNav = () => {
   const location = useLocation();
-  const { user } = useAuth();
+  const { userId } = useAuth();
 
   const navItems = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
     { to: "/calendar", label: "Agenda", icon: Calendar },
     { to: "/social", label: "Social", icon: Users },
-    { to: `/profile/${user?.id}`, label: "Perfil", icon: User },
+    { to: `/profile/${userId}`, label: "Perfil", icon: User },
     { to: "/settings", label: "Config", icon: Settings },
   ];
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchStravaActivities, StravaActivity } from "@/lib/strava";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,16 +8,16 @@ import { toast } from "sonner";
 import { Activity, Share2, Loader2, MapPin, Clock, Calendar } from "lucide-react";
 
 export const StravaActivities = () => {
-    const { user } = useAuth();
+    const { userId } = useAuth();
     const [activities, setActivities] = useState<StravaActivity[]>([]);
     const [loading, setLoading] = useState(true);
     const [postingId, setPostingId] = useState<number | null>(null);
 
     useEffect(() => {
         const loadActivities = async () => {
-            if (!user) return;
+            if (!userId) return;
             try {
-                const data = await fetchStravaActivities(user.id);
+                const data = await fetchStravaActivities(userId);
                 setActivities(data);
             } catch (err) {
                 console.error(err);
@@ -26,15 +26,15 @@ export const StravaActivities = () => {
             }
         };
         loadActivities();
-    }, [user]);
+    }, [userId]);
 
     const postActivity = async (stravaActivity: StravaActivity) => {
-        if (!user) return;
+        if (!userId) return;
         setPostingId(stravaActivity.id);
 
         try {
             const { error } = await supabase.from("activities").insert({
-                user_id: user.id,
+                user_id: userId,
                 strava_id: stravaActivity.id,
                 activity_name: stravaActivity.name,
                 distance: stravaActivity.distance,

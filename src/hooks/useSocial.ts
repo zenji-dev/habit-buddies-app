@@ -1,24 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 
 export const useSocial = () => {
-  const { user } = useAuth();
+  const { userId } = useAuth();
   const queryClient = useQueryClient();
 
   const friendsQuery = useQuery({
-    queryKey: ["friends", user?.id],
+    queryKey: ["friends", userId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("friendships")
         .select("*")
-        .or(`user_id.eq.${user!.id},friend_id.eq.${user!.id}`)
+        .or(`user_id.eq.${userId!},friend_id.eq.${userId!}`)
         .eq("status", "accepted");
       if (error) throw error;
 
       const friendIds = data.map((f) =>
-        f.user_id === user!.id ? f.friend_id : f.user_id
+        f.user_id === userId! ? f.friend_id : f.user_id
       );
 
       if (friendIds.length === 0) return [];
@@ -30,16 +30,16 @@ export const useSocial = () => {
       if (pError) throw pError;
       return profiles || [];
     },
-    enabled: !!user,
+    enabled: !!userId,
   });
 
   const incomingRequestsQuery = useQuery({
-    queryKey: ["friendRequests", user?.id],
+    queryKey: ["friendRequests", userId],
     queryFn: async () => {
       const { data: friendships, error } = await supabase
         .from("friendships")
         .select("*")
-        .eq("friend_id", user!.id)
+        .eq("friend_id", userId!)
         .eq("status", "pending");
 
       if (error) throw error;
@@ -58,13 +58,13 @@ export const useSocial = () => {
         profile: profiles?.find(p => p.user_id === f.user_id)
       }));
     },
-    enabled: !!user,
+    enabled: !!userId,
   });
 
   const feedQuery = useQuery({
-    queryKey: ["feed", user?.id],
+    queryKey: ["feed", userId],
     queryFn: async () => {
-      const friendIds = [user!.id, ...(friendsQuery.data?.map((f) => f.user_id) || [])];
+      const friendIds = [userId!, ...(friendsQuery.data?.map((f) => f.user_id) || [])];
 
       const { data, error } = await supabase
         .from("check_ins")
@@ -91,17 +91,17 @@ export const useSocial = () => {
         profile: profiles?.find((p) => p.user_id === checkIn.user_id),
         kudosCount: kudos?.filter((k) => k.check_in_id === checkIn.id).length || 0,
         hasGivenKudos: kudos?.some(
-          (k) => k.check_in_id === checkIn.id && k.from_user_id === user!.id
+          (k) => k.check_in_id === checkIn.id && k.from_user_id === userId!
         ) || false,
       }));
     },
-    enabled: !!user && !!friendsQuery.data,
+    enabled: !!userId && !!friendsQuery.data,
   });
 
   const giveKudos = useMutation({
     mutationFn: async ({ checkInId, toUserId }: { checkInId: string; toUserId: string }) => {
       const { error } = await supabase.from("kudos").insert({
-        from_user_id: user!.id,
+        from_user_id: userId!,
         to_user_id: toUserId,
         check_in_id: checkInId,
       });
@@ -118,7 +118,7 @@ export const useSocial = () => {
       const { error } = await supabase
         .from("friendships")
         .delete()
-        .or(`and(user_id.eq.${user!.id},friend_id.eq.${friendUserId}),and(user_id.eq.${friendUserId},friend_id.eq.${user!.id})`);
+        .or(`and(user_id.eq.${userId!},friend_id.eq.${friendUserId}),and(user_id.eq.${friendUserId},friend_id.eq.${userId!})`);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -137,7 +137,7 @@ export const useSocial = () => {
       .from("profiles")
       .select("*")
       .or(`name.ilike.%${searchStr}%,username.ilike.%${searchStr}%`)
-      .neq("user_id", user!.id)
+      .neq("user_id", userId!)
       .limit(5);
     if (error) throw error;
     return data || [];
@@ -177,7 +177,7 @@ export const useSocial = () => {
     const { data, error } = await supabase
       .from("friendships")
       .select("*")
-      .or(`and(user_id.eq.${user!.id},friend_id.eq.${otherUserId}),and(user_id.eq.${otherUserId},friend_id.eq.${user!.id})`)
+      .or(`and(user_id.eq.${userId!},friend_id.eq.${otherUserId}),and(user_id.eq.${otherUserId},friend_id.eq.${userId!})`)
       .maybeSingle();
     if (error) throw error;
     return data;
@@ -191,7 +191,7 @@ export const useSocial = () => {
         .from("profiles")
         .select("user_id, name, username")
         .or(`username.eq.${cleanHandle.toLowerCase()},name.eq.${friendHandle}`)
-        .neq("user_id", user!.id);
+        .neq("user_id", userId!);
 
       if (pErr) throw pErr;
 
@@ -202,7 +202,7 @@ export const useSocial = () => {
       }
 
       const { error } = await supabase.from("friendships").insert({
-        user_id: user!.id,
+        user_id: userId!,
         friend_id: friend.user_id,
         status: "pending",
       });
@@ -221,7 +221,7 @@ export const useSocial = () => {
   const addFriendById = useMutation({
     mutationFn: async (targetUserId: string) => {
       const { error } = await supabase.from("friendships").insert({
-        user_id: user!.id,
+        user_id: userId!,
         friend_id: targetUserId,
         status: "pending",
       });

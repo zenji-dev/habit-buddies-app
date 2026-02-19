@@ -4,9 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { useAuth, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import { Onboarding } from "@/components/Onboarding";
 import { useProfile } from "@/hooks/useProfile";
+import { setClerkToken } from "@/integrations/supabase/client";
+import { useSession } from "@clerk/clerk-react";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Social from "./pages/Social";
@@ -18,13 +21,33 @@ import CalendarPage from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
+// Sync Supabase Token with Clerk Session
+const SupabaseTokenSync = () => {
+  const { session } = useSession();
+
+  useEffect(() => {
+    const syncToken = async () => {
+      try {
+        const token = await session?.getToken({ template: "supabase" });
+        setClerkToken(token || null);
+      } catch (error) {
+        console.error("Error syncing Supabase token:", error);
+      }
+    };
+
+    syncToken();
+  }, [session]);
+
+  return null;
+};
+
 // Componente para proteger rotas que exigem autenticação
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading: authLoading } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const { data: profile, isLoading: profileLoading, refetch } = useProfile();
 
   // Exibe uma tela de carregamento enquanto verifica a autenticação ou o perfil
-  if (authLoading || (user && profileLoading)) {
+  if (!isLoaded || (isSignedIn && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -35,10 +58,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user) return <Navigate to="/" replace />;
+  if (!isSignedIn) {
+    return <RedirectToSignIn />;
+  }
 
-  // Se o usuário estiver logado mas não completou o onboarding, redireciona
-  if (profile && !profile.onboarded) {
+  // Se o usuário estiver logado mas não completou o onboarding (ou não tem perfil), redireciona
+  if ((!profileLoading && !profile) || (profile && !profile.onboarded)) {
     return <Onboarding onComplete={() => refetch()} />;
   }
 
@@ -53,18 +78,17 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
-              <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              <Route path="/settings/strava/callback" element={<ProtectedRoute><StravaCallback /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AuthProvider>
+          <SupabaseTokenSync />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
+            <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/settings/strava/callback" element={<ProtectedRoute><StravaCallback /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
