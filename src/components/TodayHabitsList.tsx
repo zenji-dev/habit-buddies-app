@@ -1,5 +1,7 @@
-import { Check } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AddHabitDialog } from "@/components/AddHabitDialog";
+import { Button } from "@/components/ui/button";
 
 interface HabitItemProps {
     id: string;
@@ -102,14 +104,18 @@ export const TodayHabitsList = ({
     getStreak,
     isCheckedToday,
     onCheckIn,
-    isPending
+    onUncheck,
+    isPending,
+    isUnchecking
 }: {
     habits: Habit[];
     checkIns: CheckIn[];
     getStreak: (id: string) => number;
     isCheckedToday: (id: string) => boolean;
     onCheckIn: (id: string) => void;
+    onUncheck: (id: string) => void;
     isPending: boolean;
+    isUnchecking: boolean;
 }) => {
     return (
         <div className="space-y-4">
@@ -123,14 +129,28 @@ export const TodayHabitsList = ({
                         goalMinutes={habit.goal_minutes || 0}
                         streak={getStreak(habit.id)}
                         isChecked={isCheckedToday(habit.id)}
-                        onCheckIn={() => onCheckIn(habit.id)}
-                        isPending={isPending}
+                        onCheckIn={() => {
+                            if (isCheckedToday(habit.id)) {
+                                onUncheck(habit.id);
+                            } else {
+                                onCheckIn(habit.id);
+                            }
+                        }}
+                        isPending={isPending || isUnchecking}
                     />
                 ))}
 
+                {/* 
+                    Estado vazio: substituímos o ícone de brilhos por um botão '+' 
+                    que abre o diálogo de criação de hábito diretamente ao ser clicado.
+                */}
                 {habits.length === 0 && (
                     <div className="p-12 border-2 border-dashed border-border/50 rounded-2xl text-center bg-card/50">
-                        <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-3xl opacity-50">✨</div>
+                        <AddHabitDialog>
+                            <button className="w-16 h-16 bg-primary/10 hover:bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-4 transition-all hover:scale-110 group">
+                                <Plus className="w-8 h-8 transition-transform group-hover:rotate-90" />
+                            </button>
+                        </AddHabitDialog>
                         <h3 className="text-foreground font-bold mb-1">No habits found</h3>
                         <p className="text-muted-foreground text-sm">Add a new habit to start your journey!</p>
                     </div>
