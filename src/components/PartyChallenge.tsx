@@ -36,7 +36,7 @@ export const PartyChallenge = () => {
 
     if (!challenge) {
         return (
-            <Card className="p-6 bg-card border-border overflow-hidden relative group">
+            <Card className="p-6 bg-card border-border overflow-hidden relative group shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
                 <div className="flex items-center gap-2 mb-3">
                     <span className="text-[10px] font-bold text-primary uppercase bg-primary/10 px-2 py-1 rounded">
@@ -67,9 +67,9 @@ export const PartyChallenge = () => {
     );
 
     return (
-        <Card className="p-6 bg-card border-border overflow-hidden relative group">
+        <Card className="p-6 bg-card border-border overflow-hidden relative group shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
             {/* Background glow */}
-            <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+            <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all pointer-events-none" />
 
             {/* Header */}
             <div className="flex items-center justify-between gap-2 mb-4">
@@ -87,8 +87,8 @@ export const PartyChallenge = () => {
                 {/* Invite Dialog */}
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-bold uppercase gap-1 hover:bg-primary/10 hover:text-primary transition-colors">
-                            <UserPlus className="w-3 h-3" />
+                        <Button className="h-10 px-4 text-xs font-black uppercase gap-2 bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-xl shadow-lg shadow-primary/20 border-none relative z-10">
+                            <UserPlus className="w-4 h-4" />
                             Convidar
                         </Button>
                     </DialogTrigger>
@@ -119,11 +119,15 @@ export const PartyChallenge = () => {
                                     filteredFriends.map((friend) => (
                                         <div key={friend.user_id} className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50 transition-colors group">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20">
-                                                    {friend.avatar_url ? (
-                                                        <img src={friend.avatar_url} alt={friend.name} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <span className="text-primary font-bold text-xs">{friend.name.charAt(0)}</span>
+                                                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20 relative">
+                                                    <span className="text-primary font-bold text-xs absolute z-0">{friend.name.charAt(0)}</span>
+                                                    {friend.avatar_url && (
+                                                        <img
+                                                            src={friend.avatar_url}
+                                                            alt={friend.name}
+                                                            className="w-full h-full object-cover relative z-10"
+                                                            onError={(e) => e.currentTarget.style.display = 'none'}
+                                                        />
                                                     )}
                                                 </div>
                                                 <span className="text-sm font-medium text-foreground">{friend.name}</span>
@@ -166,34 +170,34 @@ export const PartyChallenge = () => {
                                 <div className="relative cursor-pointer">
                                     <div
                                         className={`w-12 h-12 rounded-full p-[2.5px] transition-all duration-300 ${member.checkedInToday
-                                            ? "bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30"
+                                            ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30"
                                             : "bg-muted-foreground/30"
                                             }`}
                                     >
-                                        <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden">
-                                            {member.avatar_url ? (
+                                        <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden relative">
+                                            <span
+                                                className={`text-sm font-bold transition-all duration-300 absolute z-0 ${member.checkedInToday
+                                                    ? "text-primary"
+                                                    : "text-muted-foreground/50"
+                                                    }`}
+                                            >
+                                                {member.name.charAt(0)}
+                                            </span>
+                                            {member.avatar_url && (
                                                 <img
                                                     src={member.avatar_url}
                                                     alt={member.name}
-                                                    className={`w-full h-full object-cover transition-all duration-300 ${member.checkedInToday ? "" : "opacity-50 grayscale"
+                                                    className={`w-full h-full object-cover transition-all duration-300 relative z-10 ${member.checkedInToday ? "" : "opacity-50 grayscale"
                                                         }`}
+                                                    onError={(e) => e.currentTarget.style.display = 'none'}
                                                 />
-                                            ) : (
-                                                <span
-                                                    className={`text-sm font-bold transition-all duration-300 ${member.checkedInToday
-                                                        ? "text-emerald-500"
-                                                        : "text-muted-foreground/50"
-                                                        }`}
-                                                >
-                                                    {member.name.charAt(0)}
-                                                </span>
                                             )}
                                         </div>
                                     </div>
 
                                     {member.checkedInToday && (
-                                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-card">
-                                            <Check className="w-2.5 h-2.5 text-white" />
+                                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center border-2 border-card">
+                                            <Check className="w-2.5 h-2.5 text-primary-foreground" />
                                         </div>
                                     )}
                                 </div>
@@ -213,7 +217,7 @@ export const PartyChallenge = () => {
             <div className="mb-5">
                 <div className="flex justify-between items-end mb-2">
                     <p className="text-xs font-bold text-foreground">Progresso</p>
-                    <p className="text-xs font-black text-primary">{percentage}%</p>
+                    <p className="text-xs font-black text-primary">{challenge.currentDay}/{challenge.duration_days}</p>
                 </div>
                 <div className="h-2 bg-secondary rounded-full overflow-hidden">
                     <div
@@ -227,7 +231,7 @@ export const PartyChallenge = () => {
             {challenge.userCheckedInToday ? (
                 <Button
                     disabled
-                    className="w-full gap-2 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/10 font-bold rounded-xl h-11"
+                    className="w-full gap-2 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 font-bold rounded-xl h-11 transition-colors"
                     variant="outline"
                 >
                     <Check className="w-4 h-4" />
@@ -248,7 +252,7 @@ export const PartyChallenge = () => {
                 </Button>
             )}
 
-            <Users className="absolute top-1/2 -right-4 w-20 h-20 text-foreground/5 -rotate-12 group-hover:rotate-0 transition-transform duration-500" />
+            <Users className="absolute top-1/2 -right-4 w-20 h-20 text-foreground/5 -rotate-12 group-hover:rotate-0 transition-transform duration-500 pointer-events-none" />
         </Card>
     );
 };

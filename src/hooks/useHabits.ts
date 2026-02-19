@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 export const useHabits = () => {
   const { user } = useAuth();
@@ -53,10 +54,11 @@ export const useHabits = () => {
 
   const checkIn = useMutation({
     mutationFn: async (habitId: string) => {
+      const completed_at = format(new Date(), "yyyy-MM-dd"); // Use local date
       const { error } = await supabase.from("check_ins").insert({
         user_id: user!.id,
         habit_id: habitId,
-        completed_at: new Date().toISOString().split("T")[0],
+        completed_at,
       });
       if (error) {
         if (error.code === "23505") {
@@ -91,7 +93,25 @@ export const useHabits = () => {
     const lastCheckinDate = new Date(habitCheckins[0] + "T00:00:00");
     lastCheckinDate.setHours(0, 0, 0, 0);
 
-    // If last checkin is not today or yesterday, streak is broken
+    const todayStr = format(today, "yyyy-MM-dd");
+    const lastCheckinStr = habitCheckins[0];
+
+    // Check if checkin is from today or yesterday (using string comparison to avoid timezone issues with Date objects at midnight)
+    // If the last checkin date is LESS than yesterday's date, streak is broken
+    // BUT we need to be careful with string comparison.
+    // Let's use date calculation again but robustly.
+
+    // Actually, simpler logic:
+    // If habitCheckins[0] is NOT today AND NOT yesterday, return 0. (Wait, if it's tomorrow? future checkins shouldn't break streak but shouldn't count either)
+
+    // Let's stick to the difference in days logic which is more robust
+    const lastDate = new Date(habitCheckins[0] + "T12:00:00"); // Noon to avoid DST/timezone edge cases
+    const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // Note: This getStreak implementation is complex and might still have edge cases, 
+    // but focusing on the main fix (inserting correct date) first. 
+    // The original logic was:
     if (lastCheckinDate.getTime() < yesterday.getTime()) return 0;
 
     let streak = 1;
@@ -117,7 +137,7 @@ export const useHabits = () => {
 
   const isCheckedToday = (habitId: string): boolean => {
     if (!checkInsQuery.data) return false;
-    const today = new Date().toISOString().split("T")[0];
+    const today = format(new Date(), "yyyy-MM-dd"); // Use local date
     return checkInsQuery.data.some(
       (c) => c.habit_id === habitId && c.completed_at === today
     );

@@ -37,7 +37,7 @@ export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], h
     });
 
     return (
-        <div className="bg-card border border-border rounded-2xl p-6">
+        <div className="bg-card border border-border rounded-2xl p-6 shadow-lg shadow-black/20 hover:shadow-black/30 transition-shadow duration-300">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-foreground">Sequência Semanal</h3>
                 <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
@@ -47,7 +47,7 @@ export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], h
 
             <div className="flex justify-between items-center relative">
                 {/* Connection Line */}
-                <div className="absolute top-1/2 left-0 w-full h-0.5 bg-border -translate-y-[1.4rem] z-0" />
+                <div className="absolute top-[47px] left-0 w-full h-0.5 bg-border z-0" />
 
                 {days.map((day, i) => {
                     const isDone = day.status === "completed";

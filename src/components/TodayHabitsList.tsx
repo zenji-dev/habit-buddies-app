@@ -22,58 +22,64 @@ const HabitItem = ({
     isPending,
 }: HabitItemProps) => {
     return (
-        <div className="group relative flex items-center gap-4 p-4 bg-card border border-border rounded-xl hover:border-primary/30 transition-all">
-            {/* Checkbox */}
+        <div className="group flex items-center gap-5 p-5 bg-card hover:bg-secondary/20 border border-border/50 rounded-2xl transition-all duration-300 shadow-md shadow-black/30 hover:shadow-lg hover:shadow-black/40 hover:-translate-y-0.5 relative overflow-hidden">
+            {/* Checkbox Circle */}
             <button
                 onClick={onCheckIn}
                 disabled={isPending || isChecked}
                 className={cn(
-                    "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+                    "w-12 h-12 rounded-full border-[3px] flex items-center justify-center transition-all duration-300 shrink-0 z-10",
                     isChecked
-                        ? "border-streak bg-streak text-white"
-                        : "border-muted-foreground/30 hover:border-streak/50"
+                        ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-100"
+                        : "border-muted-foreground/20 hover:border-primary/50 bg-secondary/30 hover:bg-secondary/50 scale-95 hover:scale-100"
                 )}
             >
-                {isChecked && <Check className="w-3.5 h-3.5" />}
+                {isChecked && <Check className="w-6 h-6 stroke-[3] animate-check-bounce" />}
             </button>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1">
+            {/* Content */}
+            <div className="flex-1 min-w-0 z-10">
+                <div className="flex justify-between items-center mb-1.5">
                     <h3 className={cn(
-                        "font-bold text-sm truncate",
-                        isChecked ? "text-muted-foreground line-through" : "text-foreground"
+                        "font-bold text-base truncate transition-colors",
+                        isChecked ? "text-muted-foreground line-through decoration-primary/50 decoration-2" : "text-foreground"
                     )}>
                         {name}
                     </h3>
                     {isChecked ? (
-                        <span className="text-[10px] font-bold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded">
-                            Feito
+                        <span className="text-[10px] font-black text-primary uppercase bg-primary/10 px-2 py-1 rounded-md tracking-wider">
+                            Done
                         </span>
                     ) : (
-                        <p className="text-[10px] text-muted-foreground uppercase font-bold tabular-nums">
-                            {goalMinutes > 0 ? `Progresso` : ""}
-                        </p>
+                        <span className="text-[10px] font-bold text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+                            Running
+                        </span>
                     )}
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <p className="text-[10px] text-muted-foreground truncate">
-                        {goalMinutes > 0 ? `Meta: ${goalMinutes} min` : "Rotina diária"} • Sequência: {streak} dias
-                    </p>
+                <p className="text-xs text-muted-foreground font-medium mb-3 flex items-center gap-2">
+                    <span className={cn("w-1.5 h-1.5 rounded-full", isChecked ? "bg-primary" : "bg-muted-foreground/50")}></span>
+                    {goalMinutes > 0 ? `Target: ${goalMinutes}m` : "Daily Goal"} <span className="text-border mx-1">|</span> Streak: {streak} days
+                </p>
 
-                    <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
-                        <div
-                            className={cn("h-full transition-all duration-500", isChecked ? "bg-primary w-full" : "bg-primary/30 w-0")}
-                        />
-                    </div>
+                {/* Progress Bar */}
+                <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                    <div
+                        className={cn("h-full rounded-full transition-all duration-700 ease-out", isChecked ? "bg-primary w-full" : "bg-primary/50 w-0 opacity-50")}
+                    />
                 </div>
             </div>
 
-            {/* Icon */}
-            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
-                {icon}
+            {/* Right Icon */}
+            <div className={cn(
+                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors z-10",
+                isChecked ? "bg-primary/10 text-primary" : "bg-secondary/50 text-muted-foreground"
+            )}>
+                <span className="text-2xl drop-shadow-sm">{icon}</span>
             </div>
+
+            {/* Background Gradient for completed */}
+            {isChecked && <div className="absolute inset-0 bg-primary/5 pointer-events-none z-0" />}
         </div>
     );
 };
@@ -107,23 +113,6 @@ export const TodayHabitsList = ({
 }) => {
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-foreground">Hábitos de Hoje</h2>
-                <div className="flex gap-2">
-                    {["Todos", "Manhã", "Noite"].map((filter) => (
-                        <button
-                            key={filter}
-                            className={cn(
-                                "px-3 py-1 rounded-md text-[10px] font-bold uppercase transition-all",
-                                filter === "Todos" ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"
-                            )}
-                        >
-                            {filter}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
             <div className="space-y-3">
                 {habits.map((habit) => (
                     <HabitItem
@@ -140,8 +129,10 @@ export const TodayHabitsList = ({
                 ))}
 
                 {habits.length === 0 && (
-                    <div className="p-12 border-2 border-dashed border-border rounded-xl text-center">
-                        <p className="text-muted-foreground italic">Nenhum hábito cadastrado. Adicione um para começar!</p>
+                    <div className="p-12 border-2 border-dashed border-border/50 rounded-2xl text-center bg-card/50">
+                        <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-3xl opacity-50">✨</div>
+                        <h3 className="text-foreground font-bold mb-1">No habits found</h3>
+                        <p className="text-muted-foreground text-sm">Add a new habit to start your journey!</p>
                     </div>
                 )}
             </div>

@@ -26,7 +26,8 @@ import {
     Instagram,
     Twitter,
     Link as LinkIcon,
-    PartyPopper
+    PartyPopper,
+    Upload
 } from "lucide-react";
 import { StartPartyDialog } from "@/components/StartPartyDialog";
 import { toast } from "sonner";
@@ -59,6 +60,7 @@ const Profile = () => {
     const [editInstagram, setEditInstagram] = useState("");
     const [editTwitter, setEditTwitter] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
     const isOwner = currentUser?.id === id;
@@ -132,6 +134,42 @@ const Profile = () => {
         }
     };
 
+    const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            if (!event.target.files || event.target.files.length === 0) {
+                return;
+            }
+
+            setUploading(true);
+            const file = event.target.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${currentUser!.id}/${fileName}`;
+
+            let { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, {
+                    upsert: true
+                });
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+            const { data } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            setEditAvatar(data.publicUrl);
+            toast.success("Imagem carregada com sucesso!");
+        } catch (error: any) {
+            console.error(error);
+            toast.error("Erro ao fazer upload da imagem: " + error.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const isPending = incomingRequests.some(r => r.user_id === id);
 
     const formatDistance = (meters: number | null) => meters ? (meters / 1000).toFixed(2) + " km" : "0 km";
@@ -170,11 +208,46 @@ const Profile = () => {
                 <div className="bg-card rounded-2xl border border-border p-8 relative overflow-hidden shadow-sm">
                     <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/10 to-streak/10" />
                     <div className="relative flex flex-col md:flex-row items-center gap-6 mt-8">
-                        <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center text-4xl font-bold border-4 border-card overflow-hidden">
-                            {profile.avatar_url ? (
-                                <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
-                            ) : (
-                                profile.name.charAt(0)
+                        <div className="relative group">
+                            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center text-4xl font-bold border-4 border-card overflow-hidden relative">
+                                {uploading ? (
+                                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                ) : (
+                                    <>
+                                        <span className="absolute z-0 text-primary uppercase">{editName ? editName.charAt(0) : profile.name.charAt(0)}</span>
+                                        {(editAvatar || profile.avatar_url) && (
+                                            <img
+                                                src={editAvatar || profile.avatar_url}
+                                                alt={editName || profile.name}
+                                                className="w-full h-full object-cover relative z-10"
+                                                onError={(e) => e.currentTarget.style.display = 'none'}
+                                            />
+                                        )}
+                                    </>
+                                )}
+
+                                {isEditing && !uploading && (
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                        <Upload className="w-8 h-8 text-white" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {isEditing && (
+                                <label
+                                    htmlFor="avatar-upload"
+                                    className="absolute inset-0 cursor-pointer rounded-full z-50"
+                                    aria-label="Upload Avatar"
+                                >
+                                    <input
+                                        id="avatar-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleAvatarUpload}
+                                        className="hidden"
+                                        disabled={uploading}
+                                    />
+                                </label>
                             )}
                         </div>
 
@@ -187,12 +260,9 @@ const Profile = () => {
                                         placeholder="Nome de exibição"
                                         className="text-2xl font-black bg-background"
                                     />
-                                    <Input
-                                        value={editAvatar}
-                                        onChange={e => setEditAvatar(e.target.value)}
-                                        placeholder="URL do Avatar"
-                                        className="text-xs bg-background"
-                                    />
+                                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                        <Upload className="w-3 h-3" /> Clique na foto para alterar
+                                    </p>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="relative">
                                             <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

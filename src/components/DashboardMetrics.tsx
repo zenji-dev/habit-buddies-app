@@ -24,7 +24,7 @@ const MetricCard = ({
     subValueColorClass,
     trend
 }: MetricCardProps) => (
-    <Card className="p-4 bg-card border-border flex flex-col justify-between h-full">
+    <Card className="p-4 bg-card border-border flex flex-col justify-between h-full shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
         <div className="flex justify-between items-start">
             <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
@@ -59,25 +59,29 @@ const MetricCard = ({
 
 export const DashboardMetrics = ({
     totalHabits,
+    totalCompleted,
     streak,
     completionRate,
     todayProgress,
     todayTotal,
-    bestStreak
+    bestStreak,
+    completionTrend
 }: {
     totalHabits: number;
+    totalCompleted: number;
     streak: number;
     completionRate: number;
     todayProgress: number;
     todayTotal: number;
     bestStreak?: number;
+    completionTrend?: { value: string; isUp: boolean };
 }) => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard
                 label="Total de Hábitos"
-                value={totalHabits.toLocaleString()}
-                subValue="Concluídos no total"
+                value={totalHabits}
+                subValue={`${totalCompleted} check-ins realizados`}
                 icon={CheckCircle2}
                 iconColorClass="bg-streak"
             />
@@ -92,7 +96,7 @@ export const DashboardMetrics = ({
             <MetricCard
                 label="Taxa de Conclusão"
                 value={`${Math.round(completionRate)}%`}
-                trend={{ value: "5%", isUp: true }}
+                trend={completionTrend}
                 icon={BarChart3}
                 iconColorClass="bg-purple-500"
             />

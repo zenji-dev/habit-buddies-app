@@ -60,12 +60,21 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
               ))}
             </div>
           </div>
-          <Input
-            type="number"
-            placeholder="Meta em minutos (opcional)"
-            value={goalMinutes}
-            onChange={(e) => setGoalMinutes(e.target.value)}
-          />
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Meta Diária</p>
+            <div className="relative">
+              <Input
+                type="number"
+                placeholder="Ex: 30"
+                value={goalMinutes}
+                onChange={(e) => setGoalMinutes(e.target.value)}
+                className="pr-20 bg-secondary/50 border-border"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">
+                minutos
+              </span>
+            </div>
+          </div>
           <Button type="submit" className="w-full" disabled={addHabit.isPending}>
             Adicionar
           </Button>

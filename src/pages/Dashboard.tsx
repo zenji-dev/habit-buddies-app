@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHabits } from "@/hooks/useHabits";
 import { useProfile } from "@/hooks/useProfile";
@@ -7,13 +8,13 @@ import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
 import { WeeklyStreak } from "@/components/WeeklyStreak";
 import { TodayHabitsList } from "@/components/TodayHabitsList";
-import { MonthlyChallenge } from "@/components/MonthlyChallenge";
+
 import { PartyChallenge } from "@/components/PartyChallenge";
 import { ChallengeInvites } from "@/components/ChallengeInvites";
 import { DashboardActivityLog } from "@/components/DashboardActivityLog";
 import { MyHabitsDialog } from "@/components/MyHabitsDialog";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
-import { Search, Bell, Plus, Users, Settings2 } from "lucide-react";
+import { Bell, Plus, Users, Settings2, Search } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
@@ -31,12 +32,12 @@ const Dashboard = () => {
   const { habits, isLoading, checkIn, getStreak, isCheckedToday, checkIns } = useHabits();
   const { friends, feed } = useSocial();
   const { invites } = usePartyChallenge();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const invitesCount = invites?.length || 0;
 
   const todayChecked = habits.filter((h) => isCheckedToday(h.id)).length;
   const totalHabitsCount = habits.length;
-  const percentage = totalHabitsCount > 0 ? (todayChecked / totalHabitsCount) * 100 : 0;
 
   // Calculate stats for metrics
   const totalCompletedAllTime = checkIns.length;
@@ -56,6 +57,74 @@ const Dashboard = () => {
 
   const averageCompletionRate = dailyCompletions.reduce((a, b) => a + b, 0) / 7;
 
+  // Calculate best streak (all-time)
+  const getBestStreak = () => {
+    if (!checkIns.length) return 0;
+
+    // Group all check-ins by habit
+    const habitCheckinsMap: Record<string, string[]> = {};
+    checkIns.forEach(c => {
+      if (!habitCheckinsMap[c.habit_id]) habitCheckinsMap[c.habit_id] = [];
+      habitCheckinsMap[c.habit_id].push(c.completed_at);
+    });
+
+    let maxStreak = 0;
+    Object.keys(habitCheckinsMap).forEach(hId => {
+      const dates = Array.from(new Set(habitCheckinsMap[hId])).sort((a, b) => b.localeCompare(a));
+      if (dates.length === 0) return;
+
+      let currentMax = 1;
+      let tempStreak = 1;
+
+      for (let i = 0; i < dates.length - 1; i++) {
+        const current = new Date(dates[i] + "T00:00:00");
+        const next = new Date(dates[i + 1] + "T00:00:00");
+        const diff = (current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (diff === 1) {
+          tempStreak++;
+        } else {
+          tempStreak = 1;
+        }
+        currentMax = Math.max(currentMax, tempStreak);
+      }
+      maxStreak = Math.max(maxStreak, currentMax);
+    });
+    return maxStreak;
+  };
+
+  const bestStreak = getBestStreak();
+
+  // Calculate completion rate trend (Current week vs Last week)
+  const getTrend = () => {
+    if (totalHabitsCount === 0) return { value: "0%", isUp: true };
+
+    const prev7Days = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (i + 7));
+      return format(d, "yyyy-MM-dd");
+    });
+
+    const prevCompletions = prev7Days.map(date => {
+      const count = checkIns.filter(c => c.completed_at === date).length;
+      return (count / totalHabitsCount) * 100;
+    });
+
+    const prevAverage = prevCompletions.reduce((a, b) => a + b, 0) / 7;
+    const diff = averageCompletionRate - prevAverage;
+
+    return {
+      value: `${Math.abs(Math.round(diff))}%`,
+      isUp: diff >= 0
+    };
+  };
+
+  const completionTrend = getTrend();
+
+  const filteredHabits = habits.filter(h =>
+    h.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (isLoading) {
     return (
       <Layout>
@@ -70,70 +139,82 @@ const Dashboard = () => {
     <Layout>
       <div className="max-w-6xl mx-auto space-y-8 pb-10">
         {/* Top Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-black text-foreground">Visão Geral</h1>
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
-              {format(new Date(), "eeee, MMM d", { locale: ptBR })}
-            </p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Daily Overview</h1>
+            <div className="hidden sm:flex bg-card border border-border px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground items-center gap-2 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-primary/80"></span>
+              {format(new Date(), "EEEE, MMM d", { locale: ptBR })}
+            </div>
+          </div>
+
+          <div className="flex-1 max-w-md hidden lg:block mx-4">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <Input
+                placeholder="Buscar hábitos..."
+                className="bg-card border-border focus:border-primary/50 pl-10 h-11 rounded-xl shadow-sm transition-all text-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar hábitos..."
-                className="pl-10 bg-card border-border w-64 h-10 rounded-xl"
-              />
-            </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-secondary relative">
-                  <Bell className="w-5 h-5 text-muted-foreground" />
-                  {invitesCount > 0 && (
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background animate-pulse" />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0 bg-card border-border shadow-2xl rounded-2xl overflow-hidden" align="end">
-                <div className="p-4 border-b border-border bg-secondary/20">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black text-foreground">Notificações</h3>
-                    {invitesCount > 0 && (
-                      <Badge variant="destructive" className="text-[10px] h-4 px-1.5 font-bold">
-                        {invitesCount} novo{invitesCount > 1 ? 's' : ''}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                <div className="p-2 bg-card">
-                  <ChallengeInvites />
-                </div>
-              </PopoverContent>
-            </Popover>
             <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-card text-muted-foreground hover:text-foreground relative w-10 h-10 border border-transparent hover:border-border transition-all">
+                    <Bell className="w-5 h-5" />
+                    {invitesCount > 0 && (
+                      <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0 bg-card border-border shadow-2xl rounded-2xl overflow-hidden" align="end">
+                  <div className="p-4 border-b border-border bg-secondary/10">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-foreground">Notificações</h3>
+                      {invitesCount > 0 && (
+                        <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] h-5 px-1.5 font-bold">
+                          {invitesCount} new
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card">
+                    <ChallengeInvites />
+                  </div>
+                </PopoverContent>
+              </Popover>
+
               <MyHabitsDialog>
-                <Button variant="outline" className="gap-2 border-border hover:bg-secondary text-muted-foreground hover:text-foreground font-bold rounded-xl px-4 h-10 transition-all">
-                  <Settings2 className="w-4 h-4" /> Meus Hábitos
+                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-card text-muted-foreground hover:text-foreground w-10 h-10 border border-transparent hover:border-border transition-all" title="Gerenciar Hábitos">
+                  <Settings2 className="w-5 h-5" />
                 </Button>
               </MyHabitsDialog>
-              <AddHabitDialog>
-                <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-4 h-10 shadow-lg shadow-primary/20">
-                  <Plus className="w-4 h-4" /> Novo Hábito
-                </Button>
-              </AddHabitDialog>
             </div>
+
+            <div className="h-8 w-px bg-border mx-1 hidden sm:block"></div>
+
+            <AddHabitDialog>
+              <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-5 h-11 shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-105 transition-all">
+                <Plus className="w-5 h-5" /> Novo Hábito
+              </Button>
+            </AddHabitDialog>
           </div>
         </div>
 
         {/* Metrics Section */}
         <DashboardMetrics
-          totalHabits={totalCompletedAllTime}
+          totalHabits={totalHabitsCount}
+          totalCompleted={totalCompletedAllTime}
           streak={currentStreak}
           completionRate={averageCompletionRate}
           todayProgress={todayChecked}
           todayTotal={totalHabitsCount}
-          bestStreak={currentStreak} // Mocking best as current for now
+          bestStreak={bestStreak}
+          completionTrend={completionTrend}
         />
 
         {/* Weekly Streak */}
@@ -147,7 +228,7 @@ const Dashboard = () => {
           {/* Left Column (2/3) */}
           <div className="lg:col-span-2 space-y-8">
             <TodayHabitsList
-              habits={habits}
+              habits={filteredHabits}
               checkIns={checkIns}
               getStreak={getStreak}
               isCheckedToday={isCheckedToday}
@@ -159,7 +240,7 @@ const Dashboard = () => {
           {/* Right Column (1/3) */}
           <div className="space-y-8">
             <PartyChallenge />
-            <MonthlyChallenge currentDay={24} totalDays={30} />
+
             <DashboardActivityLog activity={feed} />
           </div>
         </div>

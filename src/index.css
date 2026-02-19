@@ -56,33 +56,55 @@
   }
 
   .dark {
-    --background: 220 20% 6%;
-    --foreground: 140 10% 95%;
-    --card: 220 20% 8%;
-    --card-foreground: 140 10% 95%;
-    --popover: 220 20% 8%;
-    --popover-foreground: 140 10% 95%;
-    --primary: 142 71% 45%;
+    /* User Requested Palette */
+    /* neutral-bg: #121212 */
+    --background: 0 0% 7%;
+    /* neutral-text-main: #f1f5f9 */
+    --foreground: 210 40% 96%;
+
+    /* neutral-surface: #1E1E1E */
+    --card: 0 0% 12%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 0 0% 12%;
+    --popover-foreground: 210 40% 96%;
+
+    /* primary: #fb923c */
+    --primary: 27 96% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 140 10% 95%;
-    --muted: 220 15% 15%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 100%;
+    /* Keep white for contrast on bright orange */
+
+    /* neutral-border: #2e2e2e */
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 0 0% 18%;
+    /* neutral-text-sub: #94a3b8 */
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 0 0% 18%;
+    --accent-foreground: 210 40% 96%;
+
     --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 142 71% 45%;
-    --sidebar-background: 220 20% 7%;
-    --sidebar-foreground: 140 10% 80%;
-    --sidebar-primary: 142 71% 45%;
+    --destructive-foreground: 210 40% 96%;
+
+    /* neutral-border: #2e2e2e */
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 27 96% 61%;
+
+    /* Sidebar matching neutral-surface or slightly different */
+    --sidebar-background: 0 0% 9%;
+    /* In between bg and surface */
+    --sidebar-foreground: 215 20% 65%;
+    --sidebar-primary: 27 96% 61%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 12%;
-    --sidebar-accent-foreground: 142 71% 50%;
-    --sidebar-border: 220 15% 15%;
-    --sidebar-ring: 142 71% 45%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 27 96% 61%;
+
+    --streak: 27 96% 61%;
   }
 }
 
@@ -102,7 +124,19 @@
     background: var(--gradient-success);
   }
 
+
   .gradient-achievement {
     background: var(--gradient-achievement);
   }
+}
+
+/* Remove arrow/spinners from input type=number */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
