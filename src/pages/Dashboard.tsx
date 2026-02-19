@@ -29,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 const Dashboard = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
-  const { habits, isLoading, checkIn, getStreak, isCheckedToday, checkIns } = useHabits();
+  const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
   const { friends, feed } = useSocial();
   const { invites } = usePartyChallenge();
   const [searchTerm, setSearchTerm] = useState("");
@@ -233,7 +233,9 @@ const Dashboard = () => {
               getStreak={getStreak}
               isCheckedToday={isCheckedToday}
               onCheckIn={(id) => checkIn.mutate(id)}
+              onUncheck={(id) => uncheck.mutate(id)}
               isPending={checkIn.isPending}
+              isUnchecking={uncheck.isPending}
             />
           </div>
 

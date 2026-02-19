@@ -143,6 +143,22 @@ export const useHabits = () => {
     );
   };
 
+  const uncheck = useMutation({
+    mutationFn: async (habitId: string) => {
+      const today = format(new Date(), "yyyy-MM-dd");
+      const { error } = await supabase
+        .from("check_ins")
+        .delete()
+        .eq("user_id", user!.id)
+        .eq("habit_id", habitId)
+        .eq("completed_at", today);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["check_ins"] });
+      toast.info("Check-in removido.");
+    },
+  });
   const deleteHabit = useMutation({
     mutationFn: async (habitId: string) => {
       const { error } = await supabase
@@ -164,6 +180,7 @@ export const useHabits = () => {
     isLoading: habitsQuery.isLoading,
     addHabit,
     checkIn,
+    uncheck,
     getStreak,
     isCheckedToday,
     deleteHabit,
