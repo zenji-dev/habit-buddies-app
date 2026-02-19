@@ -25,8 +25,10 @@ import {
     X,
     Instagram,
     Twitter,
-    Link as LinkIcon
+    Link as LinkIcon,
+    PartyPopper
 } from "lucide-react";
+import { StartPartyDialog } from "@/components/StartPartyDialog";
 import { toast } from "sonner";
 
 const Profile = () => {
@@ -57,6 +59,7 @@ const Profile = () => {
     const [editInstagram, setEditInstagram] = useState("");
     const [editTwitter, setEditTwitter] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
     const isOwner = currentUser?.id === id;
 
@@ -262,9 +265,22 @@ const Profile = () => {
                                         </Button>
                                     )
                                 ) : (
-                                    <Button variant="outline" className="text-destructive hover:bg-destructive/10 gap-2" onClick={() => unfriend.mutate(id!)}>
-                                        <UserMinus className="w-4 h-4" /> Desfazer Amizade
-                                    </Button>
+                                    <div className="flex flex-col gap-2">
+                                        <Button
+                                            variant="outline"
+                                            className="text-destructive hover:bg-destructive/10 gap-2 border-destructive/20"
+                                            onClick={() => unfriend.mutate(id!)}
+                                        >
+                                            <UserMinus className="w-4 h-4" /> Desfazer Amizade
+                                        </Button>
+                                        <Button
+                                            variant="secondary"
+                                            className="gap-2 font-bold shadow-sm"
+                                            onClick={() => setIsInviteDialogOpen(true)}
+                                        >
+                                            <PartyPopper className="w-4 h-4" /> Convidar para Party
+                                        </Button>
+                                    </div>
                                 )
                             )}
                         </div>
@@ -384,6 +400,12 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
+
+                <StartPartyDialog
+                    open={isInviteDialogOpen}
+                    onOpenChange={setIsInviteDialogOpen}
+                    initialSelectedFriendId={id}
+                />
             </div>
         </Layout>
     );
