@@ -18,10 +18,12 @@ import CalendarPage from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
+// Componente para proteger rotas que exigem autenticação
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading, refetch } = useProfile();
 
+  // Exibe uma tela de carregamento enquanto verifica a autenticação ou o perfil
   if (authLoading || (user && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -35,6 +37,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) return <Navigate to="/" replace />;
 
+  // Se o usuário estiver logado mas não completou o onboarding, redireciona
   if (profile && !profile.onboarded) {
     return <Onboarding onComplete={() => refetch()} />;
   }
@@ -42,6 +45,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Componente principal que define todos os provedores (Tema, Query, Auth) e as Rotas
 const App = () => (
   <ThemeProvider defaultTheme="system" storageKey="habit-buddies-theme">
     <QueryClientProvider client={queryClient}>

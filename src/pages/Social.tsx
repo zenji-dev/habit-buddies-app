@@ -225,8 +225,12 @@ const Social = () => {
               </div>
             )}
 
-            {/* My progress today */}
-            <div className="gradient-success rounded-xl p-5 text-primary-foreground shadow-lg shadow-success/20">
+            {/* 
+                Card de progresso diário 
+                Usa 'gradient-success' que agora segue a cor primária definida no tema (index.css)
+                Em modo escuro será laranja, e em modo claro será verde.
+            */}
+            <div className="gradient-success rounded-xl p-5 text-primary-foreground shadow-lg shadow-primary/20">
               <h3 className="font-semibold mb-1">Seu progresso hoje</h3>
               <div className="flex items-center gap-3">
                 <span className="text-3xl font-bold">{Math.round(percentage)}%</span>
