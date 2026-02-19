@@ -48,6 +48,14 @@ export const PartyChallenge = () => {
                     Você ainda não participa de nenhum desafio em grupo. Que tal convidar amigos para baterem uma meta juntos?
                 </p>
 
+                <Button
+                    onClick={() => setIsCreateDialogOpen(true)}
+                    className="w-full h-10 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 transition-all z-10 relative"
+                >
+                    <UserPlus className="w-4 h-4" />
+                    Criar Party
+                </Button>
+
                 <StartPartyDialog
                     open={isCreateDialogOpen}
                     onOpenChange={setIsCreateDialogOpen}
