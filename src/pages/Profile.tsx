@@ -1,33 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useSocial } from "@/hooks/useSocial";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { ConsistencyMap } from "@/components/ConsistencyMap";
 import {
     User,
-    MapPin,
-    Clock,
     Calendar,
     UserPlus,
-    UserCheck,
     UserMinus,
     Loader2,
     ArrowLeft,
-    Activity,
     History,
     Edit,
     Save,
     X,
     Instagram,
     Twitter,
-    Link as LinkIcon,
     PartyPopper,
-    Upload
+    Upload,
+    Flame,
+    Sparkles,
 } from "lucide-react";
 import { StartPartyDialog } from "@/components/StartPartyDialog";
 import { toast } from "sonner";
@@ -47,8 +44,8 @@ const Profile = () => {
     } = useSocial();
 
     const [profile, setProfile] = useState<any>(null);
-    const [activities, setActivities] = useState<any[]>([]);
     const [checkIns, setCheckIns] = useState<any[]>([]);
+    const [habits, setHabits] = useState<any[]>([]);
     const [status, setStatus] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -80,8 +77,8 @@ const Profile = () => {
             setEditAvatar(p.avatar_url || "");
             setEditInstagram(p.instagram_url || "");
             setEditTwitter(p.twitter_url || "");
-            setActivities(acts.activities);
             setCheckIns(acts.checkIns);
+            setHabits(acts.habits || []);
             setStatus(s);
         } catch (err) {
             console.error(err);
@@ -170,15 +167,73 @@ const Profile = () => {
         }
     };
 
-    const isPending = incomingRequests.some(r => r.user_id === id);
+    // Compute streak for a given habit
+    const getStreak = (habitId: string): number => {
+        const habitCheckins = Array.from(
+            new Set(
+                checkIns
+                    .filter((c) => c.habit_id === habitId)
+                    .map((c) => c.completed_at)
+            )
+        ).sort((a, b) => b.localeCompare(a));
 
-    const formatDistance = (meters: number | null) => meters ? (meters / 1000).toFixed(2) + " km" : "0 km";
-    const formatTime = (seconds: number | null) => {
-        if (!seconds) return "0m";
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+        if (habitCheckins.length === 0) return 0;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const lastCheckinDate = new Date(habitCheckins[0] + "T00:00:00");
+        lastCheckinDate.setHours(0, 0, 0, 0);
+
+        if (lastCheckinDate.getTime() < yesterday.getTime()) return 0;
+
+        let streak = 1;
+        let currentDate = lastCheckinDate;
+
+        for (let i = 1; i < habitCheckins.length; i++) {
+            const nextCheckinDate = new Date(habitCheckins[i] + "T00:00:00");
+            nextCheckinDate.setHours(0, 0, 0, 0);
+
+            const expectedDate = new Date(currentDate);
+            expectedDate.setDate(expectedDate.getDate() - 1);
+
+            if (nextCheckinDate.getTime() === expectedDate.getTime()) {
+                streak++;
+                currentDate = nextCheckinDate;
+            } else {
+                break;
+            }
+        }
+
+        return streak;
     };
+
+    // Compute last check-in label
+    const getLastCheckInLabel = (habitId: string): string | null => {
+        const habitCheckins = checkIns
+            .filter((c) => c.habit_id === habitId)
+            .sort((a, b) => b.completed_at.localeCompare(a.completed_at));
+
+        if (habitCheckins.length === 0) return null;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toISOString().slice(0, 10);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+        const lastDate = habitCheckins[0].completed_at.slice(0, 10);
+
+        if (lastDate === todayStr) return "Hoje";
+        if (lastDate === yesterdayStr) return "Ontem";
+        return new Date(lastDate + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
+    };
+
+    const isPending = incomingRequests.some(r => r.user_id === id);
 
     if (loading) return (
         <Layout>
@@ -199,26 +254,29 @@ const Profile = () => {
 
     return (
         <Layout>
-            <div className="max-w-4xl mx-auto space-y-8">
-                <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 mb-4">
+            <div className="max-w-4xl mx-auto space-y-6">
+                <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 mb-2">
                     <ArrowLeft className="w-4 h-4" /> Voltar
                 </Button>
 
-                {/* Profile Header */}
-                <div className="bg-card rounded-2xl border border-border p-8 relative overflow-hidden shadow-sm">
-                    <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/10 to-streak/10" />
-                    <div className="relative flex flex-col md:flex-row items-center gap-6 mt-8">
-                        <div className="relative group">
-                            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center text-4xl font-bold border-4 border-card overflow-hidden relative">
+                {/* ===== PROFILE HEADER ===== */}
+                <div className="bg-card rounded-2xl border border-border p-6 md:p-8 relative overflow-hidden shadow-sm">
+                    <div className="absolute top-0 left-0 w-full h-28 bg-gradient-to-r from-primary/10 via-primary/5 to-streak/10" />
+                    <div className="relative flex flex-col md:flex-row items-center gap-6 pt-4">
+                        {/* Avatar */}
+                        <div className="relative group shrink-0">
+                            <div className="w-28 h-28 rounded-full bg-primary/20 flex items-center justify-center text-5xl font-bold border-4 border-card overflow-hidden relative shadow-lg shadow-primary/10">
                                 {uploading ? (
                                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
                                 ) : (
                                     <>
-                                        <span className="absolute z-0 text-primary uppercase">{editName ? editName.charAt(0) : profile.name.charAt(0)}</span>
-                                        {(editAvatar || profile.avatar_url) && (
+                                        <span className="absolute z-0 text-primary uppercase">
+                                            {(isEditing ? editName : profile.name)?.charAt(0)}
+                                        </span>
+                                        {(isEditing ? editAvatar : profile.avatar_url) && (
                                             <img
-                                                src={editAvatar || profile.avatar_url}
-                                                alt={editName || profile.name}
+                                                src={isEditing ? editAvatar : profile.avatar_url}
+                                                alt={isEditing ? editName : profile.name}
                                                 className="w-full h-full object-cover relative z-10"
                                                 onError={(e) => e.currentTarget.style.display = 'none'}
                                             />
@@ -251,7 +309,8 @@ const Profile = () => {
                             )}
                         </div>
 
-                        <div className="flex-1 text-center md:text-left">
+                        {/* Info */}
+                        <div className="flex-1 text-center md:text-left min-w-0">
                             {isEditing ? (
                                 <div className="space-y-3">
                                     <Input
@@ -259,6 +318,12 @@ const Profile = () => {
                                         onChange={e => setEditName(e.target.value)}
                                         placeholder="Nome de exibição"
                                         className="text-2xl font-black bg-background"
+                                    />
+                                    <Textarea
+                                        value={editBio}
+                                        onChange={e => setEditBio(e.target.value)}
+                                        placeholder="Conte um pouco sobre você..."
+                                        className="bg-background min-h-[80px] text-sm"
                                     />
                                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                                         <Upload className="w-3 h-3" /> Clique na foto para alterar
@@ -292,16 +357,44 @@ const Profile = () => {
                                             <span className="text-primary font-bold text-lg">@{profile.username}</span>
                                         )}
                                     </div>
-                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-1">
-                                        <p className="text-muted-foreground text-sm flex items-center gap-1">
-                                            <Calendar className="w-3 h-3" /> Membro desde {new Date(profile.created_at).toLocaleDateString()}
+                                    {profile.bio && (
+                                        <p className="text-muted-foreground text-sm mt-2 leading-relaxed max-w-lg">
+                                            {profile.bio}
+                                        </p>
+                                    )}
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-3">
+                                        <p className="text-muted-foreground text-xs flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" /> Membro desde {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                                         </p>
                                     </div>
+
+                                    {/* Social links */}
+                                    {(profile.instagram_url || profile.twitter_url) && (
+                                        <div className="flex gap-2 mt-3 justify-center md:justify-start">
+                                            {profile.instagram_url && (
+                                                <Button variant="secondary" size="sm" className="gap-2 rounded-full text-xs font-bold shadow-sm hover:scale-105 transition-transform" asChild>
+                                                    <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer">
+                                                        <Instagram className="w-3.5 h-3.5 text-pink-500" />
+                                                        Instagram
+                                                    </a>
+                                                </Button>
+                                            )}
+                                            {profile.twitter_url && (
+                                                <Button variant="secondary" size="sm" className="gap-2 rounded-full text-xs font-bold shadow-sm hover:scale-105 transition-transform" asChild>
+                                                    <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer">
+                                                        <Twitter className="w-3.5 h-3.5 text-sky-500" />
+                                                        Twitter / X
+                                                    </a>
+                                                </Button>
+                                            )}
+                                        </div>
+                                    )}
                                 </>
                             )}
                         </div>
 
-                        <div className="flex gap-3">
+                        {/* Action buttons */}
+                        <div className="flex gap-3 shrink-0">
                             {isOwner ? (
                                 isEditing ? (
                                     <div className="flex gap-2">
@@ -356,119 +449,67 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <div className="mt-8 relative flex flex-wrap items-center gap-6">
-                        <div className="flex-1">
-                            {isEditing ? (
-                                <Textarea
-                                    value={editBio}
-                                    onChange={e => setEditBio(e.target.value)}
-                                    placeholder="Conte um pouco sobre você..."
-                                    className="bg-background min-h-[100px]"
-                                />
-                            ) : (
-                                profile.bio ? (
-                                    <p className="text-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4 py-2 bg-secondary/30 rounded-r-lg">
-                                        "{profile.bio}"
-                                    </p>
-                                ) : isOwner ? (
-                                    <button onClick={() => setIsEditing(true)} className="text-sm text-muted-foreground hover:text-primary transition-colors italic">
-                                        + Adicionar uma bio ao seu perfil
-                                    </button>
-                                ) : null
-                            )}
+                    {/* Bio prompt for owner without bio */}
+                    {!isEditing && isOwner && !profile.bio && (
+                        <div className="relative mt-4">
+                            <button onClick={() => setIsEditing(true)} className="text-sm text-muted-foreground hover:text-primary transition-colors italic">
+                                + Adicionar uma bio ao seu perfil
+                            </button>
                         </div>
-
-                        {!isEditing && (profile.instagram_url || profile.twitter_url) && (
-                            <div className="flex gap-3">
-                                {profile.instagram_url && (
-                                    <Button variant="secondary" size="sm" className="gap-2 rounded-full font-bold shadow-sm hover:scale-105 transition-transform" asChild>
-                                        <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer">
-                                            <Instagram className="w-4 h-4 text-pink-500" />
-                                            Instagram
-                                        </a>
-                                    </Button>
-                                )}
-                                {profile.twitter_url && (
-                                    <Button variant="secondary" size="sm" className="gap-2 rounded-full font-bold shadow-sm hover:scale-105 transition-transform" asChild>
-                                        <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer">
-                                            <Twitter className="w-4 h-4 text-sky-500" />
-                                            Twitter / X
-                                        </a>
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Left Column: Habits History */}
-                    <div className="space-y-6">
-                        <h3 className="text-lg font-bold flex items-center gap-2">
-                            <History className="w-5 h-5 text-primary" /> Hábitos Recentes
-                        </h3>
-                        <div className="space-y-4">
-                            {checkIns.length === 0 ? (
-                                <Card className="p-6 text-center text-muted-foreground text-sm border-dashed">
-                                    Nenhum check-in recente.
-                                </Card>
-                            ) : (
-                                checkIns.map((ci) => (
-                                    <Card key={ci.id} className="p-4 bg-card border-border">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-2xl">{ci.habits?.icon}</span>
-                                            <div>
-                                                <p className="font-bold text-foreground">{ci.habits?.name}</p>
-                                                <p className="text-[10px] text-muted-foreground uppercase">
-                                                    {new Date(ci.completed_at).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                {/* ===== CONSISTENCY MAP ===== */}
+                <ConsistencyMap checkIns={checkIns} />
 
-                    {/* Center Column: Strava Activities */}
-                    <div className="md:col-span-2 space-y-6">
-                        <h3 className="text-lg font-bold flex items-center gap-2">
-                            <Activity className="w-5 h-5 text-streak" /> Atividades Strava
-                        </h3>
-                        <div className="space-y-4">
-                            {activities.length === 0 ? (
-                                <Card className="p-12 text-center text-muted-foreground border-dashed">
-                                    Nenhuma atividade postada.
-                                </Card>
-                            ) : (
-                                activities.map((act) => (
-                                    <Card key={act.id} className="p-5 border-border bg-card hover:border-primary/30 transition-all">
-                                        <h4 className="text-lg font-extrabold text-foreground mb-3">{act.activity_name}</h4>
-                                        <div className="grid grid-cols-3 gap-4 py-3 border-y border-border/50">
-                                            <div className="text-center">
-                                                <p className="text-[10px] text-muted-foreground uppercase font-semibold">Distância</p>
-                                                <p className="text-sm font-bold text-foreground">
-                                                    {formatDistance(act.distance)}
-                                                </p>
-                                            </div>
-                                            <div className="text-center border-x border-border/50">
-                                                <p className="text-[10px] text-muted-foreground uppercase font-semibold">Tempo</p>
-                                                <p className="text-sm font-bold text-foreground">
-                                                    {formatTime(act.moving_time)}
-                                                </p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-[10px] text-muted-foreground uppercase font-semibold">Data</p>
-                                                <p className="text-sm font-bold text-foreground">
-                                                    {new Date(act.start_date).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                ))
-                            )}
+                {/* ===== PUBLIC HABITS ===== */}
+                <div>
+                    <h3 className="text-base font-bold flex items-center gap-2 text-foreground mb-4">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        Hábitos
+                    </h3>
+
+                    {habits.length === 0 ? (
+                        <div className="bg-card rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground text-sm">
+                            Nenhum hábito cadastrado.
                         </div>
-                    </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {habits.map((habit) => {
+                                const streak = getStreak(habit.id);
+                                const lastLabel = getLastCheckInLabel(habit.id);
+                                const habitCheckInCount = checkIns.filter(c => c.habit_id === habit.id).length;
+
+                                return (
+                                    <div
+                                        key={habit.id}
+                                        className="bg-card rounded-xl border border-border p-5 hover:border-primary/30 transition-all group"
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <span className="text-2xl">{habit.icon}</span>
+                                            {streak > 0 && (
+                                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                                                    <Flame className="w-3 h-3" />
+                                                    {streak} {streak === 1 ? "dia" : "dias"}
+                                                </span>
+                                            )}
+                                            {streak === 0 && lastLabel && (
+                                                <span className="text-[11px] text-muted-foreground font-medium">
+                                                    Último: {lastLabel}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h4 className="font-bold text-foreground text-sm group-hover:text-primary transition-colors">
+                                            {habit.name}
+                                        </h4>
+                                        <p className="text-[11px] text-muted-foreground mt-1">
+                                            {habitCheckInCount} check-in{habitCheckInCount !== 1 ? "s" : ""} este ano
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 <StartPartyDialog

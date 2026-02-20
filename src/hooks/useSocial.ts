@@ -153,24 +153,40 @@ export const useSocial = () => {
     return data;
   };
 
-  const getUserActivities = async (userId: string) => {
-    const { data: activities, error: aErr } = await supabase
-      .from("activities")
-      .select("*")
-      .eq("user_id", userId)
-      .order("start_date", { ascending: false })
-      .limit(10);
-    if (aErr) throw aErr;
+  const getUserActivities = async (targetUserId: string) => {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const oneYearAgoStr = oneYearAgo.toISOString().slice(0, 10);
 
-    const { data: checkIns, error: cErr } = await supabase
-      .from("check_ins")
-      .select("*, habits(*)")
-      .eq("user_id", userId)
-      .order("completed_at", { ascending: false })
-      .limit(10);
-    if (cErr) throw cErr;
+    const [activitiesRes, checkInsRes, habitsRes] = await Promise.all([
+      supabase
+        .from("activities")
+        .select("*")
+        .eq("user_id", targetUserId)
+        .order("start_date", { ascending: false })
+        .limit(10),
+      supabase
+        .from("check_ins")
+        .select("*, habits(*)")
+        .eq("user_id", targetUserId)
+        .gte("completed_at", oneYearAgoStr)
+        .order("completed_at", { ascending: false }),
+      supabase
+        .from("habits")
+        .select("*")
+        .eq("user_id", targetUserId)
+        .order("created_at"),
+    ]);
 
-    return { activities, checkIns };
+    if (activitiesRes.error) throw activitiesRes.error;
+    if (checkInsRes.error) throw checkInsRes.error;
+    if (habitsRes.error) throw habitsRes.error;
+
+    return {
+      activities: activitiesRes.data,
+      checkIns: checkInsRes.data,
+      habits: habitsRes.data,
+    };
   };
 
   const getFriendshipStatus = async (otherUserId: string) => {
