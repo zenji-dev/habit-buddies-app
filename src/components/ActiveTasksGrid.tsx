@@ -92,12 +92,12 @@ export const ActiveTasksGrid = ({
     }
 
     return (
-        <div className="bg-card-dark border border-slate-900 rounded-none shadow-neon-box relative overflow-hidden">
+        <div className="bg-card-dark border border-slate-900 rounded-none shadow-neon-box relative overflow-hidden h-full flex flex-col">
             <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none" />
 
-            <div className="relative z-10">
+            <div className="relative z-10 flex flex-col h-full flex-1 min-h-0">
                 {/* ─── HEADER ─── */}
-                <div className="flex items-stretch border-b border-slate-900">
+                <div className="flex items-stretch border-b border-slate-900 shrink-0">
                     {/* Left col header */}
                     <div className="w-64 shrink-0 px-5 py-3 border-r border-slate-900 flex items-center">
                         <span className="text-base font-bold text-white font-mono-tech tracking-wider">active tasks</span>
@@ -121,7 +121,7 @@ export const ActiveTasksGrid = ({
                 </div>
 
                 {/* ─── HABIT ROWS ─── */}
-                <div className="divide-y divide-slate-900">
+                <div className="divide-y divide-slate-900 flex-1 flex flex-col min-h-0 overflow-hidden">
                     {habits.map((habit) => {
                         const checked = isCheckedToday(habit.id);
                         const rate = getRate(habit.id);
@@ -129,10 +129,10 @@ export const ActiveTasksGrid = ({
                         const busy = isPending || isUnchecking;
 
                         return (
-                            <div key={habit.id} className="flex items-center hover:bg-[#00a375]/[0.03] transition-colors">
+                            <div key={habit.id} className="flex-1 min-h-[44px] max-h-[72px] flex items-stretch hover:bg-[#00a375]/[0.03] transition-colors">
 
                                 {/* ─── LEFT: Check-in button + name ─── */}
-                                <div className="w-64 shrink-0 px-4 py-4 border-r border-slate-900 flex items-center gap-3">
+                                <div className="w-64 shrink-0 px-4 border-r border-slate-900 flex items-center gap-3">
                                     {/* CHECK-IN BUTTON */}
                                     <button
                                         onClick={() => handleToggle(habit.id)}
@@ -184,36 +184,34 @@ export const ActiveTasksGrid = ({
                                 </div>
 
                                 {/* ─── RIGHT: Weekly dots ─── */}
-                                <div className="flex-1">
-                                    <div className="flex">
-                                        {currentWeekDays.map((day) => {
-                                            const dayChecked = isCheckedOn(habit.id, day.dateStr);
-                                            return (
+                                <div className="flex-1 flex">
+                                    {currentWeekDays.map((day) => {
+                                        const dayChecked = isCheckedOn(habit.id, day.dateStr);
+                                        return (
+                                            <div
+                                                key={day.dateStr}
+                                                className="flex-1 flex items-center justify-center border-r border-slate-900/40 last:border-r-0"
+                                            >
                                                 <div
-                                                    key={day.dateStr}
-                                                    className="flex-1 flex items-center justify-center py-4 border-r border-slate-900/40 last:border-r-0"
+                                                    title={`${day.dateStr}${dayChecked ? " ✓" : ""}`}
+                                                    className={cn(
+                                                        "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
+                                                        dayChecked
+                                                            ? "bg-[#00a375] border-[#00a375] shadow-[0_0_6px_rgba(0,163,117,0.4)]"
+                                                            : day.isToday
+                                                                ? "border-[#e66b00] bg-transparent shadow-[0_0_4px_rgba(230,107,0,0.3)]"
+                                                                : day.isFuture
+                                                                    ? "border-slate-900/30 bg-transparent opacity-20"
+                                                                    : "border-slate-700/50 bg-transparent"
+                                                    )}
                                                 >
-                                                    <div
-                                                        title={`${day.dateStr}${dayChecked ? " ✓" : ""}`}
-                                                        className={cn(
-                                                            "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
-                                                            dayChecked
-                                                                ? "bg-[#00a375] border-[#00a375] shadow-[0_0_6px_rgba(0,163,117,0.4)]"
-                                                                : day.isToday
-                                                                    ? "border-[#e66b00] bg-transparent shadow-[0_0_4px_rgba(230,107,0,0.3)]"
-                                                                    : day.isFuture
-                                                                        ? "border-slate-900/30 bg-transparent opacity-20"
-                                                                        : "border-slate-700/50 bg-transparent"
-                                                        )}
-                                                    >
-                                                        {dayChecked && (
-                                                            <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                                                        )}
-                                                    </div>
+                                                    {dayChecked && (
+                                                        <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                                                    )}
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         );
@@ -221,7 +219,7 @@ export const ActiveTasksGrid = ({
                 </div>
 
                 {/* ─── LEGEND ─── */}
-                <div className="flex items-center gap-5 px-5 py-2.5 border-t border-slate-900">
+                <div className="flex items-center gap-5 px-5 py-2.5 border-t border-slate-900 shrink-0">
                     <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-[#00a375]" />
                         <span className="text-[9px] font-mono-tech text-gray-500 uppercase tracking-wider">Concluído</span>
