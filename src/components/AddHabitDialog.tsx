@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { useHabits } from "@/hooks/useHabits";
 
 const ICONS = ["💪", "📖", "📚", "🏃", "🧘", "💻", "🎵", "🥗", "💤", "🌊"];
-
 
 interface AddHabitDialogProps {
   children?: React.ReactNode;
@@ -30,29 +28,40 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {children ? (
-          children
-        ) : (
-          <Button variant="ghost" className="text-primary gap-2">
-            <Plus className="w-4 h-4" /> Novo Hábito
-          </Button>
+        {children || (
+          <button className="text-[#00a375] gap-2 text-xs uppercase tracking-widest flex items-center">
+            <Plus className="w-4 h-4" /> INIT_HABIT
+          </button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-background-dark border-slate-900 rounded-none max-w-md shadow-neon-box">
         <DialogHeader>
-          <DialogTitle>Adicionar Hábito</DialogTitle>
+          <DialogTitle className="text-white text-sm uppercase tracking-wider font-mono-tech flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#00a375]" /> INIT_NEW_HABIT
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input placeholder="Nome do hábito" value={name} onChange={(e) => setName(e.target.value)} required />
           <div>
-            <p className="text-sm text-muted-foreground mb-2">Ícone</p>
-            <div className="flex flex-wrap gap-2">
+            <label className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech block mb-2">HABIT_NAME</label>
+            <Input
+              placeholder="enter_habit_name..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="bg-card-dark border-slate-900 text-white rounded-none text-xs font-mono-tech focus:border-[#00a375] focus:ring-[#00a375]/30 placeholder:text-gray-600"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech block mb-2">SELECT_ICON</label>
+            <div className="flex flex-wrap gap-1">
               {ICONS.map((i) => (
                 <button
                   type="button"
                   key={i}
                   onClick={() => setIcon(i)}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${icon === i ? "bg-primary/20 ring-2 ring-primary" : "bg-secondary hover:bg-muted"
+                  className={`w-10 h-10 flex items-center justify-center text-xl transition-all ${icon === i
+                    ? "bg-[#00a375]/10 border border-[#00a375] shadow-[0_0_5px_rgba(0,163,117,0.3)]"
+                    : "bg-card-dark border border-slate-900 hover:border-[#00a375]/50"
                     }`}
                 >
                   {i}
@@ -61,23 +70,27 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
             </div>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground mb-2">Meta Diária</p>
+            <label className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech block mb-2">DAILY_TARGET</label>
             <div className="relative">
               <Input
                 type="number"
-                placeholder="Ex: 30"
+                placeholder="30"
                 value={goalMinutes}
                 onChange={(e) => setGoalMinutes(e.target.value)}
-                className="pr-20 bg-secondary/50 border-border"
+                className="pr-20 bg-card-dark border-slate-900 text-white rounded-none text-xs font-mono-tech focus:border-[#00a375]"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">
-                minutos
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-600 font-mono-tech uppercase tracking-widest pointer-events-none">
+                MINUTES
               </span>
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={addHabit.isPending}>
-            Adicionar
-          </Button>
+          <button
+            type="submit"
+            className="w-full bg-[#00a375] text-white font-bold font-mono-tech py-3 rounded-none text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(0,163,117,0.4)] hover:shadow-[0_0_25px_rgba(0,163,117,0.6)] hover:bg-[#008f66] transition-all disabled:opacity-50"
+            disabled={addHabit.isPending}
+          >
+            EXECUTE
+          </button>
         </form>
       </DialogContent>
     </Dialog>

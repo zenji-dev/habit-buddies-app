@@ -1,83 +1,62 @@
-import { Button } from "@/components/ui/button";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
-import { Check, X, Users, Loader2, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Check, X, Users, Loader2 } from "lucide-react";
 
 export const ChallengeInvites = () => {
     const { invites, respondToInvite } = usePartyChallenge();
 
     if (invites.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-8 px-4 text-center space-y-2">
-                <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
-                    <Users className="w-6 h-6 text-muted-foreground/50" />
+            <div className="flex flex-col items-center justify-center py-6 px-4 text-center space-y-2">
+                <div className="w-10 h-10 border border-slate-900 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-gray-700" />
                 </div>
-                <p className="text-sm font-medium text-foreground">Sem notificações</p>
-                <p className="text-xs text-muted-foreground leading-tight">
-                    Você não tem nenhum convite de party pendente no momento.
-                </p>
+                <p className="text-[10px] font-mono-tech text-gray-600 uppercase tracking-widest">NO_SIGNALS</p>
             </div>
         );
     }
 
     return (
-        <div className="w-full space-y-2 max-h-[350px] overflow-y-auto pr-1 custom-scrollbar">
+        <div className="w-full space-y-1 max-h-[350px] overflow-y-auto pr-1">
             {invites.map((invite) => (
                 <div
                     key={invite.id}
-                    className="p-3 border border-border rounded-xl bg-card hover:bg-secondary/30 transition-colors relative overflow-hidden group"
+                    className="p-3 border border-slate-900 bg-card-dark hover:border-[#00a375]/50 transition-all relative overflow-hidden group"
                 >
-                    <div className="flex items-start justify-between gap-3 relative z-10">
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00a375] group-hover:shadow-[0_0_10px_#00a375] transition-all" />
+
+                    <div className="flex items-start justify-between gap-3 pl-2">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center overflow-hidden border border-primary/20 shadow-sm relative shrink-0">
+                            <div className="w-9 h-9 border border-slate-800 flex items-center justify-center overflow-hidden bg-background-dark shrink-0">
                                 {invite.invited_by_profile?.avatar_url ? (
-                                    <img
-                                        src={invite.invited_by_profile.avatar_url}
-                                        alt={invite.invited_by_profile.name}
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <img src={invite.invited_by_profile.avatar_url} alt={invite.invited_by_profile.name} className="w-full h-full object-cover grayscale" />
                                 ) : (
-                                    <Users className="w-5 h-5 text-primary" />
+                                    <Users className="w-4 h-4 text-[#00a375]" />
                                 )}
-                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center border border-card shadow-sm">
-                                    <Sparkles className="w-2 h-2 text-primary-foreground" />
-                                </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-bold text-foreground truncate">
-                                    {invite.invited_by_profile?.name || "Alguém"} te chamou!
+                                <p className="text-xs font-bold text-white truncate font-mono-tech">
+                                    {invite.invited_by_profile?.name || "Unknown"}
                                 </p>
-                                <div className="flex flex-col gap-1 mt-0.5">
-                                    <p className="text-[10px] text-muted-foreground truncate uppercase font-bold tracking-tight">
-                                        {invite.challenge_title}
-                                    </p>
-                                    {invite.target_habit && (
-                                        <Badge variant="outline" className="text-[9px] font-black h-4 bg-primary/5 border-primary/20 text-primary w-fit px-1 uppercase italic">
-                                            🎯 Foco: {invite.target_habit}
-                                        </Badge>
-                                    )}
-                                </div>
+                                <p className="text-[9px] text-gray-500 truncate uppercase tracking-widest font-mono-tech mt-0.5">
+                                    {invite.challenge_title}
+                                </p>
                             </div>
                         </div>
-                        <div className="flex gap-1.5 flex-shrink-0 pt-0.5">
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                className="w-7 h-7 rounded-lg text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm flex-shrink-0 transition-transform active:scale-90"
+                        <div className="flex gap-1 flex-shrink-0">
+                            <button
+                                className="w-7 h-7 rounded-none bg-[#00a375] text-white flex items-center justify-center hover:bg-[#008f66] transition-colors"
                                 onClick={() => respondToInvite.mutate({ inviteId: invite.id, accept: true })}
                                 disabled={respondToInvite.isPending}
                             >
-                                {respondToInvite.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                            </Button>
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                className="w-7 h-7 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive bg-secondary/50 border border-border flex-shrink-0 transition-transform active:scale-90"
+                                {respondToInvite.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                            </button>
+                            <button
+                                className="w-7 h-7 rounded-none border border-gray-700 text-gray-500 flex items-center justify-center hover:border-red-500 hover:text-red-500 transition-colors"
                                 onClick={() => respondToInvite.mutate({ inviteId: invite.id, accept: false })}
                                 disabled={respondToInvite.isPending}
                             >
-                                {respondToInvite.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
-                            </Button>
+                                {respondToInvite.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+                            </button>
                         </div>
                     </div>
                 </div>

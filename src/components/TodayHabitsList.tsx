@@ -1,101 +1,27 @@
-import { Check, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AddHabitDialog } from "@/components/AddHabitDialog";
-import { Button } from "@/components/ui/button";
-
-interface HabitItemProps {
-    id: string;
-    name: string;
-    icon: string;
-    goalMinutes: number;
-    streak: number;
-    isChecked: boolean;
-    onCheckIn: () => void;
-    isPending: boolean;
-}
-
-const HabitItem = ({
-    name,
-    icon,
-    goalMinutes,
-    streak,
-    isChecked,
-    onCheckIn,
-    isPending,
-}: HabitItemProps) => {
-    return (
-        <div className="group flex items-center gap-5 p-5 bg-card hover:bg-secondary/20 border border-border/50 rounded-2xl transition-all duration-300 shadow-md shadow-black/30 hover:shadow-lg hover:shadow-black/40 hover:-translate-y-0.5 relative overflow-hidden">
-            {/* Checkbox Circle */}
-            <button
-                onClick={onCheckIn}
-                disabled={isPending || isChecked}
-                className={cn(
-                    "w-12 h-12 rounded-full border-[3px] flex items-center justify-center transition-all duration-300 shrink-0 z-10",
-                    isChecked
-                        ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-100"
-                        : "border-muted-foreground/20 hover:border-primary/50 bg-secondary/30 hover:bg-secondary/50 scale-95 hover:scale-100"
-                )}
-            >
-                {isChecked && <Check className="w-6 h-6 stroke-[3] animate-check-bounce" />}
-            </button>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0 z-10">
-                <div className="flex justify-between items-center mb-1.5">
-                    <h3 className={cn(
-                        "font-bold text-base truncate transition-colors",
-                        isChecked ? "text-muted-foreground line-through decoration-primary/50 decoration-2" : "text-foreground"
-                    )}>
-                        {name}
-                    </h3>
-                    {isChecked ? (
-                        <span className="text-[10px] font-black text-primary uppercase bg-primary/10 px-2 py-1 rounded-md tracking-wider">
-                            Done
-                        </span>
-                    ) : (
-                        <span className="text-[10px] font-bold text-muted-foreground bg-secondary px-2 py-1 rounded-md">
-                            Em andamento
-                        </span>
-                    )}
-                </div>
-
-                <p className="text-xs text-muted-foreground font-medium mb-3 flex items-center gap-2">
-                    <span className={cn("w-1.5 h-1.5 rounded-full", isChecked ? "bg-primary" : "bg-muted-foreground/50")}></span>
-                    {goalMinutes > 0 ? `Meta: ${goalMinutes}m` : "Meta Diária"} <span className="text-border mx-1">|</span> Sequência: {streak} dias
-                </p>
-
-                {/* Progress Bar */}
-                <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                    <div
-                        className={cn("h-full rounded-full transition-all duration-700 ease-out", isChecked ? "bg-primary w-full" : "bg-primary/50 w-0 opacity-50")}
-                    />
-                </div>
-            </div>
-
-            {/* Right Icon */}
-            <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors z-10",
-                isChecked ? "bg-primary/10 text-primary" : "bg-secondary/50 text-muted-foreground"
-            )}>
-                <span className="text-2xl drop-shadow-sm">{icon}</span>
-            </div>
-
-            {/* Background Gradient for completed */}
-            {isChecked && <div className="absolute inset-0 bg-primary/5 pointer-events-none z-0" />}
-        </div>
-    );
-};
+import { Check } from "lucide-react";
 
 interface Habit {
     id: string;
     name: string;
     icon: string;
-    goal_minutes?: number;
+    goal_minutes: number;
 }
 
 interface CheckIn {
     habit_id: string;
     completed_at: string;
+}
+
+interface TodayHabitsListProps {
+    habits: Habit[];
+    checkIns: CheckIn[];
+    getStreak: (id: string) => number;
+    isCheckedToday: (id: string) => boolean;
+    onCheckIn: (id: string) => void;
+    onUncheck: (id: string) => void;
+    isPending: boolean;
+    isUnchecking: boolean;
 }
 
 export const TodayHabitsList = ({
@@ -106,56 +32,119 @@ export const TodayHabitsList = ({
     onCheckIn,
     onUncheck,
     isPending,
-    isUnchecking
-}: {
-    habits: Habit[];
-    checkIns: CheckIn[];
-    getStreak: (id: string) => number;
-    isCheckedToday: (id: string) => boolean;
-    onCheckIn: (id: string) => void;
-    onUncheck: (id: string) => void;
-    isPending: boolean;
-    isUnchecking: boolean;
-}) => {
-    return (
-        <div className="space-y-4">
-            <div className="space-y-3">
-                {habits.map((habit) => (
-                    <HabitItem
-                        key={habit.id}
-                        id={habit.id}
-                        name={habit.name}
-                        icon={habit.icon}
-                        goalMinutes={habit.goal_minutes || 0}
-                        streak={getStreak(habit.id)}
-                        isChecked={isCheckedToday(habit.id)}
-                        onCheckIn={() => {
-                            if (isCheckedToday(habit.id)) {
-                                onUncheck(habit.id);
-                            } else {
-                                onCheckIn(habit.id);
-                            }
-                        }}
-                        isPending={isPending || isUnchecking}
-                    />
-                ))}
-
-                {/* 
-                    Estado vazio: substituímos o ícone de brilhos por um botão '+' 
-                    que abre o diálogo de criação de hábito diretamente ao ser clicado.
-                */}
-                {habits.length === 0 && (
-                    <div className="p-12 border-2 border-dashed border-border/50 rounded-2xl text-center bg-card/50">
-                        <AddHabitDialog>
-                            <button className="w-16 h-16 bg-primary/10 hover:bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-4 transition-all hover:scale-110 group">
-                                <Plus className="w-8 h-8 transition-transform group-hover:rotate-90" />
-                            </button>
-                        </AddHabitDialog>
-                        <h3 className="text-foreground font-bold mb-1">Nenhum hábito encontrado</h3>
-                        <p className="text-muted-foreground text-sm">Adicione um novo hábito para começar sua jornada!</p>
-                    </div>
-                )}
+    isUnchecking,
+}: TodayHabitsListProps) => {
+    if (habits.length === 0) {
+        return (
+            <div className="mt-8 text-center py-6">
+                <p className="text-[10px] font-mono-tech text-gray-600">waiting for input...</p>
             </div>
+        );
+    }
+
+    return (
+        <div className="space-y-3">
+            {habits.map((habit) => {
+                const checked = isCheckedToday(habit.id);
+                const streak = getStreak(habit.id);
+
+                return (
+                    <div
+                        key={habit.id}
+                        onClick={() => {
+                            if (isPending || isUnchecking) return;
+                            checked ? onUncheck(habit.id) : onCheckIn(habit.id);
+                        }}
+                        className={cn(
+                            "bg-surface-dark rounded-none p-3 text-white shadow-sm cursor-pointer border transition-all group relative overflow-hidden",
+                            checked
+                                ? "border-[#00a375]/50 shadow-[0_0_10px_rgba(0,163,117,0.1)]"
+                                : "border-slate-900 hover:border-[#00a375]"
+                        )}
+                    >
+                        {/* Left accent bar */}
+                        <div className={cn(
+                            "absolute left-0 top-0 bottom-0 w-1 transition-all",
+                            checked
+                                ? "bg-[#00a375] shadow-[0_0_10px_#00a375]"
+                                : "bg-slate-800 group-hover:bg-[#00a375] group-hover:shadow-[0_0_10px_#00a375]"
+                        )} />
+
+                        <div className="flex items-center gap-3 pl-2">
+                            {/* ===== ROUND CHECK BUTTON ===== */}
+                            <div className={cn(
+                                "w-10 h-10 rounded-full flex items-center justify-center border-2 shrink-0 transition-all duration-300",
+                                checked
+                                    ? "bg-[#00a375] border-[#00a375] shadow-[0_0_12px_rgba(0,163,117,0.6)]"
+                                    : "bg-transparent border-slate-700 group-hover:border-[#00a375] group-hover:shadow-[0_0_8px_rgba(0,163,117,0.3)]"
+                            )}>
+                                {checked ? (
+                                    /* Checkmark when done */
+                                    <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                                ) : (
+                                    /* Emoji icon when not done */
+                                    <span className="text-base leading-none text-[#00a375] group-hover:scale-110 transition-transform">
+                                        {habit.icon || "💪"}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                                <h4 className={cn(
+                                    "font-bold font-mono-tech text-sm truncate transition-colors",
+                                    checked ? "text-[#00a375]" : "text-white group-hover:text-[#00a375]"
+                                )}>
+                                    {habit.name.toUpperCase()}.exe
+                                </h4>
+                                <div className="flex items-center gap-2 text-[10px] text-gray-500 font-mono-tech mt-1">
+                                    <span className="text-[#00a375]">TARGET: {habit.goal_minutes}m</span>
+                                    <span className="text-slate-800">|</span>
+                                    <span className="text-gray-400">SEQ: {streak}</span>
+                                </div>
+                            </div>
+
+                            {/* Right emoji icon — always teal tinted */}
+                            <div className={cn(
+                                "shrink-0 text-lg transition-all duration-300",
+                                checked ? "opacity-100 grayscale-0" : "opacity-40 group-hover:opacity-80"
+                            )}>
+                                {habit.icon}
+                            </div>
+                        </div>
+
+                        {/* Progress bar — orange accent */}
+                        <div className="mt-3 w-full bg-[#050a14] h-1 rounded-none overflow-hidden border border-slate-900">
+                            <div className={cn(
+                                "h-full transition-all duration-500",
+                                checked
+                                    ? "bg-[#e66b00] shadow-[0_0_8px_#e66b00] w-full"
+                                    : "bg-[#e66b00]/40 w-1/4"
+                            )} />
+                        </div>
+                    </div>
+                );
+            })}
+
+            {/* Skeleton placeholders */}
+            {habits.length === 1 && (
+                <div className="mt-4 space-y-4 opacity-30">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800" />
+                        <div className="h-2 bg-slate-900 w-full" />
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800" />
+                        <div className="h-2 bg-slate-900 w-2/3" />
+                    </div>
+                </div>
+            )}
+
+            {habits.length <= 2 && (
+                <div className="mt-6 text-center">
+                    <p className="text-[10px] font-mono-tech text-gray-600">waiting for input...</p>
+                </div>
+            )}
         </div>
     );
 };
