@@ -19,9 +19,11 @@ import StravaCallback from "./pages/StravaCallback";
 import NotFound from "./pages/NotFound";
 import CalendarPage from "./pages/Calendar";
 
+// Configuração do Cliente de Query (React Query) para gerenciar estado assíncrono
 const queryClient = new QueryClient();
 
-// Sync Supabase Token with Clerk Session
+// Componente para Sincronizar o Token do Supabase com a Sessão do Clerk
+// Isso permite que o Supabase use o token do Clerk para autenticação RLS
 const SupabaseTokenSync = () => {
   const { session } = useSession();
 

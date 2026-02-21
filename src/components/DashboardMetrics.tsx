@@ -24,7 +24,11 @@ const MetricCard = ({
     subValueColorClass,
     trend
 }: MetricCardProps) => (
-    <Card className="p-4 bg-card border-border flex flex-col justify-between h-full shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
+    /* 
+       Card de métrica individual. 
+       Usamos rounded-2xl para alinhar com o design de outros componentes.
+    */
+    <Card className="p-4 bg-card border-border flex flex-col justify-between h-full shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 rounded-2xl">
         <div className="flex justify-between items-start">
             <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
@@ -34,7 +38,7 @@ const MetricCard = ({
                     {value}
                 </h3>
             </div>
-            <div className={cn("p-2 rounded-lg", iconColorClass)}>
+            <div className={cn("p-2 rounded-xl", iconColorClass)}>
                 <Icon className="w-5 h-5 text-white" />
             </div>
         </div>
@@ -77,6 +81,10 @@ export const DashboardMetrics = ({
     completionTrend?: { value: string; isUp: boolean };
 }) => {
     return (
+        /* 
+           Grid de métricas: 
+           1 coluna no mobile, 2 no tablet e 4 no desktop para um layout equilibrado.
+        */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard
                 label="Total de Hábitos"

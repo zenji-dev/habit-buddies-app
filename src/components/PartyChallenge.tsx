@@ -36,7 +36,8 @@ export const PartyChallenge = () => {
 
     if (!challenge) {
         return (
-            <Card className="p-6 bg-card border-border overflow-hidden relative group shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
+            /* Card de estado vazio para Party Challenges - usamos rounded-2xl para manter a consistência visual */
+            <Card className="p-6 bg-card border-border overflow-hidden relative group shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 rounded-2xl">
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
                 <div className="flex items-center gap-2 mb-3">
                     <span className="text-[10px] font-bold text-primary uppercase bg-primary/10 px-2 py-1 rounded">
@@ -75,7 +76,8 @@ export const PartyChallenge = () => {
     );
 
     return (
-        <Card className="p-6 bg-card border-border overflow-hidden relative group shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
+        /* Card de progresso da Party ativa - mantendo bordas arredondadas consistentes */
+        <Card className="p-6 bg-card border-border overflow-hidden relative group shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 rounded-2xl">
             {/* Background glow */}
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all pointer-events-none" />
 

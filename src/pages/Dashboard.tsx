@@ -13,10 +13,9 @@ import { ChallengeInvites } from "@/components/ChallengeInvites";
 import { DashboardActivityLog } from "@/components/DashboardActivityLog";
 import { MyHabitsDialog } from "@/components/MyHabitsDialog";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
-import { Bell, Plus, Users, Settings2, Search } from "lucide-react";
+import { Bell, Plus, Users, Settings2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -30,7 +29,6 @@ const Dashboard = () => {
   const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
   const { friends, feed } = useSocial();
   const { invites } = usePartyChallenge();
-  const [searchTerm, setSearchTerm] = useState("");
 
   const invitesCount = invites?.length || 0;
 
@@ -119,9 +117,8 @@ const Dashboard = () => {
 
   const completionTrend = getTrend();
 
-  const filteredHabits = habits.filter(h =>
-    h.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Removido a lógica de filtros (searchTerm) para centralizar a interface
+  // Agora usamos a lista de hábitos diretamente.
 
   if (isLoading) {
     return (
@@ -135,18 +132,18 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto space-y-8 pb-10">
-        {/* Top Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">Visão Geral</h1>
-            <div className="hidden sm:flex bg-card border border-border px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground items-center gap-2 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-primary/80"></span>
-              {format(new Date(), "EEEE, MMM d", { locale: ptBR })}
+      <div className="max-w-5xl mx-auto space-y-8 pb-10">
+        {/* Header Centralizado - Removido o campo de busca que criava um vazio no meio */}
+        <div className="flex flex-col items-center justify-center text-center gap-6 mb-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Visão Geral</h1>
+            <div className="inline-flex bg-card border border-border px-4 py-1.5 rounded-full text-xs font-bold text-muted-foreground items-center gap-2 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-primary/80 animate-pulse"></span>
+              {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center gap-3 bg-card/50 p-2 rounded-2xl border border-border/50 backdrop-blur-sm shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
@@ -186,8 +183,6 @@ const Dashboard = () => {
               </MyHabitsDialog>
             </div>
 
-            <div className="h-8 w-px bg-border mx-1 hidden sm:block"></div>
-
             <AddHabitDialog>
               <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-5 h-11 shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-105 transition-all">
                 <Plus className="w-5 h-5" /> Novo Hábito
@@ -196,7 +191,10 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Metrics Section */}
+        {/* 
+            Seção de Métricas resumidas no topo. 
+            Isso fornece uma visão rápida do progresso sem ocupar espaço excessivo.
+        */}
         <DashboardMetrics
           totalHabits={totalHabitsCount}
           totalCompleted={totalCompletedAllTime}
@@ -208,18 +206,24 @@ const Dashboard = () => {
           completionTrend={completionTrend}
         />
 
-        {/* Weekly Streak */}
-        <WeeklyStreak
-          checkIns={checkIns}
-          habitsCount={totalHabitsCount}
-        />
-
-        {/* Main Content Grid */}
+        {/* 
+            Grid de Conteúdo Principal. 
+            Dividimos em 2/3 para o progresso/hábitos e 1/3 para social/atividades.
+        */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column (2/3) */}
+          {/* Coluna Esquerda (2/3): Focada no progresso individual e hábitos */}
           <div className="lg:col-span-2 space-y-8">
+            {/* 
+                Weekly Streak movido para dentro da coluna para alinhar verticalmente 
+                com a lista de hábitos, criando um visual mais coeso e organizado.
+            */}
+            <WeeklyStreak
+              checkIns={checkIns}
+              habitsCount={totalHabitsCount}
+            />
+
             <TodayHabitsList
-              habits={filteredHabits}
+              habits={habits}
               checkIns={checkIns}
               getStreak={getStreak}
               isCheckedToday={isCheckedToday}
@@ -230,7 +234,7 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Right Column (1/3) */}
+          {/* Coluna Direita (1/3): Focada em Party e Log de Atividades */}
           <div className="space-y-8">
             <PartyChallenge />
 

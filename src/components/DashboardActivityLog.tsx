@@ -11,9 +11,13 @@ interface ActivityItem {
 
 export const DashboardActivityLog = ({ activity }: { activity: ActivityItem[] }) => {
     return (
+        /* 
+           Seção de Log de Atividades. 
+           Usa um layout de timeline para mostrar o que está acontecendo na rede social.
+        */
         <div className="space-y-4">
             <h2 className="text-lg font-bold text-foreground">Atividade Recente</h2>
-            <Card className="p-6 bg-card border-border">
+            <Card className="p-6 bg-card border-border rounded-2xl">
                 {activity.length === 0 ? (
                     <p className="text-sm text-muted-foreground italic text-center py-8">
                         Nenhuma atividade recente.

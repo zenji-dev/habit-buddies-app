@@ -8,6 +8,7 @@ export const useHabits = () => {
   const { userId } = useAuth();
   const queryClient = useQueryClient();
 
+  // Busca a lista de hábitos do usuário logado no Supabase
   const habitsQuery = useQuery({
     queryKey: ["habits", userId],
     queryFn: async () => {
@@ -19,7 +20,7 @@ export const useHabits = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!userId,
+    enabled: !!userId, // Só executa a query se houver um usuário logado
   });
 
   const checkInsQuery = useQuery({

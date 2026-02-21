@@ -37,6 +37,10 @@ export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], h
     });
 
     return (
+        /* 
+           Visualização do progresso semanal. 
+           Mostra o status de cada dia com uma linha conectora para indicar fluxo.
+        */
         <div className="bg-card border border-border rounded-2xl p-6 shadow-lg shadow-black/20 hover:shadow-black/30 transition-shadow duration-300">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-foreground">Sequência Semanal</h3>
