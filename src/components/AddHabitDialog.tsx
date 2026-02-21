@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { useHabits } from "@/hooks/useHabits";
+import { toast } from "sonner";
 
 const ICONS = ["💪", "📖", "📚", "🏃", "🧘", "💻", "🎵", "🥗", "💤", "🌊"];
 
@@ -15,10 +16,18 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("💪");
   const [goalMinutes, setGoalMinutes] = useState("30");
-  const { addHabit } = useHabits();
+  const { addHabit, habits } = useHabits();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (habits.length >= 8) {
+      toast.error("Limite máximo alcançado!", {
+        description: "Você já atingiu o limite de 8 hábitos ativos."
+      });
+      return;
+    }
+
     addHabit.mutate(
       { name, icon, goal_minutes: parseInt(goalMinutes) || 0 },
       { onSuccess: () => { setOpen(false); setName(""); setGoalMinutes("30"); } }

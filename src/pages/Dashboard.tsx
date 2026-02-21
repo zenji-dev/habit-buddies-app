@@ -110,10 +110,10 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="w-full flex flex-col gap-6 lg:h-[calc(100vh-84px)]">
+      <div className="w-full space-y-6">
 
         {/* ===== TOP BAR ===== */}
-        <div className="flex items-center justify-between shrink-0">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-mono-tech">
             <span className="text-gray-500">SYS</span>
             <span className="text-gray-700">/</span>
@@ -164,7 +164,7 @@ const Dashboard = () => {
         </div>
 
         {/* ===== ROW 1: Profile + Party ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 shrink-0">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Profile card — 3 cols */}
           <div className="lg:col-span-3">
             <div className="bg-surface-dark border border-slate-900 rounded-none relative pb-4 shadow-neon-box grid-bg">
@@ -258,7 +258,7 @@ const Dashboard = () => {
         </div>
 
         {/* ===== ROW 2: Metrics + Weekly Streak ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch shrink-0">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
           {/* 4 Metric cards — 3 cols */}
           <div className="lg:col-span-3 h-full">
             <DashboardMetrics
@@ -281,18 +281,16 @@ const Dashboard = () => {
 
 
         {/* ===== ROW 4: Active Tasks Grid (full width) ===== */}
-        <div className="flex-1 min-h-0 h-full">
-          <ActiveTasksGrid
-            habits={habits}
-            checkIns={checkIns}
-            isCheckedToday={isCheckedToday}
-            getStreak={getStreak}
-            onCheckIn={(id) => checkIn.mutate(id)}
-            onUncheck={(id) => uncheck.mutate(id)}
-            isPending={checkIn.isPending}
-            isUnchecking={uncheck.isPending}
-          />
-        </div>
+        <ActiveTasksGrid
+          habits={habits}
+          checkIns={checkIns}
+          isCheckedToday={isCheckedToday}
+          getStreak={getStreak}
+          onCheckIn={(id) => checkIn.mutate(id)}
+          onUncheck={(id) => uncheck.mutate(id)}
+          isPending={checkIn.isPending}
+          isUnchecking={uncheck.isPending}
+        />
 
       </div>
     </Layout>
