@@ -25,6 +25,8 @@ import {
     Upload,
     Flame,
     Sparkles,
+    MapPin,
+    Users,
 } from "lucide-react";
 import { StartPartyDialog } from "@/components/StartPartyDialog";
 import { toast } from "sonner";
@@ -56,9 +58,14 @@ const Profile = () => {
     const [editAvatar, setEditAvatar] = useState("");
     const [editInstagram, setEditInstagram] = useState("");
     const [editTwitter, setEditTwitter] = useState("");
+    const [editLocation, setEditLocation] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+
+    /* Contadores sociais: seguidores e seguindo */
+    const [followersCount, setFollowersCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
 
     const isOwner = currentUserId === id;
 
@@ -77,9 +84,30 @@ const Profile = () => {
             setEditAvatar(p.avatar_url || "");
             setEditInstagram(p.instagram_url || "");
             setEditTwitter(p.twitter_url || "");
+            setEditLocation(p.location || "");
             setCheckIns(acts.checkIns);
             setHabits(acts.habits || []);
             setStatus(s);
+
+            /* 
+               Calcular seguidores e seguindo a partir da tabela friendships.
+               - Seguidores: amizades aceitas onde o usuário é o friend_id (alguém seguiu ele)
+               - Seguindo: amizades aceitas onde o usuário é o user_id (ele seguiu alguém)
+            */
+            const [followersRes, followingRes] = await Promise.all([
+                supabase
+                    .from("friendships")
+                    .select("id", { count: "exact", head: true })
+                    .eq("friend_id", id)
+                    .eq("status", "accepted"),
+                supabase
+                    .from("friendships")
+                    .select("id", { count: "exact", head: true })
+                    .eq("user_id", id)
+                    .eq("status", "accepted"),
+            ]);
+            setFollowersCount(followersRes.count || 0);
+            setFollowingCount(followingRes.count || 0);
         } catch (err) {
             console.error(err);
             toast.error("Erro ao carregar perfil");
@@ -107,6 +135,7 @@ const Profile = () => {
                     avatar_url: editAvatar.trim(),
                     instagram_url: editInstagram.trim() || null,
                     twitter_url: editTwitter.trim() || null,
+                    location: editLocation.trim() || null,
                     updated_at: new Date().toISOString()
                 })
                 .eq("user_id", currentUserId!);
@@ -120,7 +149,8 @@ const Profile = () => {
                 bio: editBio,
                 avatar_url: editAvatar,
                 instagram_url: editInstagram,
-                twitter_url: editTwitter
+                twitter_url: editTwitter,
+                location: editLocation
             });
             setIsEditing(false);
         } catch (err) {
@@ -348,6 +378,16 @@ const Profile = () => {
                                             />
                                         </div>
                                     </div>
+                                    {/* Campo de localização editável */}
+                                    <div className="relative">
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <Input
+                                            value={editLocation}
+                                            onChange={e => setEditLocation(e.target.value)}
+                                            placeholder="Sua localização (ex: São Paulo, SP)"
+                                            className="pl-9 text-xs bg-background"
+                                        />
+                                    </div>
                                 </div>
                             ) : (
                                 <>
@@ -362,7 +402,29 @@ const Profile = () => {
                                             {profile.bio}
                                         </p>
                                     )}
+                                    {/* 
+                                        Barra de estatísticas sociais: seguidores, seguindo e localização.
+                                        Inspirado no layout do GitHub para mostrar presença social.
+                                    */}
                                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-3">
+                                        <p className="text-muted-foreground text-xs flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                            <Users className="w-3.5 h-3.5" />
+                                            <span className="font-bold text-foreground">{followersCount}</span> seguidores
+                                        </p>
+                                        <span className="text-border">·</span>
+                                        <p className="text-muted-foreground text-xs flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                            <span className="font-bold text-foreground">{followingCount}</span> seguindo
+                                        </p>
+                                        {profile.location && (
+                                            <>
+                                                <span className="text-border">·</span>
+                                                <p className="text-muted-foreground text-xs flex items-center gap-1.5">
+                                                    <MapPin className="w-3.5 h-3.5" />
+                                                    {profile.location}
+                                                </p>
+                                            </>
+                                        )}
+                                        <span className="text-border">·</span>
                                         <p className="text-muted-foreground text-xs flex items-center gap-1">
                                             <Calendar className="w-3 h-3" /> Membro desde {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                                         </p>

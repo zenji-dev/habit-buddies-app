@@ -272,6 +272,8 @@ export type Database = {
           created_at: string
           id: string
           instagram_url: string | null
+          /** Localização do usuário (cidade, estado, país) */
+          location: string | null
           name: string
           onboarded: boolean | null
           twitter_url: string | null
@@ -285,6 +287,7 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_url?: string | null
+          location?: string | null
           name?: string
           onboarded?: boolean | null
           twitter_url?: string | null
@@ -298,6 +301,7 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_url?: string | null
+          location?: string | null
           name?: string
           onboarded?: boolean | null
           twitter_url?: string | null
