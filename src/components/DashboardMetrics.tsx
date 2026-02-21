@@ -20,26 +20,26 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon }: MetricCardProps) => (
-    <div className="bg-card-dark border border-slate-900 hover:border-[#00a375]/50 rounded-none p-2.5 text-white relative group overflow-hidden shadow-neon-box transition-all duration-300">
+    <div className="bg-card-dark border border-slate-900 hover:border-[#00a375]/50 rounded-none p-2 text-white relative group overflow-hidden shadow-neon-box transition-all duration-300">
         {/* Orange status dot */}
         <div className="absolute top-0 right-0 p-1">
             <div className="w-1.5 h-1.5 bg-[#e66b00] rounded-full group-hover:shadow-[0_0_5px_#e66b00] transition-all" />
         </div>
 
-        <div className="flex justify-between items-start mb-1 relative z-10">
-            <span className="text-[11px] font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
+        <div className="flex justify-between items-start mb-0.5 relative z-10">
+            <span className="text-[9px] font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
                 {label}
             </span>
             <div className="text-[#00a375] group-hover:scale-110 transition-transform">
-                <Icon className="w-[16px] h-[16px]" />
+                <Icon className="w-3.5 h-3.5" />
             </div>
         </div>
 
-        <div className="relative z-10 mt-1">
-            <span className="text-2xl font-bold font-mono-tech text-white group-hover:text-[#00a375] transition-colors">
+        <div className="relative z-10 mt-0.5">
+            <span className="text-lg font-bold font-mono-tech text-white group-hover:text-[#00a375] transition-colors leading-none">
                 {value}
             </span>
-            <p className={`text-[10px] mt-0.5 font-mono-tech border-t border-slate-900 pt-1 group-hover:border-[#00a375]/30 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
+            <p className={`text-[8px] mt-1 font-mono-tech border-t border-slate-900 pt-1 group-hover:border-[#00a375]/30 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
                 }`}>
                 {subLabel}
             </p>

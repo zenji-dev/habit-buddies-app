@@ -9,11 +9,11 @@ interface CheckIn {
 
 // ViewBox dimensions — SVG scales to fill whatever space it gets
 const VW = 420;
-const VH = 110;
+const VH = 85;
 const PAD_L = 26;
 const PAD_R = 18;
-const PAD_T = 16;
-const PAD_B = 30;
+const PAD_T = 12;
+const PAD_B = 22;
 
 const PLOT_W = VW - PAD_L - PAD_R;
 const PLOT_H = VH - PAD_T - PAD_B;
@@ -65,12 +65,12 @@ export const WeeklyStreak = ({
             <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
 
             {/* ── Header ── */}
-            <div className="relative z-10 flex justify-between items-center px-3 pt-2 pb-2 border-b border-slate-900 shrink-0">
-                <h3 className="text-sm font-bold text-white font-mono-tech tracking-wider flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#e66b00] animate-pulse" />
+            <div className="relative z-10 flex justify-between items-center px-3 pt-1.5 pb-1.5 border-b border-slate-900 shrink-0">
+                <h3 className="text-xs font-bold text-white font-mono-tech tracking-wider flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-[#e66b00] animate-pulse" />
                     STREAK_MONITOR
                 </h3>
-                <span className="text-[10px] font-mono-tech text-gray-500">
+                <span className="text-[9px] font-mono-tech text-gray-500">
                     [{format(days[0].date, "dd/MM")} — {format(days[6].date, "dd/MM")}]
                 </span>
             </div>
@@ -201,10 +201,10 @@ export const WeeklyStreak = ({
                                 {hasData && !day.isFuture && (
                                     <text
                                         x={cx}
-                                        y={cy - 9}
+                                        y={cy - 7}
                                         textAnchor="middle"
                                         fill={day.isToday ? "#e66b00" : "#00a375"}
-                                        fontSize="8"
+                                        fontSize="7"
                                         fontFamily="monospace"
                                         opacity="0.85"
                                     >
@@ -215,10 +215,10 @@ export const WeeklyStreak = ({
                                 {/* Day label */}
                                 <text
                                     x={cx}
-                                    y={PAD_T + PLOT_H + 13}
+                                    y={PAD_T + PLOT_H + 10}
                                     textAnchor="middle"
                                     fill={day.isToday ? "#e66b00" : "#4b5563"}
-                                    fontSize="7"
+                                    fontSize="6"
                                     fontFamily="monospace"
                                     fontWeight={day.isToday ? "bold" : "normal"}
                                 >
@@ -229,10 +229,10 @@ export const WeeklyStreak = ({
                                 {day.isToday && (
                                     <text
                                         x={cx}
-                                        y={PAD_T + PLOT_H + 23}
+                                        y={PAD_T + PLOT_H + 18}
                                         textAnchor="middle"
                                         fill="#00a375"
-                                        fontSize="6"
+                                        fontSize="5"
                                         fontFamily="monospace"
                                     >
                                         NOW
