@@ -1,97 +1,68 @@
-import { LayoutDashboard, Users, Settings, LogOut, Moon, Sun, Calendar } from "lucide-react";
-import { NavLink, Link, useLocation } from "react-router-dom";
-import { useAuth, useUser } from "@clerk/clerk-react";
-import { useProfile } from "@/hooks/useProfile";
+import { LayoutDashboard, Calendar, User, Settings, LogOut, Terminal } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/components/theme-provider";
 
 const navItems = [
-  { to: "/dashboard", label: "Início", icon: LayoutDashboard },
-  { to: "/calendar", label: "Calendário", icon: Calendar },
-  { to: "/social", label: "Social", icon: Users },
-  { to: "/settings", label: "Configurações", icon: Settings },
+  { to: "/dashboard", label: "DASHBOARD_V1", icon: LayoutDashboard },
+  { to: "/calendar", label: "CALENDAR_EXE", icon: Calendar },
+  { to: "/social", label: "NETWORK_SYS", icon: User },
+  { to: "/settings", label: "SYSTEM_CONFIG", icon: Settings },
 ];
 
 export const AppSidebar = () => {
   const location = useLocation();
-  const { signOut, userId } = useAuth();
-  const { user } = useUser();
-  const { theme, setTheme } = useTheme();
-  const { data: profile } = useProfile();
+  const { userId } = useAuth();
+  const { signOut } = useClerk();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-sidebar border-r border-sidebar-border h-screen sticky top-0 p-6 pb-8 overflow-y-auto z-50">
-      <div className="flex items-center gap-3 px-2 mb-10">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-          <LayoutDashboard className="w-5 h-5 text-primary-foreground" />
-        </div>
-        <div>
-          <h1 className="font-bold text-foreground text-xl tracking-tight">Habit Buddies</h1>
-        </div>
+    <aside className="hidden md:flex w-20 lg:w-24 bg-sidebar-dark border-r border-slate-900 shadow-[2px_0_15px_rgba(0,163,117,0.05)] flex-col items-center py-8 shrink-0 fixed h-screen z-50">
+      {/* Logo */}
+      <div className="w-10 h-10 bg-transparent border border-[#00a375] text-[#00a375] flex items-center justify-center mb-12 shadow-[0_0_10px_rgba(0,163,117,0.3)] hover:shadow-[0_0_15px_rgba(0,163,117,0.6)] transition-all duration-300">
+        <Terminal className="w-5 h-5" />
       </div>
 
-      <nav className="flex-1 space-y-2">
+      {/* Nav */}
+      <nav className="flex-1 w-full flex flex-col items-center gap-8">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.to;
+          const isActive = location.pathname === item.to ||
+            (item.to === "/social" && location.pathname.startsWith("/profile"));
           return (
             <NavLink
               key={item.to}
-              to={item.to}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                isActive
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              )}
+              to={item.to === "/social" ? `/profile/${userId}` : item.to}
+              className="group relative flex items-center justify-center w-full"
             >
-              <item.icon className={cn("w-5 h-5", isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
-              {item.label}
+              {/* Active indicator bar — orange accent */}
+              {isActive && (
+                <div className="absolute left-0 h-8 w-1 bg-[#e66b00] shadow-[0_0_8px_#e66b00]" />
+              )}
+
+              <div className={cn(
+                "p-3 transition-all",
+                isActive
+                  ? "bg-[#00a375]/10 border border-[#00a375]/50 text-[#00a375] shadow-[0_0_10px_rgba(0,163,117,0.2)]"
+                  : "text-[#00a375]/50 hover:text-[#00a375] hover:border hover:border-[#00a375]/50 hover:bg-[#00a375]/5 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)]"
+              )}>
+                <item.icon className="w-6 h-6" />
+              </div>
+
+              {/* Tooltip */}
+              <div className="absolute left-full ml-4 px-3 py-1 bg-background-dark border border-[#00a375] text-[#00a375] font-mono-tech text-xs shadow-neon opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                {item.label}
+              </div>
             </NavLink>
           );
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border pt-6 mt-6 space-y-4">
-        <Link
-          to={`/profile/${userId}`}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-secondary/50 transition-colors group border border-transparent hover:border-sidebar-border"
-        >
-          <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-primary transition-colors flex-shrink-0">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-muted-foreground font-bold text-sm group-hover:text-foreground">
-                {profile?.name?.charAt(0) || user?.primaryEmailAddress?.emailAddress?.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
-              {profile?.name || "Meu Perfil"}
-            </p>
-            <p className="text-[10px] text-muted-foreground truncate italic">
-              {profile?.username ? `@${profile.username}` : user?.primaryEmailAddress?.emailAddress}
-            </p>
-          </div>
-        </Link>
-
-        <div className="flex items-center justify-between px-3">
-          <span className="text-xs text-muted-foreground font-medium">Tema</span>
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            title="Alternar tema"
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-        </div>
-
+      {/* Logout */}
+      <div className="mt-auto">
         <button
           onClick={() => signOut()}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 w-full transition-colors"
+          className="w-10 h-10 border border-slate-800 flex items-center justify-center text-[#00a375]/50 hover:text-[#00a375] hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all"
         >
-          <LogOut className="w-4 h-4" />
-          Sair
+          <LogOut className="w-5 h-5" />
         </button>
       </div>
     </aside>

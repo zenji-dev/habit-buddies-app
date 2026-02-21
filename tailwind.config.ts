@@ -2,18 +2,22 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
       center: true,
       padding: "2rem",
-      screens: { "2xl": "1400px" },
+      screens: {
+        "2xl": "1400px",
+      },
     },
     extend: {
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -48,15 +52,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
-        streak: "hsl(var(--streak))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -67,6 +62,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom hacker navy colors
+        "background-dark": "#010205",
+        "surface-dark": "#02040a",
+        "card-dark": "#02040a",
+        "sidebar-dark": "#010205",
+        "neon-glow": "rgba(0, 163, 117, 0.5)",
+        "neon-primary": "#00a375",
+        "neon-accent": "#e66b00",
+      },
+      fontFamily: {
+        display: ["Inter", "sans-serif"],
+        body: ["Inter", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
+      },
+      boxShadow: {
+        neon: "0 0 5px #00a375, 0 0 10px #00a375",
+        "neon-sm": "0 0 2px #00a375",
+        "neon-box": "0 0 10px rgba(0, 163, 117, 0.15)",
+        "neon-border": "0 0 2px #00a375",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,23 +88,18 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
-        "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
-        "check-bounce": {
-          "0%": { transform: "scale(0.8)" },
-          "50%": { transform: "scale(1.2)" },
-          "100%": { transform: "scale(1)" },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        "streak-glow": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.7" },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "check-bounce": "check-bounce 0.3s ease-out",
-        "streak-glow": "streak-glow 2s ease-in-out infinite",
       },
     },
   },

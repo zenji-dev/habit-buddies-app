@@ -51,10 +51,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // Exibe uma tela de carregamento enquanto verifica a autenticação ou o perfil
   if (!isLoaded || (isSignedIn && profileLoading)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-background-dark">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground font-medium animate-pulse">Carregando...</p>
+          <div className="w-10 h-10 border-2 border-[#00a375] border-t-transparent animate-spin" />
+          <p className="text-[#00a37566] text-[10px] font-bold uppercase tracking-widest animate-pulse">&gt; LOADING_SYSTEM...</p>
         </div>
       </div>
     );
@@ -74,7 +74,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Componente principal que define todos os provedores (Tema, Query, Auth) e as Rotas
 const App = () => (
-  <ThemeProvider defaultTheme="system" storageKey="habit-buddies-theme">
+  <ThemeProvider defaultTheme="dark" storageKey="habit-buddies-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
