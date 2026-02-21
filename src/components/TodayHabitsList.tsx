@@ -25,14 +25,18 @@ const HabitItem = ({
 }: HabitItemProps) => {
     return (
         <div className="group flex items-center gap-5 p-5 bg-card hover:bg-secondary/20 border border-border/50 rounded-2xl transition-all duration-300 shadow-md shadow-black/30 hover:shadow-lg hover:shadow-black/40 hover:-translate-y-0.5 relative overflow-hidden">
-            {/* Checkbox Circle */}
+            {/* 
+                Checkbox Circle - Funciona como toggle: 
+                clique para marcar e clique novamente para desmarcar.
+                Desabilitado apenas durante o carregamento (isPending).
+            */}
             <button
                 onClick={onCheckIn}
-                disabled={isPending || isChecked}
+                disabled={isPending}
                 className={cn(
-                    "w-12 h-12 rounded-full border-[3px] flex items-center justify-center transition-all duration-300 shrink-0 z-10",
+                    "w-12 h-12 rounded-full border-[3px] flex items-center justify-center transition-all duration-300 shrink-0 z-10 cursor-pointer",
                     isChecked
-                        ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-100"
+                        ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-100 hover:bg-primary/80 hover:shadow-primary/20"
                         : "border-muted-foreground/20 hover:border-primary/50 bg-secondary/30 hover:bg-secondary/50 scale-95 hover:scale-100"
                 )}
             >

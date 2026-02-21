@@ -14,6 +14,8 @@ interface DayStreak {
     date: Date;
     status: "completed" | "partial" | "none";
     isToday: boolean;
+    /** Porcentagem real de conclusão dos hábitos neste dia (0–100) */
+    percentage: number;
 }
 
 export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], habitsCount: number }) => {
@@ -25,6 +27,9 @@ export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], h
         const dateStr = format(date, "yyyy-MM-dd");
         const dayCheckIns = checkIns.filter(c => c.completed_at === dateStr).length;
 
+        // Calcula a porcentagem real de conclusão do dia
+        const percentage = habitsCount > 0 ? Math.round((dayCheckIns / habitsCount) * 100) : 0;
+
         let status: "completed" | "partial" | "none" = "none";
         if (dayCheckIns >= habitsCount && habitsCount > 0) status = "completed";
         else if (dayCheckIns > 0) status = "partial";
@@ -32,7 +37,8 @@ export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], h
         return {
             date,
             status,
-            isToday: isToday(date)
+            isToday: isToday(date),
+            percentage
         };
     });
 
@@ -72,7 +78,8 @@ export const WeeklyStreak = ({ checkIns, habitsCount }: { checkIns: CheckIn[], h
                                 {isDone ? (
                                     <Check className="w-5 h-5" />
                                 ) : isPartial ? (
-                                    <span className="text-[10px] font-black">50%</span>
+                                    /* Exibe a porcentagem real calculada em vez de um valor fixo */
+                                    <span className="text-[10px] font-black">{day.percentage}%</span>
                                 ) : (
                                     <div className="w-1.5 h-1.5 rounded-full bg-border" />
                                 )}
