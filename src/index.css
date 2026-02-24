@@ -77,6 +77,10 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     background-color: #010205;
+    background-image: radial-gradient(circle at center, transparent 0%, rgba(1, 2, 5, 0.4) 100%);
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
   }
 }
 
@@ -105,10 +109,7 @@
 
 /* ===== GRID BACKGROUND ===== */
 .grid-bg {
-  background-size: 20px 20px;
-  background-image:
-    linear-gradient(to right, #050a14 1px, transparent 1px),
-    linear-gradient(to bottom, #050a14 1px, transparent 1px);
+  background-image: none;
 }
 
 /* ===== SCANLINE OVERLAY ===== */
@@ -135,6 +136,15 @@
 
 .shadow-neon-box {
   box-shadow: 0 0 10px rgba(0, 163, 117, 0.15);
+}
+
+/* ===== GLASSMORPHISM ===== */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(2, 4, 10, 0.25) 0%, rgba(0, 163, 117, 0.04) 100%) !important;
+  backdrop-filter: blur(6px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(150%) !important;
+  border: 1px solid rgba(0, 163, 117, 0.4) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 163, 117, 0.2) !important;
 }
 
 /* ===== SELECTION ===== */

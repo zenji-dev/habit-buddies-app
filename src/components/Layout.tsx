@@ -4,7 +4,7 @@ import { MobileNav } from "./MobileNav";
 
 export const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="bg-background-dark text-gray-300 min-h-screen flex flex-row overflow-x-hidden selection:bg-[#00a375] selection:text-white">
+    <div className="bg-transparent text-gray-300 min-h-screen flex flex-row overflow-x-hidden selection:bg-[#00a375] selection:text-white">
       {/* Scanline overlay */}
       <div className="scanline" />
 

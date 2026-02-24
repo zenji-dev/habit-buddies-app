@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-transparent p-4">
       <SignedIn>
         <Navigate to="/dashboard" replace />
       </SignedIn>

@@ -14,6 +14,7 @@ interface AddHabitDialogProps {
 export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [icon, setIcon] = useState("💪");
   const [goalMinutes, setGoalMinutes] = useState("30");
   const { addHabit, habits } = useHabits();
@@ -29,8 +30,8 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
     }
 
     addHabit.mutate(
-      { name, icon, goal_minutes: parseInt(goalMinutes) || 0 },
-      { onSuccess: () => { setOpen(false); setName(""); setGoalMinutes("30"); } }
+      { name, icon, description, goal_minutes: parseInt(goalMinutes) || 0 },
+      { onSuccess: () => { setOpen(false); setName(""); setDescription(""); setGoalMinutes("30"); } }
     );
   };
 
@@ -57,6 +58,18 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              className="bg-card-dark border-slate-900 text-white rounded-none text-xs font-mono-tech focus:border-[#00a375] focus:ring-[#00a375]/30 placeholder:text-gray-600"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-gray-500 flex justify-between uppercase tracking-widest font-mono-tech mb-2">
+              <span>DESCRIPTION</span>
+              <span className="text-gray-700">OPTIONAL</span>
+            </label>
+            <Input
+              placeholder="enter_habit_details..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="bg-card-dark border-slate-900 text-white rounded-none text-xs font-mono-tech focus:border-[#00a375] focus:ring-[#00a375]/30 placeholder:text-gray-600"
             />
           </div>

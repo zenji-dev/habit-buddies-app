@@ -61,11 +61,11 @@ export const WeeklyStreak = ({
     const gridPcts = [0.25, 0.5, 0.75, 1.0];
 
     return (
-        <div className="bg-card-dark border border-slate-900 rounded-none shadow-neon-box relative overflow-hidden h-full flex flex-col">
+        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden h-full flex flex-col">
             <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
 
             {/* ── Header ── */}
-            <div className="relative z-10 flex justify-between items-center px-3 pt-1.5 pb-1.5 border-b border-slate-900 shrink-0">
+            <div className="relative z-10 flex justify-between items-center px-3 pt-1.5 pb-1.5 border-b border-[#00a375]/30 shrink-0">
                 <h3 className="text-xs font-bold text-white font-mono-tech tracking-wider flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-[#e66b00] animate-pulse" />
                     STREAK_MONITOR
@@ -109,7 +109,7 @@ export const WeeklyStreak = ({
                             <line
                                 x1={PAD_L} y1={py(pct)}
                                 x2={VW - PAD_R} y2={py(pct)}
-                                stroke="#1a2535"
+                                stroke="rgba(0,163,117,0.3)"
                                 strokeWidth="0.8"
                                 strokeDasharray="4 5"
                             />
@@ -132,7 +132,7 @@ export const WeeklyStreak = ({
                             key={i}
                             x1={px(i)} y1={PAD_T}
                             x2={px(i)} y2={PAD_T + PLOT_H}
-                            stroke="#111827"
+                            stroke="rgba(0,163,117,0.2)"
                             strokeWidth="0.6"
                         />
                     ))}
@@ -141,7 +141,7 @@ export const WeeklyStreak = ({
                     <line
                         x1={PAD_L} y1={PAD_T + PLOT_H}
                         x2={VW - PAD_R} y2={PAD_T + PLOT_H}
-                        stroke="#1a2535"
+                        stroke="rgba(0,163,117,0.3)"
                         strokeWidth="1"
                     />
 

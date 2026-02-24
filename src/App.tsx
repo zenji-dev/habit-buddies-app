@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import StravaCallback from "./pages/StravaCallback";
 import NotFound from "./pages/NotFound";
 import CalendarPage from "./pages/Calendar";
+import { Starfield } from "@/components/Starfield";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <SupabaseTokenSync />
+        <Starfield />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

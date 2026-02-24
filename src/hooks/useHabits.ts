@@ -37,11 +37,12 @@ export const useHabits = () => {
   });
 
   const addHabit = useMutation({
-    mutationFn: async ({ name, icon, goal_minutes }: { name: string; icon: string; goal_minutes?: number }) => {
+    mutationFn: async ({ name, icon, description, goal_minutes }: { name: string; icon: string; description?: string; goal_minutes?: number }) => {
       const { error } = await supabase.from("habits").insert({
         user_id: userId!,
         name,
         icon,
+        description,
         goal_minutes: goal_minutes || 0,
       });
       if (error) throw error;

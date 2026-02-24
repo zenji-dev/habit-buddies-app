@@ -20,7 +20,7 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon }: MetricCardProps) => (
-    <div className="bg-card-dark border border-slate-900 hover:border-[#00a375]/50 rounded-none p-2 text-white relative group overflow-hidden shadow-neon-box transition-all duration-300">
+    <div className="glass-panel hover:border-[#00a375]/50 rounded-none p-2 text-white relative group overflow-hidden shadow-neon-box transition-all duration-300">
         {/* Orange status dot */}
         <div className="absolute top-0 right-0 p-1">
             <div className="w-1.5 h-1.5 bg-[#e66b00] rounded-full group-hover:shadow-[0_0_5px_#e66b00] transition-all" />
@@ -39,7 +39,7 @@ const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon }
             <span className="text-lg font-bold font-mono-tech text-white group-hover:text-[#00a375] transition-colors leading-none">
                 {value}
             </span>
-            <p className={`text-[8px] mt-1 font-mono-tech border-t border-slate-900 pt-1 group-hover:border-[#00a375]/30 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
+            <p className={`text-[8px] mt-1 font-mono-tech border-t border-[#00a375]/30 pt-1 group-hover:border-[#00a375]/50 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
                 }`}>
                 {subLabel}
             </p>

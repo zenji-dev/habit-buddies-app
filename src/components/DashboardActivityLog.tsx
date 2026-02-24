@@ -9,7 +9,7 @@ interface ActivityItem {
 
 export const DashboardActivityLog = ({ activity }: { activity: ActivityItem[] }) => {
     return (
-        <div className="bg-card-dark border border-slate-900 rounded-none p-0 min-h-[500px] shadow-neon-box relative">
+        <div className="glass-panel rounded-none p-0 min-h-[500px] shadow-neon-box relative">
             <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
 
             <div className="p-6 relative z-10">

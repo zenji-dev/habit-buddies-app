@@ -3,6 +3,7 @@ import { useState } from "react";
 import { StartPartyDialog } from "./StartPartyDialog";
 import { cn } from "@/lib/utils";
 import { Network, CheckCircle, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const PartyChallenge = () => {
     const { challenge, checkIn } = usePartyChallenge();
@@ -14,7 +15,7 @@ export const PartyChallenge = () => {
 
     return (
         <>
-            <div className="bg-card-dark border border-slate-900 rounded-none h-full flex flex-col p-0 shadow-neon-box relative overflow-hidden">
+            <div className="glass-panel rounded-none h-full flex flex-col p-0 shadow-neon-box relative overflow-hidden">
                 {/* Grid background */}
                 <div className="absolute inset-0 grid-bg opacity-30" />
 
@@ -59,9 +60,9 @@ export const PartyChallenge = () => {
 
                             <div className="flex flex-wrap justify-center gap-3">
                                 {members.map((member) => (
-                                    <div key={member.user_id} className="flex flex-col items-center gap-1">
+                                    <Link key={member.user_id} to={`/profile/${member.user_id}`} className="flex flex-col items-center gap-1 group">
                                         <div className={cn(
-                                            "w-10 h-10 border bg-background-dark flex items-center justify-center overflow-hidden",
+                                            "w-10 h-10 border bg-background-dark flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110",
                                             member.checkedInToday
                                                 ? "border-[#00a375] shadow-[0_0_10px_rgba(0,163,117,0.3)]"
                                                 : "border-slate-800"
@@ -72,11 +73,11 @@ export const PartyChallenge = () => {
                                                 <Users className="w-4 h-4 text-gray-500" />
                                             )}
                                         </div>
-                                        <span className="text-[8px] font-mono-tech text-gray-500">{member.name?.split(" ")[0]}</span>
+                                        <span className="text-[8px] font-mono-tech text-gray-500 group-hover:text-gray-300 transition-colors">{member.name?.split(" ")[0]}</span>
                                         {member.checkedInToday && (
                                             <CheckCircle className="w-3 h-3 text-[#00a375]" />
                                         )}
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
 

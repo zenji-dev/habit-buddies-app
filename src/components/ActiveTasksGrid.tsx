@@ -84,10 +84,10 @@ export const ActiveTasksGrid = ({
 
     if (visibleHabits.length === 0) {
         return (
-            <div className="bg-card-dark border border-slate-900 rounded-none shadow-neon-box p-6 h-[320px] flex flex-col">
+            <div className="glass-panel rounded-none shadow-neon-box p-6 h-[320px] flex flex-col">
                 <h3 className="text-base font-bold text-white font-mono-tech tracking-wider mb-4">active tasks</h3>
                 <div className="flex-1 flex items-center justify-center">
-                    <p className="text-[10px] font-mono-tech text-gray-600 uppercase tracking-widest">
+                    <p className="text-[10px] font-mono-tech text-gray-00 uppercase tracking-widest">
                         &gt; waiting for input...
                     </p>
                 </div>
@@ -96,14 +96,14 @@ export const ActiveTasksGrid = ({
     }
 
     return (
-        <div className="bg-card-dark border border-slate-900 rounded-none shadow-neon-box relative overflow-hidden h-[320px] flex flex-col">
+        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden h-[320px] flex flex-col">
             <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none" />
 
             <div className="relative z-10 flex flex-col h-full">
                 {/* ─── HEADER ─── */}
-                <div className="shrink-0 flex items-stretch border-b border-slate-900">
+                <div className="shrink-0 flex items-stretch border-b border-[#00a375]/30">
                     {/* Left col header */}
-                    <div className="w-64 shrink-0 px-4 py-2 border-r border-slate-900 flex items-center">
+                    <div className="w-64 shrink-0 px-4 py-2 border-r border-[#00a375]/30 flex items-center">
                         <span className="text-sm font-bold text-white font-mono-tech tracking-wider">active tasks</span>
                     </div>
 
@@ -113,7 +113,7 @@ export const ActiveTasksGrid = ({
                                 <div
                                     key={dIdx}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center text-[8px] font-mono-tech uppercase font-bold border-r border-slate-900/60 last:border-r-0",
+                                        "flex-1 flex items-center justify-center text-[8px] font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0",
                                         day.isToday ? "text-[#e66b00]" : "text-gray-600"
                                     )}
                                 >
@@ -125,7 +125,7 @@ export const ActiveTasksGrid = ({
                 </div>
 
                 {/* ─── HABIT ROWS ─── */}
-                <div className="flex-1 flex flex-col divide-y divide-slate-900 overflow-hidden">
+                <div className="flex-1 flex flex-col overflow-hidden">
                     {visibleHabits.map((habit) => {
                         const checked = isCheckedToday(habit.id);
                         const rate = getRate(habit.id);
@@ -133,10 +133,10 @@ export const ActiveTasksGrid = ({
                         const busy = isPending || isUnchecking;
 
                         return (
-                            <div key={habit.id} className="flex-1 flex items-stretch hover:bg-[#00a375]/[0.03] transition-all duration-500 min-h-[30px] max-h-[45px]">
+                            <div key={habit.id} className="flex-1 flex items-stretch hover:bg-[#00a375]/[0.03] transition-all duration-500 min-h-[30px] max-h-[45px] border-b border-[#00a375]/30">
 
                                 {/* ─── LEFT: Check-in button + name ─── */}
-                                <div className="w-64 shrink-0 px-4 border-r border-slate-900 flex items-center gap-3">
+                                <div className="w-64 shrink-0 px-4 border-r border-[#00a375]/30 flex items-center gap-3">
                                     {/* CHECK-IN BUTTON */}
                                     <button
                                         onClick={() => handleToggle(habit.id)}
@@ -174,7 +174,7 @@ export const ActiveTasksGrid = ({
                                             )}
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className="flex-1 h-1 bg-[#050a14] border border-slate-900 overflow-hidden">
+                                            <div className="flex-1 h-1 bg-[#050a14] border border-[#00a375]/30 overflow-hidden">
                                                 <div
                                                     className="h-full bg-[#00a375] transition-all duration-500"
                                                     style={{ width: `${rate}%` }}
@@ -195,7 +195,7 @@ export const ActiveTasksGrid = ({
                                             return (
                                                 <div
                                                     key={day.dateStr}
-                                                    className="flex-1 flex items-center justify-center border-r border-slate-900/40 last:border-r-0"
+                                                    className="flex-1 flex items-center justify-center border-r border-[#00a375]/30 last:border-r-0"
                                                 >
                                                     <div
                                                         title={`${day.dateStr}${dayChecked ? " ✓" : ""}`}
@@ -225,7 +225,7 @@ export const ActiveTasksGrid = ({
                 </div>
 
                 {/* ─── LEGEND ─── */}
-                <div className="shrink-0 flex items-center gap-5 px-5 py-2 border-t border-slate-900">
+                <div className="shrink-0 flex items-center gap-5 px-5 py-2 border-t border-[#00a375]/30">
                     <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-[#00a375]" />
                         <span className="text-[13px] font-mono-tech text-gray-500 uppercase tracking-wider">Concluído</span>

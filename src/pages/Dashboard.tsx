@@ -133,7 +133,7 @@ const Dashboard = () => {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-0 bg-background-dark border-slate-900 shadow-neon-box rounded-none" align="end">
+              <PopoverContent className="w-80 p-0 glass-panel shadow-neon-box rounded-none" align="end">
                 <div className="p-3 border-b border-slate-900">
                   <h3 className="text-xs font-bold text-white font-mono-tech uppercase tracking-wider">INCOMING_SIGNALS</h3>
                 </div>
@@ -167,7 +167,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Profile card — 3 cols */}
           <div className="lg:col-span-3">
-            <div className="bg-surface-dark border border-slate-900 rounded-none relative pb-4 shadow-neon-box grid-bg">
+            <div className="glass-panel rounded-none relative pb-4 shadow-neon-box grid-bg">
               {/* Cover */}
               <div className="h-[90px] w-full bg-[#050a14] relative overflow-hidden">
                 <div className="absolute inset-0 bg-[#00a375] mix-blend-overlay opacity-5" />

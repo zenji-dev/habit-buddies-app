@@ -26,7 +26,7 @@ export const MyHabitsDialog = ({ children }: MyHabitsDialogProps) => {
                     </button>
                 )}
             </DialogTrigger>
-            <DialogContent className="bg-background-dark border-slate-900 rounded-none max-w-md p-0 overflow-hidden shadow-neon-box">
+            <DialogContent className="glass-panel rounded-none max-w-md p-0 overflow-hidden shadow-neon-box">
                 <DialogHeader className="p-5 pb-3 border-b border-slate-900">
                     <DialogTitle className="flex items-center gap-2 text-sm font-bold text-white uppercase tracking-wider font-mono-tech">
                         <Settings2 className="w-4 h-4 text-[#00a375]" />

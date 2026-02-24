@@ -63,7 +63,7 @@ export const StartPartyDialog = ({ open, onOpenChange, initialSelectedFriendId }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md bg-background-dark border-slate-900 rounded-none shadow-neon-box">
+            <DialogContent className="sm:max-w-md glass-panel rounded-none shadow-neon-box">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-white text-sm uppercase tracking-wider font-mono-tech">
                         <Trophy className="w-4 h-4 text-[#00a375]" />
