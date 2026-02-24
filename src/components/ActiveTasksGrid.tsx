@@ -1,13 +1,15 @@
 import { format, startOfWeek, addDays, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Check, Flame, Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { Check, Flame, Loader2, Info } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Habit {
     id: string;
     name: string;
     icon: string;
     goal_minutes: number;
+    description?: string | null;
 }
 
 interface CheckIn {
@@ -39,6 +41,7 @@ export const ActiveTasksGrid = ({
     isPending,
     isUnchecking,
 }: ActiveTasksGridProps) => {
+    const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
     const today = new Date();
     const todayStr = format(today, "yyyy-MM-dd");
 
@@ -160,12 +163,14 @@ export const ActiveTasksGrid = ({
                                     {/* NAME + STREAK + PROGRESS */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-1.5 mb-1">
-                                            <span className={cn(
-                                                "text-xs font-bold font-mono-tech truncate transition-colors",
-                                                checked ? "text-[#00a375]" : "text-white"
-                                            )}>
+                                            <button
+                                                onClick={() => setSelectedHabit(habit)}
+                                                className={cn(
+                                                    "text-xs font-bold font-mono-tech truncate transition-colors text-left hover:underline",
+                                                    checked ? "text-[#00a375]" : "text-white hover:text-[#00a375]"
+                                                )}>
                                                 {habit.name}
-                                            </span>
+                                            </button>
                                             {streak > 0 && (
                                                 <span className="flex items-center gap-0.5 text-[9px] font-mono-tech text-[#e66b00] shrink-0">
                                                     <Flame className="w-3 h-3" />
@@ -244,6 +249,36 @@ export const ActiveTasksGrid = ({
                     </div>
                 </div>
             </div>
+
+            <Dialog open={!!selectedHabit} onOpenChange={(open) => !open && setSelectedHabit(null)}>
+                <DialogContent className="bg-background-dark border-slate-900 rounded-none max-w-sm shadow-neon-box">
+                    <DialogHeader>
+                        <DialogTitle className="text-white text-base uppercase tracking-wider font-mono-tech flex items-center gap-3">
+                            <span className="text-[#00a375] text-xl bg-[#00a375]/10 w-8 h-8 flex items-center justify-center border border-[#00a375]/30">{selectedHabit?.icon}</span>
+                            {selectedHabit?.name}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-2">
+                        <h4 className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech mb-2">DESCRIPTION</h4>
+                        <div className="bg-card-dark border border-slate-900 p-3 rounded-none relative">
+                            <p className="text-xs font-mono-tech text-gray-300 whitespace-pre-wrap leading-relaxed">
+                                {selectedHabit?.description || "> no_description_provided"}
+                            </p>
+                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00a375]/50 -mt-[1px] -mr-[1px]" />
+                            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00a375]/50 -mb-[1px] -ml-[1px]" />
+                        </div>
+                        {selectedHabit?.goal_minutes ? (
+                            <div className="mt-5">
+                                <h4 className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech mb-2">DAILY_TARGET</h4>
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00a375]/10 border border-[#00a375]/30">
+                                    <span className="text-sm font-bold font-mono-tech text-[#00a375]">{selectedHabit.goal_minutes}</span>
+                                    <span className="text-[10px] text-[#00a375]/70 font-mono-tech tracking-widest">MINUTES</span>
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

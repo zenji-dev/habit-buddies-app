@@ -51,6 +51,10 @@ export const useHabits = () => {
       queryClient.invalidateQueries({ queryKey: ["habits"] });
       toast.success("Hábito adicionado!");
     },
+    onError: (error) => {
+      console.error("Error adding habit:", error);
+      toast.error("Erro ao criar hábito: " + error.message);
+    }
   });
 
   const checkIn = useMutation({
@@ -73,6 +77,10 @@ export const useHabits = () => {
       queryClient.invalidateQueries({ queryKey: ["check_ins"] });
       toast.success("Check-in realizado! 🔥");
     },
+    onError: (error) => {
+      console.error("Error on check-in:", error);
+      toast.error("Erro ao fazer check-in: " + error.message);
+    }
   });
 
   const getStreak = (habitId: string): number => {

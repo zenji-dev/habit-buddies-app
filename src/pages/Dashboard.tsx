@@ -1,6 +1,4 @@
 import { useHabits } from "@/hooks/useHabits";
-import { useProfile } from "@/hooks/useProfile";
-import { useSocial } from "@/hooks/useSocial";
 import { Layout } from "@/components/Layout";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
@@ -11,7 +9,7 @@ import { MyHabitsDialog } from "@/components/MyHabitsDialog";
 
 import { ActiveTasksGrid } from "@/components/ActiveTasksGrid";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
-import { Bell, Plus, Settings2, Instagram, Twitter } from "lucide-react";
+import { Bell, Plus, Settings2 } from "lucide-react";
 import { format } from "date-fns";
 import {
   Popover,
@@ -22,9 +20,7 @@ import { useAuth } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const { data: profile } = useProfile();
   const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
-  const { friends } = useSocial();
   const { invites } = usePartyChallenge();
   const { userId } = useAuth();
 
@@ -163,119 +159,30 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* ===== ROW 1: Profile + Party ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Profile card — 3 cols */}
-          <div className="lg:col-span-3">
-            <div className="glass-panel rounded-none relative pb-4 shadow-neon-box grid-bg">
-              {/* Cover */}
-              <div className="h-[90px] w-full bg-[#050a14] relative overflow-hidden">
-                <div className="absolute inset-0 bg-[#00a375] mix-blend-overlay opacity-5" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background-dark/60 to-background-dark" />
-                <div className="absolute top-0 left-0 w-full h-px bg-[#00a375]/40 shadow-[0_0_10px_#00a375]" />
-                <div className="absolute bottom-0 left-0 w-full h-px bg-[#00a375]/10" />
-              </div>
-
-              <div className="px-6 relative">
-                {/* Avatar */}
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                  <Link to={`/profile/${userId}`}>
-                    <div className="w-16 h-16 rounded-none border-2 border-[#00a375] bg-background-dark p-1 shadow-[0_0_15px_rgba(0,163,117,0.4)]">
-                      {profile?.avatar_url ? (
-                        <img src={profile.avatar_url} alt={profile?.name} className="w-full h-full object-cover grayscale contrast-125" />
-                      ) : (
-                        <div className="w-full h-full bg-background-dark flex items-center justify-center text-[#00a375] text-2xl font-bold">
-                          {profile?.name?.charAt(0) || "?"}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                </div>
-
-                {/* Stats box */}
-                <div className="hidden md:flex absolute top-4 right-6 bg-background-dark/90 backdrop-blur-md rounded-none p-2 text-[#00a375] text-center gap-4 text-xs border border-[#00a375]/20 -mt-8 shadow-[0_0_10px_rgba(0,163,117,0.1)]">
-                  <div>
-                    <span className="block font-bold text-base font-mono-tech text-white">{friends?.length || 0}</span>
-                    <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Amigos</span>
-                  </div>
-                  <div className="w-px bg-[#00a375]/20" />
-                  <div>
-                    <span className="block font-bold text-base font-mono-tech text-white">{totalCompletedAllTime}</span>
-                    <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Logs</span>
-                  </div>
-                  <div className="w-px bg-[#00a375]/20" />
-                  <div>
-                    <span className="block font-bold text-base font-mono-tech text-white">{currentStreak}</span>
-                    <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Streak</span>
-                  </div>
-                </div>
-
-                {/* Spacer */}
-                <div className="h-[34px] mb-2" />
-
-                {/* Name */}
-                <div className="text-center mb-4">
-                  <h1 className="text-xl font-bold text-white flex items-center justify-center gap-2 tracking-tight">
-                    <span className="text-[#e66b00] font-mono-tech mr-2">&gt;</span>
-                    {profile?.name || "User"}
-                    <span className="text-xl animate-pulse text-[#e66b00]">_</span>
-                  </h1>
-                  <p className="text-[#00a375]/70 font-mono-tech text-[10px] mt-1 uppercase tracking-widest">
-                    [ {profile?.username ? `@${profile.username}` : "USER"} ]
-                  </p>
-                </div>
-
-                {/* Bell inside card */}
-                <div className="flex items-center justify-center">
-                  <Link to={`/profile/${userId}`}>
-                    <button className="w-10 h-10 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
-                      <Bell className="w-5 h-5" />
-                    </button>
-                  </Link>
-                </div>
-
-                {/* Social links */}
-                <div className="flex items-center justify-center gap-3 mt-2">
-                  {profile?.instagram_url && (
-                    <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
-                      <Instagram className="w-4 h-4" />
-                    </a>
-                  )}
-                  {profile?.twitter_url && (
-                    <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
-                      <Twitter className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Party card — 2 cols */}
-          <div className="lg:col-span-2">
+        {/* ===== MAIN DASHBOARD LAYOUT ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Left Column: My Party Net */}
+          <div className="lg:col-span-5 xl:col-span-5 h-[420px] lg:h-[auto]">
             <PartyChallenge />
           </div>
-        </div>
 
-        {/* ===== ROW 2: Metrics + Weekly Streak ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
-          {/* 4 Metric cards — 3 cols */}
-          <div className="lg:col-span-3 h-full">
-            <DashboardMetrics
-              totalHabits={totalHabitsCount}
-              totalCompleted={totalCompletedAllTime}
-              streak={currentStreak}
-              completionRate={averageCompletionRate}
-              todayProgress={todayChecked}
-              todayTotal={totalHabitsCount}
-              bestStreak={bestStreak}
-              completionTrend={completionTrend}
-            />
-          </div>
-
-          {/* Weekly Streak — 2 cols */}
-          <div className="lg:col-span-2 h-full">
-            <WeeklyStreak checkIns={checkIns} habitsCount={totalHabitsCount} />
+          {/* Right Column: Metrics & Streak */}
+          <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 h-[420px] lg:h-auto">
+            <div className="flex-[10] min-h-0">
+              <DashboardMetrics
+                totalHabits={totalHabitsCount}
+                totalCompleted={totalCompletedAllTime}
+                streak={currentStreak}
+                completionRate={averageCompletionRate}
+                todayProgress={todayChecked}
+                todayTotal={totalHabitsCount}
+                bestStreak={bestStreak}
+                completionTrend={completionTrend}
+              />
+            </div>
+            <div className="flex-[9] min-h-0">
+              <WeeklyStreak checkIns={checkIns} habitsCount={totalHabitsCount} />
+            </div>
           </div>
         </div>
 

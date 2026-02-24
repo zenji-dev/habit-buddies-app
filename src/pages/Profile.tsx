@@ -260,132 +260,159 @@ const Profile = () => {
                 </Button>
 
                 {/* ===== PROFILE HEADER ===== */}
-                <div className="bg-card rounded-2xl border border-border p-6 md:p-8 relative overflow-hidden shadow-sm">
-                    <div className="absolute top-0 left-0 w-full h-28 bg-gradient-to-r from-primary/10 via-primary/5 to-streak/10" />
-                    <div className="relative flex flex-col md:flex-row items-center gap-6 pt-4">
+                <div className="glass-panel rounded-none relative pb-4 shadow-neon-box grid-bg pt-[100px] mt-8">
+                    {/* Cover */}
+                    <div className="absolute top-0 left-0 w-full h-[120px] bg-[#050a14] overflow-hidden">
+                        <div className="absolute inset-0 bg-[#00a375] mix-blend-overlay opacity-5" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background-dark/90 to-background-dark" />
+                        <div className="absolute top-0 left-0 w-full h-px bg-[#00a375]/40 shadow-[0_0_10px_#00a375]" />
+                        <div className="absolute bottom-0 left-0 w-full h-px bg-[#00a375]/10" />
+                    </div>
+
+                    {/* Stats box */}
+                    <div className="hidden md:flex absolute top-4 right-6 bg-background-dark/90 backdrop-blur-md rounded-none p-2 text-[#00a375] text-center gap-4 text-xs border border-[#00a375]/20 shadow-[0_0_10px_rgba(0,163,117,0.1)] z-20">
+                        <div>
+                            <span className="block font-bold text-base font-mono-tech text-white">{checkIns.length}</span>
+                            <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Logs</span>
+                        </div>
+                        <div className="w-px bg-[#00a375]/20" />
+                        <div>
+                            <span className="block font-bold text-base font-mono-tech text-white">{habits.reduce((max, h) => Math.max(max, getStreak(h.id)), 0)}</span>
+                            <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Max Streak</span>
+                        </div>
+                    </div>
+
+                    <div className="relative px-6 flex flex-col items-center">
                         {/* Avatar */}
-                        <div className="relative group shrink-0">
-                            <div className="w-28 h-28 rounded-full bg-primary/20 flex items-center justify-center text-5xl font-bold border-4 border-card overflow-hidden relative shadow-lg shadow-primary/10">
+                        <div className="absolute -top-[84px] left-1/2 transform -translate-x-1/2">
+                            <div className="w-24 h-24 rounded-none border-2 border-[#00a375] bg-background-dark p-1 shadow-[0_0_15px_rgba(0,163,117,0.4)] group relative">
                                 {uploading ? (
-                                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <Loader2 className="w-6 h-6 animate-spin text-[#00a375]" />
+                                    </div>
                                 ) : (
                                     <>
-                                        <span className="absolute z-0 text-primary uppercase">
-                                            {(isEditing ? editName : profile.name)?.charAt(0)}
-                                        </span>
-                                        {(isEditing ? editAvatar : profile.avatar_url) && (
+                                        {(isEditing ? editAvatar : profile.avatar_url) ? (
                                             <img
                                                 src={isEditing ? editAvatar : profile.avatar_url}
                                                 alt={isEditing ? editName : profile.name}
-                                                className="w-full h-full object-cover relative z-10"
+                                                className="w-full h-full object-cover grayscale contrast-125"
                                                 onError={(e) => e.currentTarget.style.display = 'none'}
                                             />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-[#00a375] text-3xl font-bold font-mono-tech">
+                                                {(isEditing ? editName : profile.name)?.charAt(0) || "?"}
+                                            </div>
                                         )}
                                     </>
                                 )}
 
                                 {isEditing && !uploading && (
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                                        <Upload className="w-8 h-8 text-white" />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                        <Upload className="w-6 h-6 text-white" />
                                     </div>
                                 )}
-                            </div>
 
-                            {isEditing && (
-                                <label
-                                    htmlFor="avatar-upload"
-                                    className="absolute inset-0 cursor-pointer rounded-full z-50"
-                                    aria-label="Upload Avatar"
-                                >
-                                    <input
-                                        id="avatar-upload"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleAvatarUpload}
-                                        className="hidden"
-                                        disabled={uploading}
-                                    />
-                                </label>
-                            )}
+                                {isEditing && (
+                                    <label
+                                        htmlFor="avatar-upload"
+                                        className="absolute inset-0 cursor-pointer z-50"
+                                        aria-label="Upload Avatar"
+                                    >
+                                        <input
+                                            id="avatar-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleAvatarUpload}
+                                            className="hidden"
+                                            disabled={uploading}
+                                        />
+                                    </label>
+                                )}
+                            </div>
                         </div>
 
+                        {/* Spacer for Avatar */}
+                        <div className="h-[20px]" />
+
                         {/* Info */}
-                        <div className="flex-1 text-center md:text-left min-w-0">
+                        <div className="w-full text-center mt-4">
                             {isEditing ? (
-                                <div className="space-y-3">
+                                <div className="space-y-3 max-w-sm mx-auto">
                                     <Input
                                         value={editName}
                                         onChange={e => setEditName(e.target.value)}
                                         placeholder="Nome de exibição"
-                                        className="text-2xl font-black bg-background"
+                                        className="text-center font-mono-tech bg-background-dark border-[#00a375]/50 text-white rounded-none"
                                     />
                                     <Textarea
                                         value={editBio}
                                         onChange={e => setEditBio(e.target.value)}
-                                        placeholder="Conte um pouco sobre você..."
-                                        className="bg-background min-h-[80px] text-sm"
+                                        placeholder="System bio..."
+                                        className="bg-background-dark border-[#00a375]/50 text-white rounded-none min-h-[80px] text-sm font-mono-tech text-center"
                                     />
-                                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                        <Upload className="w-3 h-3" /> Clique na foto para alterar
+                                    <p className="text-xs text-[#00a375] flex items-center justify-center gap-1 font-mono-tech uppercase tracking-widest mt-2 mb-4">
+                                        <Upload className="w-3 h-3" /> Update Protocol
                                     </p>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="relative">
-                                            <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00a375]" />
                                             <Input
                                                 value={editInstagram}
                                                 onChange={e => setEditInstagram(e.target.value)}
-                                                placeholder="Link Instagram"
-                                                className="pl-9 text-xs bg-background"
+                                                placeholder="Insta URI"
+                                                className="pl-9 text-xs font-mono-tech bg-background-dark border-[#00a375]/50 text-white rounded-none"
                                             />
                                         </div>
                                         <div className="relative">
-                                            <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00a375]" />
                                             <Input
                                                 value={editTwitter}
                                                 onChange={e => setEditTwitter(e.target.value)}
-                                                placeholder="Link X (Twitter)"
-                                                className="pl-9 text-xs bg-background"
+                                                placeholder="X URI"
+                                                className="pl-9 text-xs font-mono-tech bg-background-dark border-[#00a375]/50 text-white rounded-none"
                                             />
                                         </div>
                                     </div>
                                 </div>
                             ) : (
                                 <>
-                                    <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
-                                        <h1 className="text-3xl font-black text-foreground">{profile.name}</h1>
+                                    <div className="mb-2">
+                                        <h1 className="text-2xl font-bold text-white flex items-center justify-center gap-2 tracking-tight">
+                                            <span className="text-[#e66b00] font-mono-tech mr-1">&gt;</span>
+                                            {profile.name}
+                                            <span className="text-xl animate-pulse text-[#e66b00]">_</span>
+                                        </h1>
                                         {profile.username && (
-                                            <span className="text-primary font-bold text-lg">@{profile.username}</span>
+                                            <p className="text-[#00a375]/70 font-mono-tech text-[10px] mt-1 uppercase tracking-widest">
+                                                [ @{profile.username} ]
+                                            </p>
                                         )}
                                     </div>
                                     {profile.bio && (
-                                        <p className="text-muted-foreground text-sm mt-2 leading-relaxed max-w-lg">
+                                        <p className="text-gray-400 text-sm mt-3 leading-relaxed max-w-lg mx-auto font-mono-tech">
                                             {profile.bio}
                                         </p>
                                     )}
-                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-3">
-                                        <p className="text-muted-foreground text-xs flex items-center gap-1">
-                                            <Calendar className="w-3 h-3" /> Membro desde {new Date(profile.created_at).toLocaleDateString("pt-BR")}
+
+                                    <div className="flex justify-center mt-3">
+                                        <p className="text-[#00a375]/50 font-mono-tech text-[10px] flex items-center gap-1 uppercase tracking-widest">
+                                            <Calendar className="w-3 h-3" /> NODE_CREATED: {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                                         </p>
                                     </div>
 
                                     {/* Social links */}
                                     {(profile.instagram_url || profile.twitter_url) && (
-                                        <div className="flex gap-2 mt-3 justify-center md:justify-start">
+                                        <div className="flex gap-4 mt-4 justify-center">
                                             {profile.instagram_url && (
-                                                <Button variant="secondary" size="sm" className="gap-2 rounded-full text-xs font-bold shadow-sm hover:scale-105 transition-transform" asChild>
-                                                    <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer">
-                                                        <Instagram className="w-3.5 h-3.5 text-pink-500" />
-                                                        Instagram
-                                                    </a>
-                                                </Button>
+                                                <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
+                                                    <Instagram className="w-4 h-4" />
+                                                </a>
                                             )}
                                             {profile.twitter_url && (
-                                                <Button variant="secondary" size="sm" className="gap-2 rounded-full text-xs font-bold shadow-sm hover:scale-105 transition-transform" asChild>
-                                                    <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer">
-                                                        <Twitter className="w-3.5 h-3.5 text-sky-500" />
-                                                        Twitter / X
-                                                    </a>
-                                                </Button>
+                                                <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
+                                                    <Twitter className="w-4 h-4" />
+                                                </a>
                                             )}
                                         </div>
                                     )}
@@ -394,55 +421,53 @@ const Profile = () => {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex gap-3 shrink-0">
+                        <div className="mt-6 flex justify-center gap-3">
                             {isOwner ? (
                                 isEditing ? (
                                     <div className="flex gap-2">
-                                        <Button onClick={handleSave} disabled={isSaving} className="gap-2">
-                                            <Save className="w-4 h-4" /> Salvar
-                                        </Button>
-                                        <Button variant="outline" onClick={() => setIsEditing(false)} className="gap-2">
-                                            Cancelar
-                                        </Button>
+                                        <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 bg-[#00a375]/10 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/20 hover:shadow-[0_0_15px_rgba(0,163,117,0.3)] transition-all uppercase tracking-wider disabled:opacity-50 flex items-center gap-2">
+                                            <Save className="w-4 h-4" /> COMMIT
+                                        </button>
+                                        <button onClick={() => setIsEditing(false)} className="px-6 py-2 border border-slate-700 text-gray-500 text-xs font-mono-tech hover:border-slate-500 hover:text-gray-300 transition-all uppercase tracking-wider">
+                                            ABORT
+                                        </button>
                                     </div>
                                 ) : (
-                                    <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2">
-                                        <Edit className="w-4 h-4" /> Editar Perfil
-                                    </Button>
+                                    <button onClick={() => setIsEditing(true)} className="px-6 py-2 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-2">
+                                        <Edit className="w-4 h-4" /> EDIT_SYS
+                                    </button>
                                 )
                             ) : (
                                 !status ? (
-                                    <Button onClick={() => addFriendById.mutate(id!)} className="gap-2 shadow-lg shadow-primary/20">
-                                        <UserPlus className="w-4 h-4" /> Enviar Solicitação
-                                    </Button>
+                                    <button onClick={() => addFriendById.mutate(id!)} className="px-6 py-2 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-2">
+                                        <UserPlus className="w-4 h-4" /> ADD_NODE
+                                    </button>
                                 ) : status.status === "pending" ? (
                                     status.user_id === id ? (
                                         <div className="flex gap-2">
-                                            <Button onClick={() => handleRequest.mutate({ requestId: status.id, status: "accepted" })} className="gap-2">
-                                                Aceitar Convite
-                                            </Button>
+                                            <button onClick={() => handleRequest.mutate({ requestId: status.id, status: "accepted" })} className="px-6 py-2 bg-[#00a375]/10 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/20 hover:shadow-[0_0_15px_rgba(0,163,117,0.3)] transition-all uppercase tracking-wider flex items-center gap-2">
+                                                ACCEPT_SYNC
+                                            </button>
                                         </div>
                                     ) : (
-                                        <Button disabled variant="secondary" className="gap-2">
-                                            <History className="w-4 h-4" /> Solicitação Pendente
-                                        </Button>
+                                        <button disabled className="px-6 py-2 border border-[#e66b00]/50 text-[#e66b00] text-xs font-mono-tech bg-background-dark opacity-70 uppercase tracking-wider flex items-center gap-2">
+                                            <History className="w-4 h-4" /> SYNC_PENDING
+                                        </button>
                                     )
                                 ) : (
-                                    <div className="flex flex-col gap-2">
-                                        <Button
-                                            variant="outline"
-                                            className="text-destructive hover:bg-destructive/10 gap-2 border-destructive/20"
-                                            onClick={() => unfriend.mutate(id!)}
-                                        >
-                                            <UserMinus className="w-4 h-4" /> Desfazer Amizade
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            className="gap-2 font-bold shadow-sm"
+                                    <div className="flex gap-2">
+                                        <button
+                                            className="px-6 py-2 border border-[#e66b00]/50 text-[#e66b00] text-xs font-mono-tech hover:bg-[#e66b00]/10 hover:shadow-[0_0_10px_rgba(230,107,0,0.2)] transition-all uppercase tracking-wider flex items-center gap-2"
                                             onClick={() => setIsInviteDialogOpen(true)}
                                         >
-                                            <PartyPopper className="w-4 h-4" /> Convidar para Party
-                                        </Button>
+                                            <PartyPopper className="w-4 h-4" /> INVITE_PARTY
+                                        </button>
+                                        <button
+                                            className="px-6 py-2 border border-red-900/50 text-red-500 text-xs font-mono-tech hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-2"
+                                            onClick={() => unfriend.mutate(id!)}
+                                        >
+                                            <UserMinus className="w-4 h-4" /> DISCONNECT
+                                        </button>
                                     </div>
                                 )
                             )}
@@ -451,9 +476,9 @@ const Profile = () => {
 
                     {/* Bio prompt for owner without bio */}
                     {!isEditing && isOwner && !profile.bio && (
-                        <div className="relative mt-4">
-                            <button onClick={() => setIsEditing(true)} className="text-sm text-muted-foreground hover:text-primary transition-colors italic">
-                                + Adicionar uma bio ao seu perfil
+                        <div className="relative mt-4 flex justify-center">
+                            <button onClick={() => setIsEditing(true)} className="text-[10px] text-[#00a375]/50 font-mono-tech uppercase tracking-widest hover:text-[#00a375] transition-colors">
+                                + ADD_SYSTEM_BIO
                             </button>
                         </div>
                     )}
