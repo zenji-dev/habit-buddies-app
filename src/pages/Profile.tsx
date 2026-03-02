@@ -255,9 +255,11 @@ const Profile = () => {
     return (
         <Layout>
             <div className="max-w-4xl mx-auto space-y-6">
-                <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 mb-2">
-                    <ArrowLeft className="w-4 h-4" /> Voltar
-                </Button>
+                {!isOwner && (
+                    <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 mb-2">
+                        <ArrowLeft className="w-4 h-4" /> Voltar
+                    </Button>
+                )}
 
                 {/* ===== PROFILE HEADER ===== */}
                 <div className="glass-panel rounded-none relative pb-4 shadow-neon-box grid-bg pt-[100px] mt-8">
@@ -351,9 +353,7 @@ const Profile = () => {
                                         placeholder="System bio..."
                                         className="bg-background-dark border-[#00a375]/50 text-white rounded-none min-h-[80px] text-sm font-mono-tech text-center"
                                     />
-                                    <p className="text-xs text-[#00a375] flex items-center justify-center gap-1 font-mono-tech uppercase tracking-widest mt-2 mb-4">
-                                        <Upload className="w-3 h-3" /> Update Protocol
-                                    </p>
+                                    
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="relative">
                                             <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00a375]" />

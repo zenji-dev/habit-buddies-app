@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/dashboard", label: "DASHBOARD_V1", icon: LayoutDashboard },
   { to: "/calendar", label: "CALENDAR_EXE", icon: Calendar },
-  { to: "/social", label: "NETWORK_SYS", icon: User },
+  { to: "/social", label: "Perfil", icon: User },
   { to: "/settings", label: "SYSTEM_CONFIG", icon: Settings },
 ];
 

@@ -6,48 +6,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Settings as SettingsIcon, User as UserIcon, Link2, LogOut, Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "@/components/theme-provider";
-import { StravaActivities } from "@/components/StravaActivities";
+import { Settings as SettingsIcon, User as UserIcon, Link2, LogOut, Monitor } from "lucide-react";
 
 const Settings = () => {
   const { userId, signOut } = useAuth();
   const { user } = useUser();
-  const { theme, setTheme } = useTheme();
   const { data: profile, refetch } = useProfile();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
-  const [checkingStrava, setCheckingStrava] = useState(true);
-  const [stravaConnected, setStravaConnected] = useState(false);
 
-  useEffect(() => {
-    const checkStrava = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from("strava_tokens")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
 
-      if (data) setStravaConnected(true);
-      setCheckingStrava(false);
-    };
-    checkStrava();
-  }, [user]);
-
-  const handleStravaConnect = () => {
-    const clientId = import.meta.env.VITE_STRAVA_CLIENT_ID;
-    if (!clientId) {
-      toast.error("Configuração do Strava ausente (.env)");
-      return;
-    }
-
-    const redirectUri = window.location.origin + "/settings/strava/callback";
-    const scope = "read,activity:read_all";
-    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&approval_prompt=force`;
-
-    window.location.href = authUrl;
-  };
+  
 
   const handleUpdateName = async () => {
     if (!name.trim()) return;
@@ -77,8 +46,17 @@ const Settings = () => {
             <UserIcon className="w-4 h-4" /> Perfil
           </h2>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary">
-              {(profile?.name || user?.primaryEmailAddress?.emailAddress || "?").charAt(0).toUpperCase()}
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary overflow-hidden">
+              {(profile?.avatar_url || (user as any)?.profileImageUrl || (user as any)?.imageUrl) ? (
+                <img
+                  src={profile?.avatar_url || (user as any).profileImageUrl || (user as any).imageUrl}
+                  alt={profile?.name || "Avatar"}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                (profile?.name || user?.primaryEmailAddress?.emailAddress || "?").charAt(0).toUpperCase()
+              )}
             </div>
             <div>
               <p className="font-semibold text-foreground">{profile?.name || "Sem nome"}</p>
@@ -97,80 +75,17 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Appearance */}
         <div className="bg-card rounded-xl border border-border p-6">
           <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Moon className="w-4 h-4" /> Aparência
+            <Monitor className="w-4 h-4" /> Aparência
           </h2>
-          <div className="grid grid-cols-3 gap-4">
-            <button
-              onClick={() => setTheme("light")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${theme === "light" ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"
-                }`}
-            >
-              <Sun className={`w-8 h-8 mb-2 ${theme === "light" ? "text-primary" : "text-muted-foreground"}`} />
-              <span className={`text-sm font-medium ${theme === "light" ? "text-primary" : "text-foreground"}`}>Claro</span>
-            </button>
-            <button
-              onClick={() => setTheme("dark")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${theme === "dark" ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"
-                }`}
-            >
-              <Moon className={`w-8 h-8 mb-2 ${theme === "dark" ? "text-primary" : "text-muted-foreground"}`} />
-              <span className={`text-sm font-medium ${theme === "dark" ? "text-primary" : "text-foreground"}`}>Escuro</span>
-            </button>
-            <button
-              onClick={() => setTheme("system")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${theme === "system" ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"
-                }`}
-            >
-              <Monitor className={`w-8 h-8 mb-2 ${theme === "system" ? "text-primary" : "text-muted-foreground"}`} />
-              <span className={`text-sm font-medium ${theme === "system" ? "text-primary" : "text-foreground"}`}>Sistema</span>
-            </button>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            O aplicativo segue automaticamente as preferências de tema do seu sistema operacional. Para alterar o tema, ajuste as configurações de aparência do seu dispositivo.
+          </p>
         </div>
 
-        {/* Strava Integration */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Link2 className="w-4 h-4" /> Integrações
-          </h2>
-          <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-streak/20 flex items-center justify-center">
-                <span className="text-lg font-bold text-streak">S</span>
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Strava</p>
-                <p className="text-xs text-muted-foreground">
-                  {checkingStrava ? "Verificando conexão..." :
-                    stravaConnected ? "Status: Conectado ✅" : "Sincronize treinos automaticamente"}
-                </p>
-              </div>
-            </div>
-            <Button
-              variant={stravaConnected ? "secondary" : "default"}
-              disabled={checkingStrava || stravaConnected}
-              onClick={handleStravaConnect}
-            >
-              {stravaConnected ? "Conectado" : "Conectar ao Strava"}
-            </Button>
-          </div>
-          {!stravaConnected && (
-            <div className="mt-4 p-4 bg-muted/50 rounded-lg text-sm text-muted-foreground space-y-2 border border-border/50">
-              <p className="font-medium text-foreground">Como funciona:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Ao conectar, seus treinos do Strava serão sincronizados.</li>
-                <li>Atividades elegíveis marcarão presença nos seus hábitos automaticamente.</li>
-                <li>Você pode desconectar a qualquer momento.</li>
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {stravaConnected && (
-          <StravaActivities />
-        )}
+        
+        
 
         {/* Sign out */}
         <Button variant="outline" onClick={() => signOut()} className="gap-2">
