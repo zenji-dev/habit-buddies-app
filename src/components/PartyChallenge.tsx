@@ -27,7 +27,7 @@ export const PartyChallenge = () => {
                         MY_PARTY_NET
                     </h2>
                     {/* Orange status text */}
-                    <div className="text-[10px] text-[#e66b00] font-mono-tech">
+                    <div className="text-xs text-[#e66b00] font-mono-tech">
                         STATUS: {isOnline ? "ONLINE" : "OFFLINE"}
                     </div>
                 </div>
@@ -62,18 +62,18 @@ export const PartyChallenge = () => {
                                 {members.map((member) => (
                                     <Link key={member.user_id} to={`/profile/${member.user_id}`} className="flex flex-col items-center gap-1 group">
                                         <div className={cn(
-                                            "w-10 h-10 border bg-background-dark flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110",
+                                            "w-16 h-16 border-2 bg-background-dark flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110 shadow-[0_0_20px_rgba(0,163,117,0.10)]",
                                             member.checkedInToday
-                                                ? "border-[#00a375] shadow-[0_0_10px_rgba(0,163,117,0.3)]"
+                                                ? "border-[#00a375] shadow-[0_0_20px_rgba(0,163,117,0.5)]"
                                                 : "border-slate-800"
                                         )}>
                                             {member.avatar_url ? (
                                                 <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover grayscale contrast-125" />
                                             ) : (
-                                                <Users className="w-4 h-4 text-gray-500" />
+                                                <Users className="w-8 h-8 text-gray-500" />
                                             )}
                                         </div>
-                                        <span className="text-[8px] font-mono-tech text-gray-500 group-hover:text-gray-300 transition-colors">{member.name?.split(" ")[0]}</span>
+                                        <span className="text-xs font-mono-tech text-gray-300 group-hover:text-white transition-colors font-bold tracking-wide mt-1">{member.name?.split(" ")[0]}</span>
                                         {member.checkedInToday && (
                                             <CheckCircle className="w-3 h-3 text-[#00a375]" />
                                         )}

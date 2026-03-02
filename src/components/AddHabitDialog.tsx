@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
@@ -12,15 +14,24 @@ interface AddHabitDialogProps {
 }
 
 export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
+
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [icon, setIcon] = useState("💪");
   const [goalMinutes, setGoalMinutes] = useState("30");
+  const [nameError, setNameError] = useState("");
+  const [targetDate, setTargetDate] = useState<Date | undefined>(undefined);
   const { addHabit, habits } = useHabits();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!name.trim()) {
+      setNameError("O nome do hábito é obrigatório.");
+      return;
+    }
+    setNameError("");
 
     if (habits.length >= 8) {
       toast.error("Limite máximo alcançado!", {
@@ -30,8 +41,8 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
     }
 
     addHabit.mutate(
-      { name, icon, description, goal_minutes: parseInt(goalMinutes) || 0 },
-      { onSuccess: () => { setOpen(false); setName(""); setDescription(""); setGoalMinutes("30"); } }
+      { name, icon, description, goal_minutes: parseInt(goalMinutes) || 0, target_date: targetDate ? format(targetDate, "yyyy-MM-dd") : null },
+      { onSuccess: () => { setOpen(false); setName(""); setDescription(""); setGoalMinutes("30"); setNameError(""); setTargetDate(undefined); } }
     );
   };
 
@@ -56,10 +67,16 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
             <Input
               placeholder="enter_habit_name..."
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (e.target.value.trim()) setNameError("");
+              }}
               required
-              className="bg-card-dark border-slate-900 text-white rounded-none text-xs font-mono-tech focus:border-[#00a375] focus:ring-[#00a375]/30 placeholder:text-gray-600"
+              className={`bg-card-dark border-slate-900 text-white rounded-none text-xs font-mono-tech focus:border-[#00a375] focus:ring-[#00a375]/30 placeholder:text-gray-600 ${nameError ? "border-red-500" : ""}`}
             />
+            {nameError && (
+              <p className="text-xs text-red-500 mt-1 font-mono-tech">{nameError}</p>
+            )}
           </div>
           <div>
             <label className="text-[10px] text-gray-500 flex justify-between uppercase tracking-widest font-mono-tech mb-2">
@@ -78,10 +95,10 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
             <div className="flex flex-wrap gap-1">
               {ICONS.map((i) => (
                 <button
-                  type="button"
                   key={i}
+                  type="button"
                   onClick={() => setIcon(i)}
-                  className={`w-10 h-10 flex items-center justify-center text-xl transition-all ${icon === i
+                  className={`w-10 h-10 flex items-center justify-center text-xl transition-all z-10 ${icon === i
                     ? "bg-[#00a375]/10 border border-[#00a375] shadow-[0_0_5px_rgba(0,163,117,0.3)]"
                     : "bg-card-dark border border-slate-900 hover:border-[#00a375]/50"
                     }`}
@@ -104,6 +121,25 @@ export const AddHabitDialog = ({ children }: AddHabitDialogProps) => {
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-gray-600 font-mono-tech uppercase tracking-widest pointer-events-none">
                 MINUTES
               </span>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech block mb-2">DATA OBJETIVO</label>
+            <div className="bg-card-dark border border-slate-900 rounded-none p-2">
+              <Calendar
+                mode="single"
+                selected={targetDate}
+                onSelect={setTargetDate}
+                fromDate={new Date()}
+                captionLayout="dropdown"
+                className="rounded-md shadow-sm"
+              />
+              {targetDate && (
+                <div className="mt-2 text-xs text-primary font-bold flex items-center gap-2">
+                  Data escolhida: {format(targetDate, "dd 'de' MMMM 'de' yyyy", { locale: undefined })}
+                  <button type="button" className="ml-2 text-xs text-red-500 underline" onClick={() => setTargetDate(undefined)}>Limpar</button>
+                </div>
+              )}
             </div>
           </div>
           <button

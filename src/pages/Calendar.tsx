@@ -57,6 +57,16 @@ const CalendarPage = () => {
         );
     }
 
+    // Popover para seleção de mês/ano
+    const [showMonthYearPicker, setShowMonthYearPicker] = useState(false);
+    const currentYear = currentMonth.getFullYear();
+    const currentMonthIdx = currentMonth.getMonth();
+    const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - 10 + i); // 10 anos para trás e 10 para frente
+    const months = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
     return (
         <Layout>
             <div className="max-w-6xl mx-auto space-y-6 pb-20 md:pb-0">
@@ -69,9 +79,52 @@ const CalendarPage = () => {
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                     <CalendarIcon className="w-5 h-5" />
                                 </div>
-                                <h1 className="text-xl font-bold text-foreground capitalize">
-                                    {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
-                                </h1>
+                                <div className="relative">
+                                    <button
+                                        className="text-xl font-bold text-foreground capitalize flex items-center gap-1 hover:underline focus:outline-none"
+                                        onClick={() => setShowMonthYearPicker((v) => !v)}
+                                    >
+                                        {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+                                    </button>
+                                    {showMonthYearPicker && (
+                                        <div className="absolute left-0 mt-2 z-50 bg-background border border-border rounded-xl shadow-lg p-4 flex gap-4">
+                                            <div>
+                                                <span className="block text-xs font-bold mb-1 text-muted-foreground">Ano</span>
+                                                <select
+                                                    className="block w-24 p-1 rounded border border-border bg-card text-foreground"
+                                                    value={currentYear}
+                                                    onChange={e => {
+                                                        setCurrentMonth(new Date(Number(e.target.value), currentMonthIdx, 1));
+                                                    }}
+                                                    size={8}
+                                                >
+                                                    {years.map(y => (
+                                                        <option key={y} value={y}>{y}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <span className="block text-xs font-bold mb-1 text-muted-foreground">Mês</span>
+                                                <select
+                                                    className="block w-32 p-1 rounded border border-border bg-card text-foreground"
+                                                    value={currentMonthIdx}
+                                                    onChange={e => {
+                                                        setCurrentMonth(new Date(currentYear, Number(e.target.value), 1));
+                                                    }}
+                                                    size={8}
+                                                >
+                                                    {months.map((m, idx) => (
+                                                        <option key={m} value={idx}>{m}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <button
+                                                className="ml-4 text-xs text-primary font-bold hover:underline"
+                                                onClick={() => setShowMonthYearPicker(false)}
+                                            >Fechar</button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button variant="outline" size="icon" onClick={prevMonth} className="rounded-lg h-9 w-9">
@@ -86,10 +139,13 @@ const CalendarPage = () => {
                             </div>
                         </div>
 
-                        {/* Days of Week */}
+                        {/* Days of Week - estilo destacado */}
                         <div className="grid grid-cols-7 bg-secondary/10 border-b border-border">
-                            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day) => (
-                                <div key={day} className="py-3 text-center text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                            {["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"].map((day) => (
+                                <div
+                                    key={day}
+                                    className="flex-1 flex items-center justify-center text-2xl font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0 py-3 text-[#00a375] tracking-widest"
+                                >
                                     {day}
                                 </div>
                             ))}
@@ -103,25 +159,47 @@ const CalendarPage = () => {
                                 const isCurrentMonth = isSameMonth(day, monthStart);
                                 const isTodayDate = isToday(day);
 
+                                // Verifica se algum hábito tem target_date e se o dia está entre hoje e target_date
+                                const today = new Date();
+                                today.setHours(0,0,0,0);
+                                let isGoalRange = false;
+                                let goalHabits: any[] = [];
+                                habits.forEach(habit => {
+                                    if (habit.target_date) {
+                                        const target = new Date(habit.target_date + "T00:00:00");
+                                        target.setHours(0,0,0,0);
+                                        if (day >= today && day <= target) {
+                                            isGoalRange = true;
+                                            goalHabits.push(habit);
+                                        }
+                                    }
+                                });
+
                                 return (
                                     <div
                                         key={day.toString()}
                                         onClick={() => setSelectedDate(day)}
                                         className={cn(
-                                            "min-h-[70px] md:min-h-[100px] p-2 border-r border-b border-border transition-all cursor-pointer relative group",
+                                            "min-h-[90px] md:min-h-[120px] p-2 border-r border-b border-border transition-all cursor-pointer relative group",
                                             !isCurrentMonth && "bg-secondary/5 opacity-30",
                                             isSelected && "bg-primary/5 ring-1 ring-inset ring-primary/20 z-10",
-                                            idx % 7 === 6 && "border-r-0"
+                                            idx % 7 === 6 && "border-r-0",
+                                            isGoalRange && "bg-yellow-100/40 border-yellow-400/40"
                                         )}
                                     >
                                         <span className={cn(
-                                            "text-sm font-semibold inline-flex items-center justify-center w-7 h-7 rounded-full",
+                                            "text-3xl font-bold inline-flex items-center justify-center w-12 h-12 rounded-full",
                                             isTodayDate && "bg-primary text-primary-foreground",
                                             !isTodayDate && isSelected && "text-primary",
                                             !isTodayDate && !isSelected && "text-muted-foreground"
                                         )}>
                                             {format(day, "d")}
                                         </span>
+
+                                        {/* Renderiza uma linha ou barra para cada hábito com objetivo */}
+                                        {goalHabits.length > 0 && (
+                                            <div className="absolute left-1 right-1 top-1 h-1 rounded-full bg-yellow-400/60" title={goalHabits.map(h => h.name).join(", ")}></div>
+                                        )}
 
                                         <div className="mt-2 flex flex-wrap gap-1">
                                             {dayCheckIns.slice(0, 4).map((c, i) => {
