@@ -27,7 +27,7 @@ const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon }
         </div>
 
         <div className="flex justify-between items-start relative z-10">
-            <span className="text-[10px] font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
+            <span className="text-xs font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
                 {label}
             </span>
             <div className="text-[#00a375] group-hover:scale-110 transition-transform">
@@ -39,7 +39,7 @@ const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon }
             <span className="text-2xl font-bold font-mono-tech text-white group-hover:text-[#00a375] transition-colors leading-none">
                 {value}
             </span>
-            <p className={`text-[9px] mt-2 font-mono-tech border-t border-[#00a375]/30 pt-1.5 group-hover:border-[#00a375]/50 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
+            <p className={`text-xs mt-2 font-mono-tech border-t border-[#00a375]/30 pt-1.5 group-hover:border-[#00a375]/50 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
                 }`}>
                 {subLabel}
             </p>

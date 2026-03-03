@@ -88,7 +88,7 @@ export const ActiveTasksGrid = ({
     if (visibleHabits.length === 0) {
         return (
             <div className="glass-panel rounded-none shadow-neon-box p-6 h-[320px] flex flex-col">
-                <h3 className="text-base font-bold text-white font-mono-tech tracking-wider mb-4">active tasks</h3>
+                <h3 className="text-lg font-bold text-white font-mono-tech tracking-wider mb-4">active tasks</h3>
                 <div className="flex-1 flex items-center justify-center">
                     <p className="text-[10px] font-mono-tech text-gray-00 uppercase tracking-widest">
                         &gt; waiting for input...
@@ -107,7 +107,7 @@ export const ActiveTasksGrid = ({
                 <div className="shrink-0 flex items-stretch border-b border-[#00a375]/30">
                     {/* Left col header */}
                     <div className="w-64 shrink-0 px-4 py-2 border-r border-[#00a375]/30 flex items-center">
-                        <span className="text-sm font-bold text-white font-mono-tech tracking-wider">active tasks</span>
+                        <span className="text-base font-bold text-white font-mono-tech tracking-wider">active tasks</span>
                     </div>
 
                     <div className="flex-1">
@@ -116,8 +116,8 @@ export const ActiveTasksGrid = ({
                                 <div
                                     key={dIdx}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center text-[8px] font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0",
-                                        day.isToday ? "text-[#e66b00]" : "text-gray-600"
+                                        "flex-1 flex items-center justify-center text-xl font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0",
+                                        day.isToday ? "text-[#e66b00]" : "text-[#00a375]/70"
                                     )}
                                 >
                                     {DAY_NAMES[day.dayOfWeek]}

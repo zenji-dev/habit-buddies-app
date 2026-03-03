@@ -15,9 +15,9 @@ import Dashboard from "./pages/Dashboard";
 import Social from "./pages/Social";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
-import StravaCallback from "./pages/StravaCallback";
 import NotFound from "./pages/NotFound";
 import CalendarPage from "./pages/Calendar";
+import { VerifyEmail } from "./pages/VerifyEmail";
 import { Starfield } from "@/components/Starfield";
 
 const queryClient = new QueryClient();
@@ -82,12 +82,13 @@ const App = () => (
         <Starfield />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
           <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/settings/strava/callback" element={<ProtectedRoute><StravaCallback /></ProtectedRoute>} />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>
