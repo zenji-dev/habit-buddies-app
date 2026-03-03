@@ -241,12 +241,23 @@ export const useSocial = () => {
         friend_id: targetUserId,
         status: "pending",
       });
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") return null; // Already sent, handle silently for success format
+        throw error;
+      }
+      return true;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      toast.success("Solicitação enviada!");
+      if (data) {
+        toast.success("Solicitação enviada!");
+      } else {
+        toast.info("A solicitação já existe para este usuário!");
+      }
     },
+    onError: (err) => {
+      toast.error("Erro ao enviar solicitação: " + err.message);
+    }
   });
 
   const handleRequest = useMutation({

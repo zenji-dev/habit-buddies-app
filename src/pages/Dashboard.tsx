@@ -11,6 +11,7 @@ import { MyHabitsDialog } from "@/components/MyHabitsDialog";
 
 import { ActiveTasksGrid } from "@/components/ActiveTasksGrid";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
+import { useSocial } from "@/hooks/useSocial";
 import { Bell, Plus, Settings2, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -23,11 +24,12 @@ import { useAuth } from "@clerk/clerk-react";
 const Dashboard = () => {
   const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
   const { invites } = usePartyChallenge();
+  const { incomingRequests } = useSocial();
   const { userId } = useAuth();
 
   const [isFriendDialogOpen, setIsFriendDialogOpen] = useState(false);
 
-  const invitesCount = invites?.length || 0;
+  const invitesCount = (invites?.length || 0) + (incomingRequests?.length || 0);
   const todayChecked = habits.filter((h) => isCheckedToday(h.id)).length;
   const totalHabitsCount = habits.length;
   const totalCompletedAllTime = checkIns.length;
