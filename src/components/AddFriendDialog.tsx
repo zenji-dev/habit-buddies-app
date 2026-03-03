@@ -10,7 +10,7 @@ interface AddFriendDialogProps {
 }
 
 export const AddFriendDialog = ({ open, onOpenChange }: AddFriendDialogProps) => {
-    const { searchUsers, addFriendById } = useSocial();
+    const { searchUsers, addFriendById, cancelFriendRequest } = useSocial();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -27,10 +27,24 @@ export const AddFriendDialog = ({ open, onOpenChange }: AddFriendDialogProps) =>
         finally { setIsSearching(false); }
     };
 
-    const handleAdd = (userId: string) => {
-        addFriendById.mutate(userId, {
-            onSuccess: () => setSentIds(prev => [...prev, userId]),
-        });
+    const handleClick = (user: any) => {
+        const sent = sentIds.includes(user.user_id) || user.friendshipStatus === "pending";
+
+        if (sent && user.isRequester) {
+            cancelFriendRequest.mutate(user.user_id, {
+                onSuccess: () => {
+                    setSentIds(prev => prev.filter(id => id !== user.user_id));
+                    setResults(prev => prev.map(u => u.user_id === user.user_id ? { ...u, friendshipStatus: null, isRequester: false } : u));
+                }
+            });
+        } else if (!sent && !user.friendshipStatus) {
+            addFriendById.mutate(user.user_id, {
+                onSuccess: () => {
+                    setSentIds(prev => [...prev, user.user_id]);
+                    setResults(prev => prev.map(u => u.user_id === user.user_id ? { ...u, friendshipStatus: "pending", isRequester: true } : u));
+                },
+            });
+        }
     };
 
     const handleClose = (val: boolean) => {
@@ -66,7 +80,12 @@ export const AddFriendDialog = ({ open, onOpenChange }: AddFriendDialogProps) =>
                     {results.length > 0 && (
                         <div className="space-y-1 max-h-64 overflow-y-auto border border-slate-900 bg-card-dark p-1">
                             {results.map(user => {
-                                const sent = sentIds.includes(user.user_id);
+                                const sent = sentIds.includes(user.user_id) || user.friendshipStatus === "pending";
+                                const isFriend = user.friendshipStatus === "accepted";
+                                const canCancel = sent && user.isRequester;
+                                const isPendingAction = addFriendById.isPending || cancelFriendRequest.isPending;
+                                const isDisabled = isFriend || (sent && !user.isRequester) || isPendingAction;
+
                                 return (
                                     <div
                                         key={user.user_id}
@@ -89,15 +108,34 @@ export const AddFriendDialog = ({ open, onOpenChange }: AddFriendDialogProps) =>
                                         </div>
 
                                         <button
-                                            onClick={() => handleAdd(user.user_id)}
-                                            disabled={sent || addFriendById.isPending}
-                                            className={`px-3 py-1 text-[10px] font-mono-tech uppercase tracking-wider border transition-all flex items-center gap-1 ${sent
-                                                    ? "border-[#00a375]/30 text-[#00a375]/50 bg-[#00a375]/5 cursor-default"
+                                            onClick={() => handleClick(user)}
+                                            disabled={isDisabled}
+                                            className={`px-3 py-1 text-[10px] font-mono-tech uppercase tracking-wider border transition-all flex items-center gap-1 ${isDisabled
+                                                ? "border-[#00a375]/30 text-[#00a375]/50 bg-[#00a375]/5 cursor-default"
+                                                : canCancel
+                                                    ? "border-red-500/50 text-red-500 hover:bg-red-500/10"
                                                     : "border-[#00a375]/50 text-[#00a375] hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)]"
                                                 }`}
                                         >
-                                            {sent ? (
-                                                <><Check className="w-3 h-3" /> SENT</>
+                                            {isFriend ? (
+                                                <><Check className="w-3 h-3" /> FRIEND</>
+                                            ) : sent ? (
+                                                <div className="relative group/btn">
+                                                    {canCancel ? (
+                                                        <>
+                                                            <span className="flex items-center gap-1 group-hover/btn:hidden">
+                                                                <Check className="w-3 h-3" /> SENT
+                                                            </span>
+                                                            <span className="hidden group-hover/btn:flex items-center gap-1">
+                                                                CANCEL
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1">
+                                                            <Check className="w-3 h-3" /> SENT
+                                                        </span>
+                                                    )}
+                                                </div>
                                             ) : (
                                                 <><UserPlus className="w-3 h-3" /> ADD</>
                                             )}

@@ -26,6 +26,8 @@ import {
     Sparkles,
 } from "lucide-react";
 import { StartPartyDialog } from "@/components/StartPartyDialog";
+import { InviteToPartyDialog } from "@/components/InviteToPartyDialog";
+import { usePartyChallenge } from "@/hooks/usePartyChallenge";
 import { toast } from "sonner";
 
 const Profile = () => {
@@ -41,12 +43,15 @@ const Profile = () => {
         handleRequest,
         incomingRequests
     } = useSocial();
+    const { challenge, checkUserInParty, inviteFriend } = usePartyChallenge();
 
     const [profile, setProfile] = useState<any>(null);
     const [checkIns, setCheckIns] = useState<any[]>([]);
     const [habits, setHabits] = useState<any[]>([]);
     const [status, setStatus] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [targetInParty, setTargetInParty] = useState(false);
+    const [isExistingInviteOpen, setIsExistingInviteOpen] = useState(false);
 
     // Edit states
     const [isEditing, setIsEditing] = useState(false);
@@ -79,6 +84,9 @@ const Profile = () => {
             setCheckIns(acts.checkIns);
             setHabits(acts.habits || []);
             setStatus(s);
+
+            const inParty = await checkUserInParty(id);
+            setTargetInParty(inParty);
         } catch (err) {
             console.error(err);
             toast.error("Erro ao carregar perfil");
@@ -455,12 +463,34 @@ const Profile = () => {
                                     )
                                 ) : (
                                     <div className="flex gap-2">
-                                        <button
-                                            className="px-6 py-2 border border-[#e66b00]/50 text-[#e66b00] text-xs font-mono-tech hover:bg-[#e66b00]/10 hover:shadow-[0_0_10px_rgba(230,107,0,0.2)] transition-all uppercase tracking-wider flex items-center gap-2"
-                                            onClick={() => setIsInviteDialogOpen(true)}
-                                        >
-                                            <PartyPopper className="w-4 h-4" /> INVITE_PARTY
-                                        </button>
+                                        {!targetInParty && (
+                                            challenge ? (
+                                                <button
+                                                    className="px-6 py-2 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-2"
+                                                    onClick={() => {
+                                                        inviteFriend.mutate(id!, {
+                                                            onSuccess: () => setTargetInParty(true)
+                                                        });
+                                                    }}
+                                                >
+                                                    <PartyPopper className="w-4 h-4" /> INVITE_TO_MY_PARTY
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="px-6 py-2 border border-[#e66b00]/50 text-[#e66b00] text-xs font-mono-tech hover:bg-[#e66b00]/10 hover:shadow-[0_0_10px_rgba(230,107,0,0.2)] transition-all uppercase tracking-wider flex items-center gap-2"
+                                                    onClick={() => setIsInviteDialogOpen(true)}
+                                                >
+                                                    <PartyPopper className="w-4 h-4" /> START_PARTY_WITH
+                                                </button>
+                                            )
+                                        )}
+
+                                        {targetInParty && (
+                                            <div className="px-6 py-2 border border-gray-800 text-gray-600 text-[10px] font-mono-tech uppercase tracking-widest bg-background-dark/50 flex items-center gap-2">
+                                                <History className="w-4 h-4" /> ALREADY_IN_PARTY
+                                            </div>
+                                        )}
+
                                         <button
                                             className="px-6 py-2 border border-red-900/50 text-red-500 text-xs font-mono-tech hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-2"
                                             onClick={() => unfriend.mutate(id!)}

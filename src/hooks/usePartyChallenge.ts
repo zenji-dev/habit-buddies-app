@@ -316,6 +316,17 @@ export const usePartyChallenge = () => {
         }
     });
 
+    const checkUserInParty = async (targetId: string) => {
+        const { data, error } = await supabase
+            .from("challenge_members")
+            .select("challenge_id")
+            .eq("user_id", targetId)
+            .eq("status", "accepted");
+
+        if (error) throw error;
+        return data && data.length > 0;
+    };
+
     return {
         challenge: challengeQuery.data ?? null,
         invites: invitesQuery.data || [],
@@ -325,6 +336,7 @@ export const usePartyChallenge = () => {
         checkIn,
         inviteFriend,
         kickMember,
-        respondToInvite
+        respondToInvite,
+        checkUserInParty
     };
 };
