@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useHabits } from "@/hooks/useHabits";
 import { Layout } from "@/components/Layout";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
+import { AddFriendDialog } from "@/components/AddFriendDialog";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
 import { WeeklyStreak } from "@/components/WeeklyStreak";
 import { PartyChallenge } from "@/components/PartyChallenge";
@@ -9,7 +11,7 @@ import { MyHabitsDialog } from "@/components/MyHabitsDialog";
 
 import { ActiveTasksGrid } from "@/components/ActiveTasksGrid";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
-import { Bell, Plus, Settings2 } from "lucide-react";
+import { Bell, Plus, Settings2, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import {
   Popover,
@@ -17,12 +19,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAuth } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
   const { invites } = usePartyChallenge();
   const { userId } = useAuth();
+
+  const [isFriendDialogOpen, setIsFriendDialogOpen] = useState(false);
 
   const invitesCount = invites?.length || 0;
   const todayChecked = habits.filter((h) => isCheckedToday(h.id)).length;
@@ -139,6 +142,15 @@ const Dashboard = () => {
               </PopoverContent>
             </Popover>
 
+            {/* ADD_FRIEND */}
+            <button
+              onClick={() => setIsFriendDialogOpen(true)}
+              className="h-10 bg-card-dark hover:bg-[#050a14] text-[#00a375] font-medium font-mono-tech px-4 rounded-none flex items-center justify-center gap-2 transition-colors border border-[#00a375]/50 hover:border-[#00a375] shadow-[0_0_5px_rgba(0,163,117,0.1)] uppercase tracking-wider text-xs"
+            >
+              <UserPlus className="w-4 h-4 text-[#00a375]" />
+              ADD_FRIEND
+            </button>
+
             {/* CONFIG_HABITS */}
             <MyHabitsDialog>
               <div>
@@ -200,6 +212,7 @@ const Dashboard = () => {
         />
 
       </div>
+      <AddFriendDialog open={isFriendDialogOpen} onOpenChange={setIsFriendDialogOpen} />
     </Layout>
   );
 };
