@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { ConsistencyMap } from "@/components/ConsistencyMap";
 import {
     User,
     Calendar,
@@ -353,7 +352,7 @@ const Profile = () => {
                                         placeholder="System bio..."
                                         className="bg-background-dark border-[#00a375]/50 text-white rounded-none min-h-[80px] text-sm font-mono-tech text-center"
                                     />
-                                    
+
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="relative">
                                             <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00a375]" />
@@ -483,9 +482,6 @@ const Profile = () => {
                         </div>
                     )}
                 </div>
-
-                {/* ===== CONSISTENCY MAP ===== */}
-                <ConsistencyMap checkIns={checkIns} />
 
                 {/* ===== PUBLIC HABITS ===== */}
                 <div>

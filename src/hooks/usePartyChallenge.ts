@@ -276,6 +276,23 @@ export const usePartyChallenge = () => {
         }
     });
 
+    const kickMember = useMutation({
+        mutationFn: async (targetUserId: string) => {
+            if (!challengeQuery.data) return;
+            const { error } = await supabase
+                .from("challenge_members")
+                .delete()
+                .eq("challenge_id", challengeQuery.data.id)
+                .eq("user_id", targetUserId);
+            if (error) throw error;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["partyChallenge"] });
+            queryClient.invalidateQueries({ queryKey: ["friendsToInvite"] });
+            toast.success("Membro removido da party.");
+        }
+    });
+
     const respondToInvite = useMutation({
         mutationFn: async ({ inviteId, accept }: { inviteId: string, accept: boolean }) => {
             if (accept) {
@@ -307,6 +324,7 @@ export const usePartyChallenge = () => {
         createChallenge,
         checkIn,
         inviteFriend,
+        kickMember,
         respondToInvite
     };
 };
