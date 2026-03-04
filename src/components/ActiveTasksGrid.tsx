@@ -20,12 +20,13 @@ interface CheckIn {
 interface ActiveTasksGridProps {
     habits: Habit[];
     checkIns: CheckIn[];
-    isCheckedToday: (habitId: string) => boolean;   // from useHabits — already correct
-    getStreak: (habitId: string) => number;          // from useHabits — already correct
+    isCheckedToday: (habitId: string) => boolean;
+    getStreak: (habitId: string) => number;
     onCheckIn: (id: string) => void;
     onUncheck: (id: string) => void;
     isPending: boolean;
     isUnchecking: boolean;
+    isLoading?: boolean;
 }
 
 const DAY_INITIALS = ["D", "S", "T", "Q", "Q", "S", "S"]; // kept for future use
@@ -40,6 +41,7 @@ export const ActiveTasksGrid = ({
     onUncheck,
     isPending,
     isUnchecking,
+    isLoading,
 }: ActiveTasksGridProps) => {
     const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
     const today = new Date();
@@ -84,6 +86,23 @@ export const ActiveTasksGrid = ({
     };
 
     const visibleHabits = habits.slice(0, 8);
+
+    if (isLoading) {
+        return (
+            <div className="glass-panel rounded-none shadow-neon-box p-6 h-[320px] flex flex-col">
+                <h3 className="text-lg font-bold text-white font-mono-tech tracking-wider mb-4">active tasks</h3>
+                <div className="flex-1 flex flex-col justify-center gap-3 px-2">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="flex items-center gap-3 animate-pulse">
+                            <div className="w-8 h-8 bg-slate-800 rounded-none" />
+                            <div className="flex-1 h-3 bg-slate-800 rounded-none" style={{ width: `${60 + i * 10}%` }} />
+                            <div className="w-16 h-3 bg-slate-800 rounded-none" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     if (visibleHabits.length === 0) {
         return (

@@ -129,18 +129,43 @@ export const useSocial = () => {
   });
 
   const searchUsers = async (query: string) => {
-    if (!query || query.length < 2) return [];
+    if (!query || query.length < 2 || !userId) return [];
 
     const searchStr = query.startsWith("@") ? query.slice(1) : query;
 
-    const { data, error } = await supabase
+    const { data: profiles, error: pError } = await supabase
       .from("profiles")
       .select("*")
       .or(`name.ilike.%${searchStr}%,username.ilike.%${searchStr}%`)
-      .neq("user_id", userId!)
-      .limit(5);
-    if (error) throw error;
-    return data || [];
+      .neq("user_id", userId)
+      .limit(10);
+
+    if (pError) throw pError;
+    if (!profiles || profiles.length === 0) return [];
+
+    const userIds = profiles.map(p => p.user_id);
+
+    const { data: friendships, error: fError } = await supabase
+      .from("friendships")
+      .select("*")
+      .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+      .in('user_id', [...userIds, userId])
+      .in('friend_id', [...userIds, userId]);
+
+    if (fError) throw fError;
+
+    return profiles.map(profile => {
+      const friendship = friendships?.find(f =>
+        (f.user_id === userId && f.friend_id === profile.user_id) ||
+        (f.friend_id === userId && f.user_id === profile.user_id)
+      );
+
+      return {
+        ...profile,
+        friendshipStatus: friendship?.status || null,
+        isRequester: friendship?.user_id === userId
+      };
+    });
   };
 
   const getUserProfile = async (userId: string) => {
@@ -279,6 +304,28 @@ export const useSocial = () => {
     },
   });
 
+  const cancelFriendRequest = useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!userId) return;
+      const { error } = await supabase
+        .from("friendships")
+        .delete()
+        .eq("user_id", userId)
+        .eq("friend_id", targetUserId)
+        .eq("status", "pending");
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      // Invalida as queries de busca e solicitações para atualizar a interface
+      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+      toast.success("Solicitação cancelada.");
+    },
+    onError: (err) => {
+      toast.error("Erro ao cancelar solicitação: " + err.message);
+    }
+  });
+
   return {
     friends: friendsQuery.data || [],
     incomingRequests: incomingRequestsQuery.data || [],
@@ -287,6 +334,7 @@ export const useSocial = () => {
     giveKudos,
     addFriend,
     addFriendById,
+    cancelFriendRequest,
     handleRequest,
     unfriend,
     searchUsers,
