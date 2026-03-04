@@ -118,7 +118,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-2 text-sm font-mono-tech">
             <span className="text-gray-500">SYS</span>
             <span className="text-gray-700">/</span>
-            <span className="text-[#00a375] font-bold uppercase tracking-wider">DASHBOARD</span>
+            <span className="text-[#e66b00] font-bold uppercase tracking-wider">DASHBOARD</span>
           </div>
 
           <div className="flex items-center gap-3">
