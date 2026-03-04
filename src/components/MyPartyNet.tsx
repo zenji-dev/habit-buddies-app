@@ -15,10 +15,12 @@ const MyPartyNet = () => {
         { id: '4', name: 'Dejesus', habits: { 'Leitura': true, 'Beber Água': false, 'Academia': false }, avatar: '/placeholder.svg' },
     ]);
 
-    // Cálculo Risk Meter: (Concluídos / Total) * 100
+    // Cálculo do Risk Meter: Determina a porcentagem de conclusão de hábitos de todo o grupo.
+    // (Hábitos Concluídos / Total de Hábitos Necessários) * 100
     const riskMeterValue = useMemo(() => {
         const totalHabits = participants.length * partyInfo.habits.length;
         const completedHabits = participants.reduce((sum, p) =>
+            // Soma os valores verdadeiros (concluídos) de cada participante
             sum + Object.values(p.habits).filter(v => v).length, 0
         );
         return Math.round((completedHabits / totalHabits) * 100);
@@ -26,7 +28,7 @@ const MyPartyNet = () => {
 
     return (
         <div className="w-full bg-black text-[#00FF88] font-mono border border-[#00FF88]/20 shadow-[0_0_30px_rgba(0,255,136,0.05)] overflow-hidden">
-            {/* HEADER SECTION */}
+            {/* SEÇÃO DE CABEÇALHO - Exibe o nome da party e status de conexão */}
             <div className="flex justify-between items-center p-4 border-b border-[#00FF88]/10 bg-[#000805]">
                 <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-[#e66b00] shadow-[0_0_8px_#e66b00]"></div>
@@ -42,7 +44,7 @@ const MyPartyNet = () => {
                 </div>
             </div>
 
-            {/* INFORMATION LAYER */}
+            {/* CAMADA DE INFORMAÇÕES - Detalhes básicos da party */}
             <div className="p-6 space-y-2 border-b border-[#00FF88]/10 bg-gradient-to-b from-black to-[#000502]">
                 <div className="flex gap-2 text-[11px]">
                     <span className="text-white/40"># PARTY_NAME:</span>
@@ -58,10 +60,10 @@ const MyPartyNet = () => {
                 </div>
             </div>
 
-            {/* PROGRESS FLOW SECTION */}
+            {/* SEÇÃO DE FLUXO DE PROGRESSO - Visualização gráfica do status do grupo */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8 items-center border-b border-[#00FF88]/10">
 
-                {/* RISK METER GAUGE */}
+                {/* MÉTRICA DE RISCO (GAUGE) - Representação visual do progresso total */}
                 <div className="flex flex-col items-center justify-center space-y-4">
                     <div className="relative w-48 h-24 overflow-hidden flex items-end justify-center">
                         {/* SVG GAUGE BG */}
@@ -79,7 +81,7 @@ const MyPartyNet = () => {
                             <div className="text-[10px] text-[#00FF88]/40 font-black tracking-[0.2em] uppercase mb-1">Risk Meter</div>
                             <div className="text-3xl font-black text-white leading-none">{riskMeterValue}%</div>
                         </div>
-                        {/* Pointer needle */}
+                        {/* Ponteiro do gauge */}
                         <div
                             className="absolute bottom-0 left-1/2 w-0.5 h-16 bg-white/40 origin-bottom transition-all duration-[1500ms]"
                             style={{ transform: `translateX(-50%) rotate(${(riskMeterValue * 1.8) - 90}deg)` }}
@@ -88,9 +90,10 @@ const MyPartyNet = () => {
                     <div className="text-[9px] text-white/20 tracking-[0.4em]">SYNC_CAPACITY_LIMIT</div>
                 </div>
 
-                {/* PARTICIPANTS NODES */}
+                {/* NODES DOS PARTICIPANTES - Cards individuais de cada membro */}
                 <div className="lg:col-span-2 flex flex-wrap justify-center gap-6">
                     {participants.map(user => {
+                        // Verifica se todos os hábitos foram concluídos pelo usuário
                         const isDone = Object.values(user.habits).every(v => v);
                         const partial = Object.values(user.habits).filter(v => v).length;
                         const total = partyInfo.habits.length;
@@ -108,14 +111,14 @@ const MyPartyNet = () => {
                                             user.id === '2' ? <Zap className="w-10 h-10 text-white/40" /> : <Users className="w-10 h-10 text-white/10" />
                                         )}
 
-                                        {/* Discrete Check Icon */}
+                                        {/* Ícone de check discreto para conclusão total */}
                                         {isDone && (
                                             <div className="absolute top-1 right-1 w-5 h-5 bg-[#00FF88] text-black flex items-center justify-center shadow-[0_0_10px_#00FF88] z-20">
                                                 <Check className="w-3.5 h-3.5 stroke-[4px]" />
                                             </div>
                                         )}
 
-                                        {/* Background Blur Overlay for 100% users */}
+                                        {/* Overlay de desfoque para usuários que completaram 100% */}
                                         {isDone && <div className="absolute inset-0 bg-[#00FF88]/5 backdrop-blur-[2px] z-10"></div>}
                                     </div>
                                 </div>
@@ -124,7 +127,7 @@ const MyPartyNet = () => {
                                     <span className={`text-[11px] font-bold uppercase tracking-wider ${isDone ? 'text-white' : 'text-white/40'}`}>
                                         {user.name}
                                     </span>
-                                    {/* Status Grid Below Name */}
+                                    {/* Grade de status abaixo do nome (pontos coloridos por hábito) */}
                                     <div className="flex justify-center gap-1.5 pt-0.5">
                                         {partyInfo.habits.map((h, idx) => (
                                             <div key={idx} className={`w-1.5 h-1.5 rounded-full ${user.habits[h] ? 'bg-[#00FF88] shadow-[0_0_4px_#00FF88]' : 'bg-white/5 border border-white/10'}`}></div>
@@ -137,7 +140,7 @@ const MyPartyNet = () => {
                 </div>
             </div>
 
-            {/* HABIT DATA TABLE */}
+            {/* TABELA DE DADOS DE HÁBITOS - Detalhamento textual e barras de eficiência */}
             <div className="w-full overflow-hidden">
                 <table className="w-full border-collapse">
                     <thead>
