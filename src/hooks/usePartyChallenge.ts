@@ -10,8 +10,14 @@ interface Profile {
     avatar_url: string | null;
 }
 
+interface ChallengeHabit {
+    id: string;
+    name: string;
+    icon: string;
+}
+
 interface MemberWithProfile extends Profile {
-    checkedInToday: boolean;
+    completedHabits: string[];
     status: string;
 }
 
@@ -27,12 +33,12 @@ interface PartyChallenge {
     id: string;
     title: string;
     target_habit: string | null;
+    habits: ChallengeHabit[];
     duration_days: number;
     start_date: string;
     created_by: string;
     currentDay: number;
     members: MemberWithProfile[];
-    userCheckedInToday: boolean;
 }
 
 export const usePartyChallenge = () => {
@@ -43,7 +49,7 @@ export const usePartyChallenge = () => {
     const challengeQuery = useQuery({
         queryKey: ["partyChallenge", userId],
         queryFn: async (): Promise<PartyChallenge | null> => {
-            // 1. Find active challenge memberships (accepted)
+            // 1. Find active challenge memberships
             const { data: memberships, error: mErr } = await supabase
                 .from("challenge_members")
                 .select("challenge_id")
@@ -67,14 +73,25 @@ export const usePartyChallenge = () => {
 
             const activeChallenge = challenges[0];
 
-            // 3. Fetch all members (accepted)
-            const { data: allMembers, error: amErr } = await supabase
-                .from("challenge_members")
-                .select("user_id, status")
-                .eq("challenge_id", activeChallenge.id)
-                .eq("status", "accepted");
+            // 3. Fetch members and today's logs in parallel
+            const [
+                { data: allMembers, error: amErr },
+                { data: todayLogs, error: lErr },
+            ] = await Promise.all([
+                supabase
+                    .from("challenge_members")
+                    .select("user_id, status")
+                    .eq("challenge_id", activeChallenge.id)
+                    .eq("status", "accepted"),
+                supabase
+                    .from("daily_logs")
+                    .select("user_id, habit_name")
+                    .eq("challenge_id", activeChallenge.id)
+                    .eq("log_date", today),
+            ]);
 
             if (amErr) throw amErr;
+            if (lErr) throw lErr;
 
             const memberIds = (allMembers || []).map((m) => m.user_id);
 
@@ -86,22 +103,39 @@ export const usePartyChallenge = () => {
 
             if (pErr) throw pErr;
 
-            // 5. Fetch today's logs
-            const { data: todayLogs, error: lErr } = await supabase
-                .from("daily_logs")
-                .select("user_id")
-                .eq("challenge_id", activeChallenge.id)
-                .eq("log_date", today);
+            // Build per-user completed habits map
+            const userHabitsMap: Record<string, string[]> = {};
+            (todayLogs || []).forEach((log) => {
+                if (!log.habit_name) return;
+                if (!userHabitsMap[log.user_id]) userHabitsMap[log.user_id] = [];
+                userHabitsMap[log.user_id].push(log.habit_name);
+            });
 
-            if (lErr) throw lErr;
-
-            const checkedInUserIds = new Set((todayLogs || []).map((l) => l.user_id));
+            // Parse habits from target_habit JSON field (stored as JSON string)
+            let habits: ChallengeHabit[] = [];
+            try {
+                const parsed = JSON.parse(activeChallenge.target_habit || "[]");
+                if (Array.isArray(parsed)) {
+                    habits = parsed.map((h: any, i: number) => ({
+                        id: String(i),
+                        name: h.name || h,
+                        icon: h.icon || "💪",
+                    }));
+                }
+            } catch {
+                // fallback: treat as comma-separated string
+                habits = (activeChallenge.target_habit || "").split(",").filter(Boolean).map((name, i) => ({
+                    id: String(i),
+                    name: name.trim(),
+                    icon: "💪",
+                }));
+            }
 
             const members: MemberWithProfile[] = (profiles || []).map((p) => ({
                 user_id: p.user_id,
                 name: p.name,
                 avatar_url: p.avatar_url,
-                checkedInToday: checkedInUserIds.has(p.user_id),
+                completedHabits: userHabitsMap[p.user_id] || [],
                 status: allMembers?.find(m => m.user_id === p.user_id)?.status || 'accepted'
             }));
 
@@ -115,12 +149,12 @@ export const usePartyChallenge = () => {
                 id: activeChallenge.id,
                 title: activeChallenge.title,
                 target_habit: activeChallenge.target_habit,
+                habits,
                 duration_days: activeChallenge.duration_days,
                 start_date: activeChallenge.start_date,
                 created_by: activeChallenge.created_by,
                 currentDay: Math.min(currentDay, activeChallenge.duration_days),
                 members,
-                userCheckedInToday: checkedInUserIds.has(userId!),
             };
         },
         enabled: !!userId,
@@ -158,33 +192,30 @@ export const usePartyChallenge = () => {
     const friendsToInviteQuery = useQuery({
         queryKey: ["friendsToInvite", challengeQuery.data?.id],
         queryFn: async () => {
-            // Get friendships
-            const { data: friendships } = await supabase
-                .from("friendships")
-                .select("*")
-                .or(`user_id.eq.${userId!},friend_id.eq.${userId!}`)
-                .eq("status", "accepted");
+            const challengeId = challengeQuery.data?.id;
+
+            const [{ data: friendships }, { data: currentMembers }] = await Promise.all([
+                supabase
+                    .from("friendships")
+                    .select("*")
+                    .or(`user_id.eq.${userId!},friend_id.eq.${userId!}`)
+                    .eq("status", "accepted"),
+                challengeId
+                    ? supabase.from("challenge_members").select("user_id").eq("challenge_id", challengeId)
+                    : Promise.resolve({ data: null }),
+            ]);
 
             const friendIds = (friendships || []).map(f => f.user_id === userId! ? f.friend_id : f.user_id);
             if (friendIds.length === 0) return [];
 
-            // If we have an active challenge, filter out those already in it
-            let excludedIds: string[] = [];
-            if (challengeQuery.data) {
-                const { data: currentMembers } = await supabase
-                    .from("challenge_members")
-                    .select("user_id")
-                    .eq("challenge_id", challengeQuery.data.id);
-                excludedIds = currentMembers?.map(m => m.user_id) || [];
-            }
+            const excludedIds = currentMembers?.map((m: { user_id: string }) => m.user_id) || [];
 
             const memberIdsSet = new Set(excludedIds);
             const inviteableIds = friendIds.filter(id => !memberIdsSet.has(id));
 
-            if (inviteableIds.length === 0 && challengeQuery.data) return [];
+            if (inviteableIds.length === 0 && challengeQuery.data?.id) return [];
 
-            // If no challenge, show all friends
-            const finalIds = challengeQuery.data ? inviteableIds : friendIds;
+            const finalIds = challengeQuery.data?.id ? inviteableIds : friendIds;
             if (finalIds.length === 0) return [];
 
             const { data: profiles } = await supabase
@@ -198,13 +229,18 @@ export const usePartyChallenge = () => {
     });
 
     const createChallenge = useMutation({
-        mutationFn: async ({ title, target_habit, duration_days, friendIds }: { title: string, target_habit: string, duration_days: number, friendIds: string[] }) => {
-            // 1. Create Challenge
+        mutationFn: async ({ title, habits, duration_days, friendIds }: {
+            title: string,
+            habits: { name: string, icon: string }[],
+            duration_days: number,
+            friendIds: string[]
+        }) => {
+            // 1. Create Challenge — habits stored as JSON in target_habit
             const { data: challenge, error: cErr } = await supabase
                 .from("challenges")
                 .insert({
                     title,
-                    target_habit,
+                    target_habit: JSON.stringify(habits.map(h => ({ name: h.name, icon: h.icon }))),
                     duration_days,
                     start_date: today,
                     created_by: userId!
@@ -214,7 +250,7 @@ export const usePartyChallenge = () => {
 
             if (cErr) throw cErr;
 
-            // 2. Add creator
+            // 2. Add creator membership
             const { error: creatorErr } = await supabase.from("challenge_members").insert({
                 challenge_id: challenge.id,
                 user_id: userId!,
@@ -240,22 +276,26 @@ export const usePartyChallenge = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["partyChallenge"] });
             queryClient.invalidateQueries({ queryKey: ["partyInvites"] });
-            toast.success("Party criada com sucesso! 🚀");
+            toast.success("Party criada com sucesso!");
+        },
+        onError: (err: any) => {
+            console.error("Erro ao criar party:", err);
+            toast.error(`Erro ao criar party: ${err?.message || "tente novamente"}`);
         }
     });
 
     const checkIn = useMutation({
-        mutationFn: async (challengeId: string) => {
+        mutationFn: async ({ challengeId, habitName }: { challengeId: string, habitName: string }) => {
             const { error } = await supabase.from("daily_logs").insert({
                 challenge_id: challengeId,
                 user_id: userId!,
                 log_date: today,
+                habit_name: habitName,
             });
             if (error && error.code !== "23505") throw error;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["partyChallenge"] });
-            toast.success("Check-in feito! 🎉");
         }
     });
 
@@ -312,7 +352,28 @@ export const usePartyChallenge = () => {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["partyChallenge"] });
             queryClient.invalidateQueries({ queryKey: ["partyInvites"] });
-            toast.success(variables.accept ? "Convite aceito! 🚀" : "Convite recusado.");
+            toast.success(variables.accept ? "Convite aceito!" : "Convite recusado.");
+        }
+    });
+
+    const leaveParty = useMutation({
+        mutationFn: async () => {
+            if (!challengeQuery.data) return;
+            const { error } = await supabase
+                .from("challenge_members")
+                .delete()
+                .eq("challenge_id", challengeQuery.data.id)
+                .eq("user_id", userId!);
+            if (error) throw error;
+        },
+        onSuccess: () => {
+            // Limpa imediatamente o cache para mostrar tela de criar party
+            queryClient.setQueryData(["partyChallenge", userId], null);
+            queryClient.removeQueries({ queryKey: ["friendsToInvite"] });
+            toast.success("Você saiu da party.");
+        },
+        onError: (err: any) => {
+            toast.error(`Erro ao sair da party: ${err?.message || "tente novamente"}`);
         }
     });
 
@@ -336,6 +397,7 @@ export const usePartyChallenge = () => {
         checkIn,
         inviteFriend,
         kickMember,
+        leaveParty,
         respondToInvite,
         checkUserInParty
     };

@@ -50,6 +50,38 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_habits: {
+        Row: {
+          challenge_id: string
+          created_at: string | null
+          icon: string
+          id: string
+          name: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string | null
+          icon?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string | null
+          icon?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_habits_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       challenge_members: {
         Row: {
           challenge_id: string
@@ -154,6 +186,7 @@ export type Database = {
         Row: {
           challenge_id: string
           created_at: string | null
+          habit_name: string | null
           id: string
           log_date: string
           user_id: string
@@ -161,6 +194,7 @@ export type Database = {
         Insert: {
           challenge_id: string
           created_at?: string | null
+          habit_name?: string | null
           id?: string
           log_date?: string
           user_id: string
@@ -168,6 +202,7 @@ export type Database = {
         Update: {
           challenge_id?: string
           created_at?: string | null
+          habit_name?: string | null
           id?: string
           log_date?: string
           user_id?: string

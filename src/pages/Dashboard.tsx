@@ -94,21 +94,6 @@ const Dashboard = () => {
 
   const completionTrend = getTrend();
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center h-64">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-2 border-[#00a375] border-t-transparent animate-spin" />
-            <p className="text-gray-600 text-[10px] font-mono-tech uppercase tracking-widest">
-              &gt; LOADING_SYSTEM...
-            </p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <div className="w-full space-y-6">
@@ -174,14 +159,14 @@ const Dashboard = () => {
         </div>
 
         {/* ===== MAIN DASHBOARD LAYOUT ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column: My Party Net */}
-          <div className="lg:col-span-5 xl:col-span-5 h-[420px] lg:h-[auto]">
+          <div className="lg:col-span-7 xl:col-span-7">
             <PartyChallenge />
           </div>
 
           {/* Right Column: Metrics & Streak */}
-          <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 h-[420px] lg:h-auto">
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
             <div className="flex-[10] min-h-0">
               <DashboardMetrics
                 totalHabits={totalHabitsCount}
@@ -211,6 +196,7 @@ const Dashboard = () => {
           onUncheck={(id) => uncheck.mutate(id)}
           isPending={checkIn.isPending}
           isUnchecking={uncheck.isPending}
+          isLoading={isLoading}
         />
 
       </div>
