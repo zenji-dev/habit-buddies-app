@@ -17,30 +17,30 @@ interface MetricCardProps {
     subLabel: string;
     subHighlight?: boolean;
     icon: React.ElementType;
+    valueColor?: string;
 }
 
-const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon }: MetricCardProps) => (
-    <div className="glass-panel hover:border-[#00a375]/50 rounded-none p-4 flex flex-col justify-between text-white relative group overflow-hidden shadow-neon-box transition-all duration-300 h-full">
+const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon, valueColor }: MetricCardProps) => (
+    <div className="glass-panel hover:border-[#00a375]/50 rounded-none p-3 flex flex-col justify-between text-white relative group overflow-hidden shadow-neon-box transition-all duration-300 h-full min-h-[100px]">
         {/* Orange status dot */}
         <div className="absolute top-0 right-0 p-1">
             <div className="w-1.5 h-1.5 bg-[#e66b00] rounded-full group-hover:shadow-[0_0_5px_#e66b00] transition-all" />
         </div>
 
         <div className="flex justify-between items-start relative z-10">
-            <span className="text-xs font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
+            <span className="text-[10px] font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
                 {label}
             </span>
             <div className="text-[#00a375] group-hover:scale-110 transition-transform">
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5" />
             </div>
         </div>
 
-        <div className="relative z-10 mt-auto pt-4">
-            <span className="text-2xl font-bold font-mono-tech text-white group-hover:text-[#00a375] transition-colors leading-none">
+        <div className="relative z-10 mt-auto pt-2">
+            <span className={`text-3xl font-black font-mono-tech leading-none ${valueColor || "text-white group-hover:text-[#00a375]"} transition-colors`}>
                 {value}
             </span>
-            <p className={`text-xs mt-2 font-mono-tech border-t border-[#00a375]/30 pt-1.5 group-hover:border-[#00a375]/50 ${subHighlight ? "text-[#00a375]" : "text-gray-500 group-hover:text-[#00a375]/80"
-                }`}>
+            <p className={`text-[9px] mt-1.5 font-mono-tech uppercase tracking-wider ${subHighlight ? "text-[#00a375]" : "text-gray-600"}`}>
                 {subLabel}
             </p>
         </div>
@@ -61,31 +61,32 @@ export const DashboardMetrics = ({
     completionTrend,
 }: DashboardMetricsProps) => {
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+        <div className="grid grid-cols-2 gap-3">
             <MetricCard
-                label="Total Habits"
+                label="Total Habits 📊"
                 value={totalHabits}
-                subLabel={`Check-ins: ${totalCompleted > 0 ? "OK" : "PENDING"}`}
+                subLabel={`ACTIVE_SESSIONS: ${totalCompleted > 0 ? String(totalCompleted).padStart(2, "0") : "00"}`}
                 icon={BarChart3}
             />
             <MetricCard
-                label="Streak.sys"
-                value={`${streak}`}
-                subLabel={`Peak: ${bestStreak} day${bestStreak !== 1 ? "s" : ""}`}
+                label="Streak.sys ⚡"
+                value={streak}
+                subLabel={`HIGHEST: ${bestStreak}`}
                 subHighlight={true}
                 icon={Zap}
+                valueColor="text-[#e66b00]"
             />
             <MetricCard
-                label="Comp. Rate"
+                label="Comp. Rate ↗"
                 value={`${Math.round(completionRate)}%`}
-                subLabel={`${completionTrend.isUp ? "+" : "-"}${completionTrend.value} WEEK`}
+                subLabel={`WEEKLY_DELTA: ${completionTrend.isUp ? "+" : "-"}${completionTrend.value}`}
                 subHighlight={true}
                 icon={TrendingUp}
             />
             <MetricCard
-                label="Target.lock"
-                value={`${todayProgress}/${todayTotal}`}
-                subLabel={`${todayTotal - todayProgress} remaining`}
+                label="Target.lock ⊙"
+                value={String(todayTotal - todayProgress).padStart(2, "0")}
+                subLabel="CRITICAL_HABITS"
                 icon={Target}
             />
         </div>

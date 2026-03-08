@@ -8,6 +8,7 @@ import { WeeklyStreak } from "@/components/WeeklyStreak";
 import { PartyChallenge } from "@/components/PartyChallenge";
 import { ChallengeInvites } from "@/components/ChallengeInvites";
 import { MyHabitsDialog } from "@/components/MyHabitsDialog";
+import { SystemLog } from "@/components/SystemLog";
 
 import { ActiveTasksGrid } from "@/components/ActiveTasksGrid";
 import { usePartyChallenge } from "@/hooks/usePartyChallenge";
@@ -23,7 +24,7 @@ import { useAuth } from "@clerk/clerk-react";
 
 const Dashboard = () => {
   const { habits, isLoading, checkIn, uncheck, getStreak, isCheckedToday, checkIns } = useHabits();
-  const { invites } = usePartyChallenge();
+  const { invites, challenge } = usePartyChallenge();
   const { incomingRequests } = useSocial();
   const { userId } = useAuth();
 
@@ -96,7 +97,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="w-full space-y-6">
+      <div className="w-full space-y-5">
 
         {/* ===== TOP BAR ===== */}
         <div className="flex items-center justify-between">
@@ -158,46 +159,46 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* ===== MAIN DASHBOARD LAYOUT ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: My Party Net */}
-          <div className="lg:col-span-7 xl:col-span-7">
+        {/* ===== MAIN 2-COLUMN LAYOUT ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+          {/* ─── LEFT COLUMN: Party + Active Tasks ─── */}
+          <div className="lg:col-span-8 space-y-5">
             <PartyChallenge />
+            <ActiveTasksGrid
+              habits={habits}
+              checkIns={checkIns}
+              isCheckedToday={isCheckedToday}
+              getStreak={getStreak}
+              onCheckIn={(id) => checkIn.mutate(id)}
+              onUncheck={(id) => uncheck.mutate(id)}
+              isPending={checkIn.isPending}
+              isUnchecking={uncheck.isPending}
+              isLoading={isLoading}
+            />
           </div>
 
-          {/* Right Column: Metrics & Streak */}
-          <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
-            <div className="flex-[10] min-h-0">
-              <DashboardMetrics
-                totalHabits={totalHabitsCount}
-                totalCompleted={totalCompletedAllTime}
-                streak={currentStreak}
-                completionRate={averageCompletionRate}
-                todayProgress={todayChecked}
-                todayTotal={totalHabitsCount}
-                bestStreak={bestStreak}
-                completionTrend={completionTrend}
-              />
-            </div>
-            <div className="flex-[9] min-h-0">
-              <WeeklyStreak checkIns={checkIns} habitsCount={totalHabitsCount} />
-            </div>
+          {/* ─── RIGHT COLUMN: Metrics + Streak + SystemLog ─── */}
+          <div className="lg:col-span-4 space-y-5">
+            <DashboardMetrics
+              totalHabits={totalHabitsCount}
+              totalCompleted={totalCompletedAllTime}
+              streak={currentStreak}
+              completionRate={averageCompletionRate}
+              todayProgress={todayChecked}
+              todayTotal={totalHabitsCount}
+              bestStreak={bestStreak}
+              completionTrend={completionTrend}
+            />
+            <WeeklyStreak checkIns={checkIns} habitsCount={totalHabitsCount} />
+            <SystemLog
+              habitsCount={totalHabitsCount}
+              checkedToday={todayChecked}
+              hasParty={!!challenge}
+              streak={currentStreak}
+            />
           </div>
         </div>
-
-
-        {/* ===== ROW 4: Active Tasks Grid (full width) ===== */}
-        <ActiveTasksGrid
-          habits={habits}
-          checkIns={checkIns}
-          isCheckedToday={isCheckedToday}
-          getStreak={getStreak}
-          onCheckIn={(id) => checkIn.mutate(id)}
-          onUncheck={(id) => uncheck.mutate(id)}
-          isPending={checkIn.isPending}
-          isUnchecking={uncheck.isPending}
-          isLoading={isLoading}
-        />
 
       </div>
       <AddFriendDialog open={isFriendDialogOpen} onOpenChange={setIsFriendDialogOpen} />

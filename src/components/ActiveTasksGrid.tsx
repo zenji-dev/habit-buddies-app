@@ -1,6 +1,6 @@
 import { format, startOfWeek, addDays, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Check, Flame, Loader2, Info } from "lucide-react";
+import { Check, Flame, Loader2, Terminal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -29,7 +29,6 @@ interface ActiveTasksGridProps {
     isLoading?: boolean;
 }
 
-const DAY_INITIALS = ["D", "S", "T", "Q", "Q", "S", "S"]; // kept for future use
 const DAY_NAMES = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 
 export const ActiveTasksGrid = ({
@@ -47,7 +46,6 @@ export const ActiveTasksGrid = ({
     const today = new Date();
     const todayStr = format(today, "yyyy-MM-dd");
 
-    // Current week only (Sunday → Saturday)
     const currentWeekDays = useMemo(() => {
         const weekStart = startOfWeek(today, { weekStartsOn: 0 });
         return Array.from({ length: 7 }).map((_, dayIdx) => {
@@ -64,11 +62,9 @@ export const ActiveTasksGrid = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [todayStr]);
 
-    // Use raw string comparison (same format as Supabase returns)
     const isCheckedOn = (habitId: string, dateStr: string) =>
         checkIns.some(c => c.habit_id === habitId && c.completed_at.startsWith(dateStr));
 
-    // Completion rate over the current week's past days
     const getRate = (habitId: string) => {
         const pastDays = currentWeekDays.filter(d => !d.isFuture);
         if (!pastDays.length) return 0;
@@ -89,8 +85,11 @@ export const ActiveTasksGrid = ({
 
     if (isLoading) {
         return (
-            <div className="glass-panel rounded-none shadow-neon-box p-6 h-[320px] flex flex-col">
-                <h3 className="text-lg font-bold text-white font-mono-tech tracking-wider mb-4">active tasks</h3>
+            <div className="glass-panel rounded-none shadow-neon-box p-6 flex flex-col">
+                <h3 className="text-sm font-bold text-[#00a375] font-mono-tech tracking-wider mb-4 flex items-center gap-2">
+                    <Terminal className="w-4 h-4" />
+                    active_tasks.sys
+                </h3>
                 <div className="flex-1 flex flex-col justify-center gap-3 px-2">
                     {[1, 2, 3].map(i => (
                         <div key={i} className="flex items-center gap-3 animate-pulse">
@@ -106,10 +105,13 @@ export const ActiveTasksGrid = ({
 
     if (visibleHabits.length === 0) {
         return (
-            <div className="glass-panel rounded-none shadow-neon-box p-6 h-[320px] flex flex-col">
-                <h3 className="text-lg font-bold text-white font-mono-tech tracking-wider mb-4">active tasks</h3>
-                <div className="flex-1 flex items-center justify-center">
-                    <p className="text-[10px] font-mono-tech text-gray-00 uppercase tracking-widest">
+            <div className="glass-panel rounded-none shadow-neon-box p-6 flex flex-col">
+                <h3 className="text-sm font-bold text-[#00a375] font-mono-tech tracking-wider mb-4 flex items-center gap-2">
+                    <Terminal className="w-4 h-4" />
+                    active_tasks.sys
+                </h3>
+                <div className="flex-1 flex items-center justify-center py-8">
+                    <p className="text-[10px] font-mono-tech text-gray-600 uppercase tracking-widest">
                         &gt; waiting for input...
                     </p>
                 </div>
@@ -118,15 +120,20 @@ export const ActiveTasksGrid = ({
     }
 
     return (
-        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden h-[320px] flex flex-col">
+        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden flex flex-col">
             <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col h-full">
+            <div className="relative z-10 flex flex-col">
                 {/* ─── HEADER ─── */}
+                <div className="px-4 py-2.5 border-b border-[#00a375]/30 flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-[#00a375]" />
+                    <span className="text-sm font-bold text-[#00a375] font-mono-tech tracking-wider">active_tasks.sys</span>
+                </div>
+
+                {/* ─── TABLE HEADER ─── */}
                 <div className="shrink-0 flex items-stretch border-b border-[#00a375]/30">
-                    {/* Left col header */}
-                    <div className="w-64 shrink-0 px-4 py-2 border-r border-[#00a375]/30 flex items-center">
-                        <span className="text-base font-bold text-white font-mono-tech tracking-wider">active tasks</span>
+                    <div className="w-48 shrink-0 px-4 py-2 border-r border-[#00a375]/30 flex items-center">
+                        <span className="text-[10px] font-bold text-gray-500 font-mono-tech tracking-wider uppercase">HABIT_PROTOCOL</span>
                     </div>
 
                     <div className="flex-1">
@@ -135,8 +142,8 @@ export const ActiveTasksGrid = ({
                                 <div
                                     key={dIdx}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center text-xl font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0",
-                                        day.isToday ? "text-[#e66b00]" : "text-[#00a375]/70"
+                                        "flex-1 flex items-center justify-center text-[10px] font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0 py-2",
+                                        day.isToday ? "text-[#e66b00] bg-[#e66b00]/5" : "text-gray-500"
                                     )}
                                 >
                                     {DAY_NAMES[day.dayOfWeek]}
@@ -144,131 +151,103 @@ export const ActiveTasksGrid = ({
                             ))}
                         </div>
                     </div>
+
+                    {/* Intensity header */}
+                    <div className="w-28 shrink-0 px-3 py-2 flex items-center justify-center border-l border-[#00a375]/30">
+                        <span className="text-[10px] font-bold text-gray-500 font-mono-tech tracking-wider uppercase">INTENSITY</span>
+                    </div>
                 </div>
 
                 {/* ─── HABIT ROWS ─── */}
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex flex-col">
                     {visibleHabits.map((habit) => {
                         const checked = isCheckedToday(habit.id);
                         const rate = getRate(habit.id);
-                        const streak = getStreak(habit.id);
                         const busy = isPending || isUnchecking;
 
+                        // Intensity bar color based on rate
+                        const barColor = rate >= 80 ? "#00a375" : rate >= 50 ? "#00a375" : rate >= 30 ? "#e66b00" : "#1a3a5c";
+
                         return (
-                            <div key={habit.id} className="flex-1 flex items-stretch hover:bg-[#00a375]/[0.03] transition-all duration-500 min-h-[30px] max-h-[45px] border-b border-[#00a375]/30">
+                            <div key={habit.id} className="flex items-stretch hover:bg-[#00a375]/[0.03] transition-all duration-300 border-b border-[#00a375]/20 last:border-b-0">
 
-                                {/* ─── LEFT: Check-in button + name ─── */}
-                                <div className="w-64 shrink-0 px-4 border-r border-[#00a375]/30 flex items-center gap-3">
-                                    {/* CHECK-IN BUTTON */}
+                                {/* ─── LEFT: Name ─── */}
+                                <div className="w-48 shrink-0 px-4 py-3 border-r border-[#00a375]/30 flex items-center gap-2">
                                     <button
-                                        onClick={() => handleToggle(habit.id)}
-                                        disabled={busy}
-                                        title={checked ? "Clique para desmarcar o check-in de hoje" : "Clique para marcar o check-in de hoje"}
+                                        onClick={() => setSelectedHabit(habit)}
                                         className={cn(
-                                            "w-7 h-7 rounded-full border flex items-center justify-center shrink-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#00a375]/50",
-                                            checked
-                                                ? "bg-[#00a375] border-[#00a375] shadow-[0_0_14px_rgba(0,163,117,0.55)] hover:bg-[#008f66] hover:border-[#008f66]"
-                                                : "border-slate-600 bg-transparent hover:border-[#00a375] hover:bg-[#00a375]/10 hover:shadow-[0_0_12px_rgba(0,163,117,0.3)]",
-                                            busy && "opacity-40 cursor-not-allowed"
-                                        )}
-                                    >
-                                        {busy ? (
-                                            <Loader2 className="w-3 h-3 text-[#00a375] animate-spin" />
-                                        ) : checked ? (
-                                            <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
-                                        ) : null}
+                                            "text-[11px] font-bold font-mono-tech truncate transition-colors text-left hover:underline uppercase",
+                                            checked ? "text-[#00a375]" : "text-white/70 hover:text-[#00a375]"
+                                        )}>
+                                        {habit.name}
                                     </button>
-
-                                    {/* NAME + STREAK + PROGRESS */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <button
-                                                onClick={() => setSelectedHabit(habit)}
-                                                className={cn(
-                                                    "text-xs font-bold font-mono-tech truncate transition-colors text-left hover:underline",
-                                                    checked ? "text-[#00a375]" : "text-white hover:text-[#00a375]"
-                                                )}>
-                                                {habit.name}
-                                            </button>
-                                            {streak > 0 && (
-                                                <span className="flex items-center gap-0.5 text-[9px] font-mono-tech text-[#e66b00] shrink-0">
-                                                    <Flame className="w-3 h-3" />
-                                                    {streak}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex-1 h-1 bg-[#050a14] border border-[#00a375]/30 overflow-hidden">
-                                                <div
-                                                    className="h-full bg-[#00a375] transition-all duration-500"
-                                                    style={{ width: `${rate}%` }}
-                                                />
-                                            </div>
-                                            <span className="text-[9px] font-mono-tech text-[#00a375]/80 w-7 text-right shrink-0">
-                                                {rate}%
-                                            </span>
-                                        </div>
-                                    </div>
                                 </div>
 
-                                {/* ─── RIGHT: Weekly dots ─── */}
+                                {/* ─── CENTER: Weekly checkboxes ─── */}
                                 <div className="flex-1 flex items-stretch">
                                     <div className="flex flex-1">
                                         {currentWeekDays.map((day) => {
                                             const dayChecked = isCheckedOn(habit.id, day.dateStr);
+                                            const isTodayCell = day.isToday;
+                                            const canToggle = isTodayCell && !busy;
+
                                             return (
                                                 <div
                                                     key={day.dateStr}
-                                                    className="flex-1 flex items-center justify-center border-r border-[#00a375]/30 last:border-r-0"
+                                                    className={cn(
+                                                        "flex-1 flex items-center justify-center border-r border-[#00a375]/30 last:border-r-0",
+                                                        isTodayCell && "bg-[#e66b00]/5"
+                                                    )}
                                                 >
-                                                    <div
-                                                        title={`${day.dateStr}${dayChecked ? " ✓" : ""}`}
+                                                    <button
+                                                        onClick={() => canToggle && handleToggle(habit.id)}
+                                                        disabled={!canToggle}
+                                                        title={dayChecked ? (isTodayCell ? "Desmarcar" : day.dateStr) : (isTodayCell ? "Check-in" : day.dateStr)}
                                                         className={cn(
-                                                            "w-4 h-4 rounded-full border flex items-center justify-center transition-all",
+                                                            "w-4 h-4 border flex items-center justify-center transition-all",
                                                             dayChecked
                                                                 ? "bg-[#00a375] border-[#00a375] shadow-[0_0_6px_rgba(0,163,117,0.4)]"
-                                                                : day.isToday
-                                                                    ? "border-[#e66b00] bg-transparent shadow-[0_0_4px_rgba(230,107,0,0.3)]"
+                                                                : isTodayCell
+                                                                    ? "border-[#e66b00]/50 bg-transparent hover:border-[#e66b00] cursor-pointer"
                                                                     : day.isFuture
                                                                         ? "border-slate-900/30 bg-transparent opacity-20"
-                                                                        : "border-slate-700/50 bg-transparent"
+                                                                        : "border-slate-700/50 bg-transparent",
+                                                            canToggle && !dayChecked && "hover:border-[#00a375] hover:shadow-[0_0_6px_rgba(0,163,117,0.3)] cursor-pointer",
+                                                            busy && isTodayCell && "opacity-40 cursor-not-allowed"
                                                         )}
                                                     >
-                                                        {dayChecked && (
+                                                        {busy && isTodayCell ? (
+                                                            <Loader2 className="w-2.5 h-2.5 text-[#00a375] animate-spin" />
+                                                        ) : dayChecked ? (
                                                             <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                                                        )}
-                                                    </div>
+                                                        ) : null}
+                                                    </button>
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                </div>
+
+                                {/* ─── RIGHT: Intensity bar ─── */}
+                                <div className="w-28 shrink-0 px-3 py-3 flex items-center border-l border-[#00a375]/30">
+                                    <div className="w-full h-2 bg-[#050a14] border border-[#00a375]/20 overflow-hidden">
+                                        <div
+                                            className="h-full transition-all duration-700"
+                                            style={{
+                                                width: `${rate}%`,
+                                                background: `linear-gradient(90deg, ${barColor}88, ${barColor})`,
+                                                boxShadow: rate > 50 ? `0 0 8px ${barColor}66` : "none",
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         );
                     })}
                 </div>
-
-                {/* ─── LEGEND ─── */}
-                <div className="shrink-0 flex items-center gap-5 px-5 py-2 border-t border-[#00a375]/30">
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-[#00a375]" />
-                        <span className="text-[13px] font-mono-tech text-gray-500 uppercase tracking-wider">Concluído</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full border border-[#e66b00]" />
-                        <span className="text-[13px] font-mono-tech text-gray-500 uppercase tracking-wider">Hoje</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full border border-slate-700/50" />
-                        <span className="text-[13px] font-mono-tech text-gray-500 uppercase tracking-wider">Não realizado</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 ml-auto">
-                        <Flame className="w-3 h-3 text-[#e66b00]" />
-                        <span className="text-[13px] font-mono-tech text-gray-500 uppercase tracking-wider">Streak atual</span>
-                    </div>
-                </div>
             </div>
 
+            {/* Habit Detail Dialog */}
             <Dialog open={!!selectedHabit} onOpenChange={(open) => !open && setSelectedHabit(null)}>
                 <DialogContent className="bg-background-dark border-slate-900 rounded-none max-w-sm shadow-neon-box">
                     <DialogHeader>

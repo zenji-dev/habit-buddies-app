@@ -31,10 +31,10 @@ export const PartyChallenge = () => {
     // Avatar size based on member count
     const avatarSize = useMemo(() => {
         const count = members.length;
-        if (count <= 2) return 96;
-        if (count <= 4) return 72;
-        if (count <= 6) return 56;
-        return 48;
+        if (count <= 2) return 80;
+        if (count <= 4) return 64;
+        if (count <= 6) return 52;
+        return 44;
     }, [members.length]);
 
     const currentUser = members.find(m => m.user_id === userId);
@@ -46,43 +46,59 @@ export const PartyChallenge = () => {
                 {/* Grid background */}
                 <div className="absolute inset-0 grid-bg opacity-30" />
 
-                {/* Header */}
-                <div className="border-b border-slate-900 p-2.5 bg-background-dark/80 backdrop-blur z-10 flex justify-between items-center">
-                    <h2 className="text-lg font-bold text-white font-mono-tech tracking-wider flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#e66b00] animate-pulse" />
-                        MY_PARTY_NET
-                    </h2>
+                {/* Header Row */}
+                <div className="border-b border-slate-900 px-4 py-2.5 bg-background-dark/80 backdrop-blur z-10 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 border border-[#e66b00]/50 bg-[#e66b00]/10 flex items-center justify-center">
+                            <Network className="w-4 h-4 text-[#e66b00]" />
+                        </div>
+                        <div>
+                            <h2 className="text-base font-bold text-white font-mono-tech tracking-wider leading-none">
+                                MY_PARTY_NET
+                            </h2>
+                            <div className="flex items-center gap-2 text-[9px] font-mono-tech mt-0.5">
+                                <span className="text-gray-600">STATUS:</span>
+                                <span className={isOnline ? "text-[#00a375]" : "text-gray-600"}>{isOnline ? "ONLINE" : "OFFLINE"}</span>
+                                {hasChallenge && (
+                                    <>
+                                        <span className="text-gray-800">|</span>
+                                        <span className="text-gray-600">#HABIT_SYNC_V4</span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="flex items-center gap-2">
                         {hasChallenge && (
                             <>
+                                {/* Net ID */}
+                                <span className="text-[8px] font-mono-tech text-gray-700 mr-2">
+                                    NET_ID: {challenge.id?.slice(0, 6).toUpperCase() || "---"}
+                                </span>
                                 <button
                                     onClick={() => setIsInviteOpen(true)}
-                                    className="px-2.5 py-1 border border-[#00a375]/40 text-[#00a375] text-[9px] font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_8px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-1"
+                                    className="px-3 py-1.5 border border-[#00a375]/40 text-[#00a375] text-[10px] font-mono-tech font-bold hover:bg-[#00a375]/10 hover:shadow-[0_0_8px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-1.5"
                                 >
-                                    <UserPlus className="w-3 h-3" />
                                     INVITE
                                 </button>
                                 <button
                                     onClick={() => leaveParty.mutate()}
                                     disabled={leaveParty.isPending}
                                     title="Sair da party"
-                                    className="px-2.5 py-1 border border-red-700/40 text-red-500 text-[9px] font-mono-tech hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-1 disabled:opacity-50"
+                                    className="px-3 py-1.5 border border-red-700/40 text-red-500 text-[10px] font-mono-tech font-bold hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-1.5 disabled:opacity-50"
                                 >
-                                    <LogOut className="w-3 h-3" />
                                     LEAVE
                                 </button>
                             </>
                         )}
-                        <div className="text-xs text-[#e66b00] font-mono-tech">
-                            STATUS: {isOnline ? "ONLINE" : "OFFLINE"}
-                        </div>
                     </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 relative z-10">
                     {!hasChallenge ? (
-                        <div className="flex items-center justify-center h-full min-h-[300px]">
+                        <div className="flex items-center justify-center h-full min-h-[200px]">
                             <div className="text-gray-700 font-mono-tech text-sm flex flex-col items-center gap-3">
                                 <Network className="w-10 h-10 opacity-20" />
                                 <span>NO_NODES_CONNECTED</span>
@@ -96,51 +112,10 @@ export const PartyChallenge = () => {
                         </div>
                     ) : (
                         <div className="w-full">
-                            {/* Info layer */}
-                            <div className="p-4 space-y-1 border-b border-slate-900/50 bg-gradient-to-b from-background-dark/60 to-transparent">
-                                <div className="flex gap-2 text-[10px] font-mono-tech">
-                                    <span className="text-gray-600"># PARTY_NAME:</span>
-                                    <span className="text-[#00a375] font-bold uppercase">{challenge.title}</span>
-                                </div>
-                                <div className="flex gap-2 text-[10px] font-mono-tech">
-                                    <span className="text-gray-600"># DAY:</span>
-                                    <span className="text-white/60">{challenge.currentDay}/{challenge.duration_days}</span>
-                                </div>
-                                <div className="flex gap-2 text-[10px] font-mono-tech">
-                                    <span className="text-gray-600"># ACTIVE_MODULES:</span>
-                                    <span className="text-white/40 italic">{habits.map(h => h.name).join(", ")}</span>
-                                </div>
-                            </div>
-
-                            {/* Risk Meter + Participants */}
-                            <div className="grid grid-cols-3 gap-4 p-4 items-center">
-                                {/* Risk Meter Gauge */}
-                                <div className="flex flex-col items-center justify-center">
-                                    <div className="relative w-32 h-16 overflow-hidden flex items-end justify-center">
-                                        <svg className="absolute top-0 w-32 h-32 -rotate-90" viewBox="0 0 128 128">
-                                            <circle cx="64" cy="64" r="52" fill="none" stroke="#0a120d" strokeWidth="8" strokeDasharray="163 326" />
-                                            <circle
-                                                cx="64" cy="64" r="52" fill="none"
-                                                stroke={riskMeterValue > 70 ? "#00a375" : riskMeterValue > 30 ? "#e66b00" : "#ff2a2a"}
-                                                strokeWidth="8"
-                                                strokeDasharray={`${(riskMeterValue * 1.63)} 326`}
-                                                className="transition-all duration-[1500ms]"
-                                            />
-                                        </svg>
-                                        <div className="z-10 text-center pb-1">
-                                            <div className="text-xl font-black text-white leading-none font-mono-tech">{riskMeterValue}%</div>
-                                        </div>
-                                        {/* Needle */}
-                                        <div
-                                            className="absolute bottom-0 left-1/2 w-0.5 h-12 bg-white/30 origin-bottom transition-all duration-[1500ms]"
-                                            style={{ transform: `translateX(-50%) rotate(${(riskMeterValue * 1.8) - 90}deg)` }}
-                                        />
-                                    </div>
-                                    <div className="text-[8px] text-white/20 tracking-[0.2em] font-mono-tech mt-1 uppercase">RISK_METER</div>
-                                </div>
-
-                                {/* Participants Grid */}
-                                <div className="col-span-2 flex flex-wrap justify-center gap-4">
+                            {/* Avatars Row + Risk Meter */}
+                            <div className="flex items-center gap-4 p-4 border-b border-white/5">
+                                {/* Participant Avatars */}
+                                <div className="flex gap-4 flex-1">
                                     {members.map((member) => {
                                         const isDone = habits.length > 0 && member.completedHabits.length >= habits.length;
                                         return (
@@ -149,7 +124,7 @@ export const PartyChallenge = () => {
                                                     <div
                                                         className={cn(
                                                             "border-2 bg-background-dark flex items-center justify-center overflow-hidden transition-all duration-500 relative",
-                                                            "group-hover:scale-110 shadow-[0_0_20px_rgba(0,163,117,0.10)]",
+                                                            "group-hover:scale-105 shadow-[0_0_20px_rgba(0,163,117,0.10)]",
                                                             isDone
                                                                 ? "border-[#00a375] shadow-[0_0_20px_rgba(0,163,117,0.4)]"
                                                                 : member.completedHabits.length > 0
@@ -171,7 +146,6 @@ export const PartyChallenge = () => {
                                                             <Users className="text-gray-500" style={{ width: avatarSize * 0.5, height: avatarSize * 0.5 }} />
                                                         )}
 
-                                                        {/* 100% overlay */}
                                                         {isDone && (
                                                             <>
                                                                 <div className="absolute inset-0 bg-[#00a375]/10 backdrop-blur-[1px] z-10" />
@@ -182,28 +156,12 @@ export const PartyChallenge = () => {
                                                         )}
                                                     </div>
                                                 </Link>
-                                                <div className="text-center">
-                                                    <span className={cn(
-                                                        "text-[10px] font-mono-tech font-bold uppercase tracking-wider transition-colors",
-                                                        isDone ? "text-white" : "text-white/40"
-                                                    )}>
-                                                        {member.name?.split(" ")[0]}
-                                                    </span>
-                                                    {/* Habit dots */}
-                                                    <div className="flex justify-center gap-1 mt-0.5">
-                                                        {habits.map((h) => (
-                                                            <div
-                                                                key={h.id}
-                                                                className={cn(
-                                                                    "w-1.5 h-1.5 rounded-full transition-all",
-                                                                    member.completedHabits.includes(h.name)
-                                                                        ? "bg-[#00a375] shadow-[0_0_4px_#00a375]"
-                                                                        : "bg-white/5 border border-white/10"
-                                                                )}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
+                                                <span className={cn(
+                                                    "text-[10px] font-mono-tech font-bold uppercase tracking-wider transition-colors",
+                                                    isDone ? "text-[#00a375]" : "text-white/60"
+                                                )}>
+                                                    {member.name?.split(" ")[0]}
+                                                </span>
 
                                                 {/* Kick button */}
                                                 {isOwner && member.user_id !== userId && (
@@ -220,81 +178,75 @@ export const PartyChallenge = () => {
                                         );
                                     })}
                                 </div>
+
+                                {/* Risk Meter */}
+                                <div className="flex flex-col items-center justify-center border border-[#00a375]/20 bg-background-dark/50 px-6 py-3">
+                                    <div className="text-[8px] text-white/30 tracking-[0.15em] font-mono-tech uppercase mb-1">RISK_METER</div>
+                                    <div className="text-2xl font-black text-white leading-none font-mono-tech">{riskMeterValue}%</div>
+                                    <div className="w-full mt-2 h-1 bg-[#050a14] border border-[#00a375]/20 overflow-hidden">
+                                        <div
+                                            className="h-full transition-all duration-[1500ms]"
+                                            style={{
+                                                width: `${riskMeterValue}%`,
+                                                background: riskMeterValue > 70 ? "#00a375" : riskMeterValue > 30 ? "#e66b00" : "#ff2a2a",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Habit Data Table — habits as rows, members as columns */}
                             {habits.length > 0 && (
-                                <div className="w-full overflow-x-auto border-t border-white/5">
+                                <div className="w-full overflow-x-auto">
                                     <table className="w-full border-collapse">
                                         <thead>
-                                            <tr className="border-b border-white/5 text-[8px] uppercase tracking-[0.15em] text-white/30 text-left bg-white/[0.02] font-mono-tech">
-                                                <th className="p-3 font-black border-r border-white/5 min-w-[120px]">HABIT</th>
+                                            <tr className="border-b border-white/5 text-[9px] uppercase tracking-[0.15em] text-gray-500 text-left bg-white/[0.02] font-mono-tech">
+                                                <th className="p-3 font-bold border-r border-white/5 min-w-[140px]">NETWORK_HABIT</th>
                                                 {members.map(m => (
-                                                    <th key={m.user_id} className="p-3 font-black text-center">
+                                                    <th key={m.user_id} className="p-3 font-bold text-center uppercase">
                                                         {m.name?.split(" ")[0]}
                                                     </th>
                                                 ))}
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {habits.map((habit) => {
-                                                const isSelfRow = true; // check per cell
-                                                return (
-                                                    <tr key={habit.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors group">
-                                                        {/* Habit name cell */}
-                                                        <td className="p-3 border-r border-white/5 whitespace-nowrap">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-base leading-none">{habit.icon}</span>
-                                                                <span className="text-[10px] font-bold font-mono-tech text-white/70 uppercase tracking-wide">
-                                                                    {habit.name}
-                                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        {/* One cell per member */}
-                                                        {members.map((member) => {
-                                                            const isCompleted = member.completedHabits.includes(habit.name);
-                                                            const isSelf = member.user_id === userId;
-                                                            const canCheckIn = isSelf && !isCompleted;
-                                                            return (
-                                                                <td key={member.user_id} className="p-3 text-center">
-                                                                    <button
-                                                                        onClick={() => canCheckIn && checkIn.mutate({ challengeId: challenge.id, habitName: habit.name })}
-                                                                        disabled={!canCheckIn || checkIn.isPending}
-                                                                        title={canCheckIn ? `Check-in: ${habit.name}` : undefined}
-                                                                        className={cn(
-                                                                            "w-5 h-5 rounded-full border mx-auto flex items-center justify-center transition-all",
-                                                                            isCompleted
-                                                                                ? "bg-[#00a375] border-[#00a375] shadow-[0_0_6px_#00a375]"
-                                                                                : canCheckIn
-                                                                                    ? "border-white/20 hover:border-[#00a375] hover:shadow-[0_0_6px_rgba(0,163,117,0.4)] cursor-pointer"
-                                                                                    : "border-white/10 cursor-default"
-                                                                        )}
-                                                                    >
-                                                                        {isCompleted && <Check className="w-3 h-3 text-black stroke-[3px]" />}
-                                                                    </button>
-                                                                </td>
-                                                            );
-                                                        })}
-                                                    </tr>
-                                                );
-                                            })}
+                                            {habits.map((habit) => (
+                                                <tr key={habit.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors group">
+                                                    <td className="p-3 border-r border-white/5 whitespace-nowrap">
+                                                        <span className="text-[10px] font-bold font-mono-tech text-white/70 uppercase tracking-wide">
+                                                            {habit.name}
+                                                        </span>
+                                                    </td>
+                                                    {members.map((member) => {
+                                                        const isCompleted = member.completedHabits.includes(habit.name);
+                                                        const isSelf = member.user_id === userId;
+                                                        const canCheckIn = isSelf && !isCompleted;
+                                                        return (
+                                                            <td key={member.user_id} className="p-3 text-center">
+                                                                <button
+                                                                    onClick={() => canCheckIn && checkIn.mutate({ challengeId: challenge.id, habitName: habit.name })}
+                                                                    disabled={!canCheckIn || checkIn.isPending}
+                                                                    title={canCheckIn ? `Check-in: ${habit.name}` : undefined}
+                                                                    className={cn(
+                                                                        "w-4 h-4 border mx-auto flex items-center justify-center transition-all",
+                                                                        isCompleted
+                                                                            ? "bg-[#00a375] border-[#00a375] shadow-[0_0_6px_#00a375]"
+                                                                            : canCheckIn
+                                                                                ? "border-white/20 hover:border-[#00a375] hover:shadow-[0_0_6px_rgba(0,163,117,0.4)] cursor-pointer"
+                                                                                : "border-white/10 cursor-default"
+                                                                    )}
+                                                                >
+                                                                    {isCompleted && <Check className="w-2.5 h-2.5 text-black stroke-[3px]" />}
+                                                                </button>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
                             )}
-
-                            {/* Footer legend */}
-                            <div className="p-2 border-t border-white/5 flex justify-center gap-6">
-                                <div className="flex items-center gap-1.5 text-[7px] font-black tracking-[0.2em] text-white/15 font-mono-tech">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#00a375]" /> COMPLETED
-                                </div>
-                                <div className="flex items-center gap-1.5 text-[7px] font-black tracking-[0.2em] text-white/15 font-mono-tech">
-                                    <div className="w-1.5 h-1.5 border border-[#e66b00]" /> IN_PROGRESS
-                                </div>
-                                <div className="flex items-center gap-1.5 text-[7px] font-black tracking-[0.2em] text-white/15 font-mono-tech">
-                                    <div className="w-1.5 h-1.5 border border-white/10" /> NULL
-                                </div>
-                            </div>
                         </div>
                     )}
                 </div>

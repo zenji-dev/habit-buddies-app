@@ -1,4 +1,5 @@
 import { format, startOfWeek, addDays, isToday, isBefore, startOfDay } from "date-fns";
+import { useMemo } from "react";
 
 const DAY_ABBR = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 
@@ -7,12 +8,12 @@ interface CheckIn {
     habit_id: string;
 }
 
-// ViewBox dimensions — SVG scales to fill whatever space it gets
+// ViewBox dimensions
 const VW = 420;
-const VH = 85;
+const VH = 100;
 const PAD_L = 26;
 const PAD_R = 18;
-const PAD_T = 12;
+const PAD_T = 14;
 const PAD_B = 22;
 
 const PLOT_W = VW - PAD_L - PAD_R;
@@ -53,19 +54,39 @@ export const WeeklyStreak = ({
     // Build polyline points
     const points = days.map((d, i) => `${px(i)},${py(d.completion)}`).join(" ");
 
-    // Area path: line + close to baseline
+    // Area path
     const areaPath =
         days.map((d, i) => `${i === 0 ? "M" : "L"}${px(i)},${py(d.completion)}`).join(" ") +
         ` L${px(6)},${py(0)} L${px(0)},${py(0)} Z`;
 
     const gridPcts = [0.25, 0.5, 0.75, 1.0];
 
+    // Generate analyst note
+    const analystNote = useMemo(() => {
+        const todayIdx = days.findIndex(d => d.isToday);
+        const todayDay = todayIdx >= 0 ? days[todayIdx] : null;
+        const pastDays = days.filter(d => d.isPast);
+        const avgPast = pastDays.length > 0 ? pastDays.reduce((s, d) => s + d.completion, 0) / pastDays.length : 0;
+
+        if (todayDay && todayDay.completion > avgPast && avgPast > 0) {
+            const pctAbove = Math.round(((todayDay.completion - avgPast) / avgPast) * 100);
+            return `ANALYST_NOTE: ${todayDay.label} performance exceeded baseline protocols by ${pctAbove}%. Synchronization recommended.`;
+        }
+        if (todayDay && todayDay.completion === 0 && habitsCount > 0) {
+            return `ANALYST_NOTE: No check-ins registered for ${todayDay.label}. Initiate habit protocols.`;
+        }
+        if (pastDays.length > 0 && avgPast >= 0.8) {
+            return `ANALYST_NOTE: Weekly average above 80% threshold. System operating at optimal capacity.`;
+        }
+        return `ANALYST_NOTE: Monitoring active. Data collection in progress for current cycle.`;
+    }, [days, habitsCount]);
+
     return (
-        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden h-full flex flex-col">
+        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden flex flex-col">
             <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
 
             {/* ── Header ── */}
-            <div className="relative z-10 flex justify-between items-center px-3 pt-1.5 pb-1.5 border-b border-[#00a375]/30 shrink-0">
+            <div className="relative z-10 flex justify-between items-center px-3 pt-2 pb-1.5 border-b border-[#00a375]/30 shrink-0">
                 <h3 className="text-xs font-bold text-white font-mono-tech tracking-wider flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-[#e66b00] animate-pulse" />
                     STREAK_MONITOR
@@ -75,8 +96,8 @@ export const WeeklyStreak = ({
                 </span>
             </div>
 
-            {/* ── Chart fills remaining space ── */}
-            <div className="relative z-10 flex-1 min-h-0">
+            {/* ── Chart ── */}
+            <div className="relative z-10 flex-1 min-h-[140px]">
                 <svg
                     viewBox={`0 0 ${VW} ${VH}`}
                     preserveAspectRatio="xMidYMid meet"
@@ -118,7 +139,7 @@ export const WeeklyStreak = ({
                                 y={py(pct) + 3}
                                 textAnchor="end"
                                 fill="#374151"
-                                fontSize="8"
+                                fontSize="7"
                                 fontFamily="monospace"
                             >
                                 {Math.round(pct * 100)}
@@ -126,7 +147,7 @@ export const WeeklyStreak = ({
                         </g>
                     ))}
 
-                    {/* ── Vertical day separators (subtle) ── */}
+                    {/* ── Vertical day separators ── */}
                     {days.map((_, i) => (
                         <line
                             key={i}
@@ -157,6 +178,7 @@ export const WeeklyStreak = ({
                         strokeLinejoin="round"
                         strokeLinecap="round"
                         filter="url(#lineglow)"
+                        strokeDasharray="6 3"
                     />
 
                     {/* ── Dots + labels per day ── */}
@@ -186,22 +208,32 @@ export const WeeklyStreak = ({
                                     />
                                 )}
 
-                                {/* Data dot */}
-                                <circle
-                                    cx={cx} cy={cy}
-                                    r={day.isToday || day.completion >= 1 ? 5 : 3.5}
-                                    fill={dotFill}
-                                    stroke={dotStroke}
-                                    strokeWidth={day.isToday || day.completion >= 1 ? 1.8 : 1.2}
-                                    opacity={day.isFuture ? 0.3 : 1}
-                                    filter={day.isToday || day.completion >= 1 ? "url(#dotglow)" : undefined}
-                                />
+                                {/* Diamond for today, circle for others */}
+                                {day.isToday ? (
+                                    <polygon
+                                        points={`${cx},${cy - 5} ${cx + 5},${cy} ${cx},${cy + 5} ${cx - 5},${cy}`}
+                                        fill={dotFill}
+                                        stroke={dotStroke}
+                                        strokeWidth="1.5"
+                                        filter="url(#dotglow)"
+                                    />
+                                ) : (
+                                    <circle
+                                        cx={cx} cy={cy}
+                                        r={day.completion >= 1 ? 4.5 : 3}
+                                        fill={dotFill}
+                                        stroke={dotStroke}
+                                        strokeWidth={day.completion >= 1 ? 1.5 : 1}
+                                        opacity={day.isFuture ? 0.3 : 1}
+                                        filter={day.completion >= 1 ? "url(#dotglow)" : undefined}
+                                    />
+                                )}
 
                                 {/* % above dot */}
                                 {hasData && !day.isFuture && (
                                     <text
                                         x={cx}
-                                        y={cy - 7}
+                                        y={cy - 8}
                                         textAnchor="middle"
                                         fill={day.isToday ? "#e66b00" : "#00a375"}
                                         fontSize="7"
@@ -241,8 +273,14 @@ export const WeeklyStreak = ({
                             </g>
                         );
                     })}
-
                 </svg>
+            </div>
+
+            {/* ── Analyst Note ── */}
+            <div className="relative z-10 mx-3 mb-3 p-2.5 bg-[#00a375]/5 border border-[#00a375]/30">
+                <p className="text-[10px] font-mono-tech text-[#00a375] leading-relaxed">
+                    {analystNote}
+                </p>
             </div>
         </div>
     );
