@@ -101,28 +101,28 @@ const Dashboard = () => {
 
         {/* ===== TOP BAR ===== */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-mono-tech">
-            <span className="text-gray-500">SYS</span>
-            <span className="text-gray-700">/</span>
-            <span className="text-[#e66b00] font-bold uppercase tracking-wider">DASHBOARD</span>
+          <div className="flex items-center gap-2 text-sm font-bold">
+            <span className="text-[#25f4f4]/60">SYS</span>
+            <span className="text-[#25f4f4]/60">/</span>
+            <span className="text-white uppercase tracking-wider">DASHBOARD</span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Bell */}
             <Popover>
               <PopoverTrigger asChild>
-                <button className="w-10 h-10 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_15px_rgba(0,163,117,0.4)] transition-all text-[#00a375] bg-card-dark relative">
+                <button className="w-10 h-10 flex items-center justify-center rounded border-2 border-[#224949] hover:border-[#25f4f4] transition-all text-[#25f4f4] bg-card-dark relative neo-shadow">
                   <Bell className="w-5 h-5" />
                   {invitesCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#e66b00] text-white text-[8px] font-bold flex items-center justify-center animate-pulse">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#25f4f4] text-background-dark text-[8px] font-bold flex items-center justify-center rounded">
                       {invitesCount}
                     </span>
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-0 glass-panel shadow-neon-box rounded-none" align="end">
-                <div className="p-3 border-b border-slate-900">
-                  <h3 className="text-xs font-bold text-white font-mono-tech uppercase tracking-wider">INCOMING_SIGNALS</h3>
+              <PopoverContent className="w-80 p-0 bg-card-dark neo-border neo-shadow rounded" align="end">
+                <div className="p-3 border-b-2 border-[#224949]">
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">INCOMING_SIGNALS</h3>
                 </div>
                 <div className="p-2">
                   <ChallengeInvites />
@@ -133,17 +133,17 @@ const Dashboard = () => {
             {/* ADD_FRIEND */}
             <button
               onClick={() => setIsFriendDialogOpen(true)}
-              className="h-10 bg-card-dark hover:bg-[#050a14] text-[#00a375] font-medium font-mono-tech px-4 rounded-none flex items-center justify-center gap-2 transition-colors border border-[#00a375]/50 hover:border-[#00a375] shadow-[0_0_5px_rgba(0,163,117,0.1)] uppercase tracking-wider text-xs"
+              className="h-10 bg-card-dark hover:bg-[#2a2a2a] text-[#25f4f4] font-bold px-4 rounded flex items-center justify-center gap-2 transition-colors border-2 border-[#224949] hover:border-[#25f4f4] neo-shadow uppercase tracking-wider text-xs"
             >
-              <UserPlus className="w-4 h-4 text-[#00a375]" />
+              <UserPlus className="w-4 h-4 text-[#25f4f4]" />
               ADD_FRIEND
             </button>
 
             {/* CONFIG_HABITS */}
             <MyHabitsDialog>
               <div>
-                <button className="h-10 bg-card-dark hover:bg-[#050a14] text-[#00a375] font-medium font-mono-tech px-4 rounded-none flex items-center justify-center gap-2 transition-colors border border-[#00a375]/50 hover:border-[#00a375] shadow-[0_0_5px_rgba(0,163,117,0.1)] uppercase tracking-wider text-xs">
-                  <Settings2 className="w-4 h-4 text-[#00a375]" />
+                <button className="h-10 bg-card-dark hover:bg-[#2a2a2a] text-[#25f4f4] font-bold px-4 rounded flex items-center justify-center gap-2 transition-colors border-2 border-[#224949] hover:border-[#25f4f4] neo-shadow uppercase tracking-wider text-xs">
+                  <Settings2 className="w-4 h-4 text-[#25f4f4]" />
                   CONFIG_HABITS
                 </button>
               </div>
@@ -151,7 +151,7 @@ const Dashboard = () => {
 
             {/* INIT_HABIT */}
             <AddHabitDialog>
-              <button className="h-10 bg-[#00a375] text-white font-bold font-mono-tech px-5 rounded-none flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(0,163,117,0.4)] hover:shadow-[0_0_25px_rgba(0,163,117,0.6)] hover:bg-[#008f66] tracking-wider uppercase text-xs group">
+              <button className="h-10 bg-[#25f4f4] text-background-dark font-bold px-5 rounded flex items-center justify-center gap-2 transition-all neo-shadow hover:brightness-110 tracking-wider uppercase text-xs group">
                 <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
                 INIT_HABIT
               </button>

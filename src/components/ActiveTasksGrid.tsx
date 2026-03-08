@@ -85,17 +85,17 @@ export const ActiveTasksGrid = ({
 
     if (isLoading) {
         return (
-            <div className="glass-panel rounded-none shadow-neon-box p-6 flex flex-col">
-                <h3 className="text-sm font-bold text-[#00a375] font-mono-tech tracking-wider mb-4 flex items-center gap-2">
+            <div className="bg-card-dark neo-border neo-shadow rounded p-6 flex flex-col">
+                <h3 className="text-sm font-bold text-[#25f4f4] tracking-wider mb-4 flex items-center gap-2 uppercase">
                     <Terminal className="w-4 h-4" />
                     active_tasks.sys
                 </h3>
                 <div className="flex-1 flex flex-col justify-center gap-3 px-2">
                     {[1, 2, 3].map(i => (
                         <div key={i} className="flex items-center gap-3 animate-pulse">
-                            <div className="w-8 h-8 bg-slate-800 rounded-none" />
-                            <div className="flex-1 h-3 bg-slate-800 rounded-none" style={{ width: `${60 + i * 10}%` }} />
-                            <div className="w-16 h-3 bg-slate-800 rounded-none" />
+                            <div className="w-8 h-8 bg-[#224949] rounded" />
+                            <div className="flex-1 h-3 bg-[#224949] rounded" style={{ width: `${60 + i * 10}%` }} />
+                            <div className="w-16 h-3 bg-[#224949] rounded" />
                         </div>
                     ))}
                 </div>
@@ -105,13 +105,13 @@ export const ActiveTasksGrid = ({
 
     if (visibleHabits.length === 0) {
         return (
-            <div className="glass-panel rounded-none shadow-neon-box p-6 flex flex-col">
-                <h3 className="text-sm font-bold text-[#00a375] font-mono-tech tracking-wider mb-4 flex items-center gap-2">
+            <div className="bg-card-dark neo-border neo-shadow rounded p-6 flex flex-col">
+                <h3 className="text-sm font-bold text-[#25f4f4] tracking-wider mb-4 flex items-center gap-2 uppercase">
                     <Terminal className="w-4 h-4" />
                     active_tasks.sys
                 </h3>
                 <div className="flex-1 flex items-center justify-center py-8">
-                    <p className="text-[10px] font-mono-tech text-gray-600 uppercase tracking-widest">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest">
                         &gt; waiting for input...
                     </p>
                 </div>
@@ -120,20 +120,19 @@ export const ActiveTasksGrid = ({
     }
 
     return (
-        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden flex flex-col">
-            <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none" />
+        <div className="bg-card-dark neo-border neo-shadow rounded relative overflow-hidden flex flex-col">
 
             <div className="relative z-10 flex flex-col">
                 {/* ─── HEADER ─── */}
-                <div className="px-4 py-2.5 border-b border-[#00a375]/30 flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-[#00a375]" />
-                    <span className="text-sm font-bold text-[#00a375] font-mono-tech tracking-wider">active_tasks.sys</span>
+                <div className="px-4 py-2.5 border-b-2 border-[#224949] flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-[#25f4f4]" />
+                    <span className="text-sm font-bold text-[#25f4f4] tracking-wider uppercase">active_tasks.sys</span>
                 </div>
 
                 {/* ─── TABLE HEADER ─── */}
-                <div className="shrink-0 flex items-stretch border-b border-[#00a375]/30">
-                    <div className="w-48 shrink-0 px-4 py-2 border-r border-[#00a375]/30 flex items-center">
-                        <span className="text-[10px] font-bold text-gray-500 font-mono-tech tracking-wider uppercase">HABIT_PROTOCOL</span>
+                <div className="shrink-0 flex items-stretch border-b-2 border-[#224949]">
+                    <div className="w-48 shrink-0 px-4 py-2 border-r-2 border-[#224949] flex items-center">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">HABIT_PROTOCOL</span>
                     </div>
 
                     <div className="flex-1">
@@ -142,8 +141,8 @@ export const ActiveTasksGrid = ({
                                 <div
                                     key={dIdx}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center text-[10px] font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0 py-2",
-                                        day.isToday ? "text-[#e66b00] bg-[#e66b00]/5" : "text-gray-500"
+                                        "flex-1 flex items-center justify-center text-[10px] uppercase font-bold border-r-2 border-[#224949] last:border-r-0 py-2",
+                                        day.isToday ? "text-[#25f4f4] bg-[#25f4f4]/5" : "text-slate-500"
                                     )}
                                 >
                                     {DAY_NAMES[day.dayOfWeek]}
@@ -153,8 +152,8 @@ export const ActiveTasksGrid = ({
                     </div>
 
                     {/* Intensity header */}
-                    <div className="w-28 shrink-0 px-3 py-2 flex items-center justify-center border-l border-[#00a375]/30">
-                        <span className="text-[10px] font-bold text-gray-500 font-mono-tech tracking-wider uppercase">INTENSITY</span>
+                    <div className="w-28 shrink-0 px-3 py-2 flex items-center justify-center border-l-2 border-[#224949]">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">INTENSITY</span>
                     </div>
                 </div>
 
@@ -166,18 +165,18 @@ export const ActiveTasksGrid = ({
                         const busy = isPending || isUnchecking;
 
                         // Intensity bar color based on rate
-                        const barColor = rate >= 80 ? "#00a375" : rate >= 50 ? "#00a375" : rate >= 30 ? "#e66b00" : "#1a3a5c";
+                        const barColor = rate >= 80 ? "#25f4f4" : rate >= 50 ? "#25f4f4" : rate >= 30 ? "#3a8888" : "#224949";
 
                         return (
-                            <div key={habit.id} className="flex items-stretch hover:bg-[#00a375]/[0.03] transition-all duration-300 border-b border-[#00a375]/20 last:border-b-0">
+                            <div key={habit.id} className="flex items-stretch hover:bg-[#25f4f4]/[0.03] transition-all duration-300 border-b border-[#224949] last:border-b-0">
 
                                 {/* ─── LEFT: Name ─── */}
-                                <div className="w-48 shrink-0 px-4 py-3 border-r border-[#00a375]/30 flex items-center gap-2">
+                                <div className="w-48 shrink-0 px-4 py-3 border-r-2 border-[#224949] flex items-center gap-2">
                                     <button
                                         onClick={() => setSelectedHabit(habit)}
                                         className={cn(
-                                            "text-[11px] font-bold font-mono-tech truncate transition-colors text-left hover:underline uppercase",
-                                            checked ? "text-[#00a375]" : "text-white/70 hover:text-[#00a375]"
+                                            "text-[11px] font-bold truncate transition-colors text-left hover:underline uppercase",
+                                            checked ? "text-[#25f4f4]" : "text-white/70 hover:text-[#25f4f4]"
                                         )}>
                                         {habit.name}
                                     </button>
@@ -195,8 +194,8 @@ export const ActiveTasksGrid = ({
                                                 <div
                                                     key={day.dateStr}
                                                     className={cn(
-                                                        "flex-1 flex items-center justify-center border-r border-[#00a375]/30 last:border-r-0",
-                                                        isTodayCell && "bg-[#e66b00]/5"
+                                                        "flex-1 flex items-center justify-center border-r-2 border-[#224949] last:border-r-0",
+                                                        isTodayCell && "bg-[#25f4f4]/5"
                                                     )}
                                                 >
                                                     <button
@@ -204,22 +203,22 @@ export const ActiveTasksGrid = ({
                                                         disabled={!canToggle}
                                                         title={dayChecked ? (isTodayCell ? "Desmarcar" : day.dateStr) : (isTodayCell ? "Check-in" : day.dateStr)}
                                                         className={cn(
-                                                            "w-4 h-4 border flex items-center justify-center transition-all",
+                                                            "w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all",
                                                             dayChecked
-                                                                ? "bg-[#00a375] border-[#00a375] shadow-[0_0_6px_rgba(0,163,117,0.4)]"
+                                                                ? "bg-[#25f4f4] border-[#25f4f4]"
                                                                 : isTodayCell
-                                                                    ? "border-[#e66b00]/50 bg-transparent hover:border-[#e66b00] cursor-pointer"
+                                                                    ? "border-[#25f4f4]/50 bg-transparent hover:border-[#25f4f4] cursor-pointer"
                                                                     : day.isFuture
-                                                                        ? "border-slate-900/30 bg-transparent opacity-20"
-                                                                        : "border-slate-700/50 bg-transparent",
-                                                            canToggle && !dayChecked && "hover:border-[#00a375] hover:shadow-[0_0_6px_rgba(0,163,117,0.3)] cursor-pointer",
+                                                                        ? "border-[#224949]/30 bg-transparent opacity-20"
+                                                                        : "border-[#224949] bg-transparent",
+                                                            canToggle && !dayChecked && "hover:border-[#25f4f4] cursor-pointer",
                                                             busy && isTodayCell && "opacity-40 cursor-not-allowed"
                                                         )}
                                                     >
                                                         {busy && isTodayCell ? (
-                                                            <Loader2 className="w-2.5 h-2.5 text-[#00a375] animate-spin" />
+                                                            <Loader2 className="w-2.5 h-2.5 text-[#25f4f4] animate-spin" />
                                                         ) : dayChecked ? (
-                                                            <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                                                            <Check className="w-2.5 h-2.5 text-background-dark" strokeWidth={3} />
                                                         ) : null}
                                                     </button>
                                                 </div>
@@ -229,14 +228,13 @@ export const ActiveTasksGrid = ({
                                 </div>
 
                                 {/* ─── RIGHT: Intensity bar ─── */}
-                                <div className="w-28 shrink-0 px-3 py-3 flex items-center border-l border-[#00a375]/30">
-                                    <div className="w-full h-2 bg-[#050a14] border border-[#00a375]/20 overflow-hidden">
+                                <div className="w-28 shrink-0 px-3 py-3 flex items-center border-l-2 border-[#224949]">
+                                    <div className="w-full h-2 bg-background-dark border border-[#224949] rounded overflow-hidden">
                                         <div
-                                            className="h-full transition-all duration-700"
+                                            className="h-full transition-all duration-700 rounded"
                                             style={{
                                                 width: `${rate}%`,
-                                                background: `linear-gradient(90deg, ${barColor}88, ${barColor})`,
-                                                boxShadow: rate > 50 ? `0 0 8px ${barColor}66` : "none",
+                                                background: barColor,
                                             }}
                                         />
                                     </div>
@@ -249,28 +247,26 @@ export const ActiveTasksGrid = ({
 
             {/* Habit Detail Dialog */}
             <Dialog open={!!selectedHabit} onOpenChange={(open) => !open && setSelectedHabit(null)}>
-                <DialogContent className="bg-background-dark border-slate-900 rounded-none max-w-sm shadow-neon-box">
+                <DialogContent className="bg-background-dark neo-border neo-shadow rounded max-w-sm">
                     <DialogHeader>
-                        <DialogTitle className="text-white text-base uppercase tracking-wider font-mono-tech flex items-center gap-3">
-                            <span className="text-[#00a375] text-xl bg-[#00a375]/10 w-8 h-8 flex items-center justify-center border border-[#00a375]/30">{selectedHabit?.icon}</span>
+                        <DialogTitle className="text-white text-base uppercase tracking-wider flex items-center gap-3">
+                            <span className="text-[#25f4f4] text-xl bg-[#25f4f4]/10 w-8 h-8 flex items-center justify-center border-2 border-[#224949] rounded">{selectedHabit?.icon}</span>
                             {selectedHabit?.name}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="py-2">
-                        <h4 className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech mb-2">DESCRIPTION</h4>
-                        <div className="bg-card-dark border border-slate-900 p-3 rounded-none relative">
-                            <p className="text-xs font-mono-tech text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        <h4 className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">DESCRIPTION</h4>
+                        <div className="bg-card-dark neo-border p-3 rounded relative">
+                            <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">
                                 {selectedHabit?.description || "> no_description_provided"}
                             </p>
-                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00a375]/50 -mt-[1px] -mr-[1px]" />
-                            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00a375]/50 -mb-[1px] -ml-[1px]" />
                         </div>
                         {selectedHabit?.goal_minutes ? (
                             <div className="mt-5">
-                                <h4 className="text-[10px] text-gray-500 uppercase tracking-widest font-mono-tech mb-2">DAILY_TARGET</h4>
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00a375]/10 border border-[#00a375]/30">
-                                    <span className="text-sm font-bold font-mono-tech text-[#00a375]">{selectedHabit.goal_minutes}</span>
-                                    <span className="text-[10px] text-[#00a375]/70 font-mono-tech tracking-widest">MINUTES</span>
+                                <h4 className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">DAILY_TARGET</h4>
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#25f4f4]/10 border-2 border-[#224949] rounded">
+                                    <span className="text-sm font-bold text-[#25f4f4]">{selectedHabit.goal_minutes}</span>
+                                    <span className="text-[10px] text-[#25f4f4]/70 tracking-widest">MINUTES</span>
                                 </div>
                             </div>
                         ) : null}

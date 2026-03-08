@@ -61,22 +61,22 @@ export const InviteToPartyDialog = ({ open, onOpenChange }: InviteToPartyDialogP
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-sm glass-panel rounded-none shadow-neon-box">
+            <DialogContent className="sm:max-w-sm glass-panel rounded neo-shadow">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-white text-sm uppercase tracking-wider font-mono-tech">
-                        <Send className="w-4 h-4 text-[#00a375]" />
+                    <DialogTitle className="flex items-center gap-2 text-white text-sm uppercase tracking-wider font-bold">
+                        <Send className="w-4 h-4 text-[#25f4f4]" />
                         INVITE_TO_PARTY
                     </DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4 pt-2">
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-mono-tech text-gray-500 uppercase tracking-widest">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             SELECT_FRIENDS_TO_JOIN
                         </label>
-                        <div className="max-h-[250px] overflow-y-auto border border-slate-900 bg-card-dark p-1 space-y-0.5">
+                        <div className="max-h-[250px] overflow-y-auto border border-[#224949] bg-card-dark p-1 space-y-0.5">
                             {friendsToInvite.length === 0 ? (
-                                <p className="text-center py-8 text-[10px] text-gray-600 uppercase tracking-widest font-mono-tech">
+                                <p className="text-center py-8 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
                                     NO_NODES_AVAILABLE
                                 </p>
                             ) : (
@@ -87,21 +87,21 @@ export const InviteToPartyDialog = ({ open, onOpenChange }: InviteToPartyDialogP
                                             key={friend.user_id}
                                             onClick={() => toggleFriend(friend.user_id)}
                                             className={`flex items-center justify-between p-2 cursor-pointer transition-all ${selected
-                                                ? "bg-[#00a375]/10 border border-[#00a375]/30"
-                                                : "hover:bg-[#02040a] border border-transparent"
+                                                ? "bg-[#25f4f4]/10 border border-[#25f4f4]/30"
+                                                : "hover:bg-[#242424] border border-transparent"
                                                 }`}
                                         >
                                             <div className="flex items-center gap-2">
-                                                <div className="w-7 h-7 border border-slate-800 flex items-center justify-center overflow-hidden bg-background-dark flex-shrink-0">
+                                                <div className="w-7 h-7 border border-[#224949] flex items-center justify-center overflow-hidden bg-background-dark flex-shrink-0">
                                                     {friend.avatar_url ? (
                                                         <img src={friend.avatar_url} alt={friend.name} className="w-full h-full object-cover grayscale" />
                                                     ) : (
-                                                        <span className="text-[#00a375] font-bold text-[9px]">{friend.name?.charAt(0)}</span>
+                                                        <span className="text-[#25f4f4] font-bold text-[9px]">{friend.name?.charAt(0)}</span>
                                                     )}
                                                 </div>
-                                                <span className="text-[11px] text-white font-medium font-mono-tech">{friend.name}</span>
+                                                <span className="text-[11px] text-white font-medium font-bold">{friend.name}</span>
                                             </div>
-                                            {selected && <Check className="w-3 h-3 text-[#00a375]" />}
+                                            {selected && <Check className="w-3 h-3 text-[#25f4f4]" />}
                                         </div>
                                     );
                                 })
@@ -114,7 +114,7 @@ export const InviteToPartyDialog = ({ open, onOpenChange }: InviteToPartyDialogP
                     <button
                         onClick={handleSend}
                         disabled={sending || selectedFriendIds.length === 0}
-                        className="w-full bg-[#00a375] text-white font-bold font-mono-tech py-3 rounded-none text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(0,163,117,0.4)] hover:shadow-[0_0_25px_rgba(0,163,117,0.6)] hover:bg-[#008f66] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full bg-[#25f4f4] text-white font-bold font-bold py-3 rounded text-xs uppercase tracking-wider neo-shadow hover:neo-shadow hover:bg-[#1ec8c8] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                         SEND_INVITES

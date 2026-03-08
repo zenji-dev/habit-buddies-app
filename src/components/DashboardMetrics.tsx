@@ -21,32 +21,24 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ label, value, subLabel, subHighlight = false, icon: Icon, valueColor }: MetricCardProps) => (
-    <div className="glass-panel hover:border-[#00a375]/50 rounded-none p-3 flex flex-col justify-between text-white relative group overflow-hidden shadow-neon-box transition-all duration-300 h-full min-h-[100px]">
-        {/* Orange status dot */}
-        <div className="absolute top-0 right-0 p-1">
-            <div className="w-1.5 h-1.5 bg-[#e66b00] rounded-full group-hover:shadow-[0_0_5px_#e66b00] transition-all" />
-        </div>
-
+    <div className="bg-card-dark neo-border neo-shadow rounded p-3 flex flex-col justify-between text-white relative group overflow-hidden transition-all duration-300 h-full min-h-[100px] hover:border-[#25f4f4]">
         <div className="flex justify-between items-start relative z-10">
-            <span className="text-[10px] font-mono-tech font-bold uppercase tracking-widest text-[#00a375]/70">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#25f4f4]">
                 {label}
             </span>
-            <div className="text-[#00a375] group-hover:scale-110 transition-transform">
+            <div className="text-[#25f4f4] group-hover:scale-110 transition-transform">
                 <Icon className="w-3.5 h-3.5" />
             </div>
         </div>
 
         <div className="relative z-10 mt-auto pt-2">
-            <span className={`text-3xl font-black font-mono-tech leading-none ${valueColor || "text-white group-hover:text-[#00a375]"} transition-colors`}>
+            <span className={`text-3xl font-black leading-none ${valueColor || "text-white group-hover:text-[#25f4f4]"} transition-colors`}>
                 {value}
             </span>
-            <p className={`text-[9px] mt-1.5 font-mono-tech uppercase tracking-wider ${subHighlight ? "text-[#00a375]" : "text-gray-600"}`}>
+            <p className={`text-[9px] mt-1.5 uppercase tracking-wider ${subHighlight ? "text-[#25f4f4]" : "text-slate-500"}`}>
                 {subLabel}
             </p>
         </div>
-
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-[#00a375]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </div>
 );
 
@@ -74,7 +66,7 @@ export const DashboardMetrics = ({
                 subLabel={`HIGHEST: ${bestStreak}`}
                 subHighlight={true}
                 icon={Zap}
-                valueColor="text-[#e66b00]"
+                valueColor="text-[#25f4f4]"
             />
             <MetricCard
                 label="Comp. Rate ↗"

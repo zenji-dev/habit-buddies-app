@@ -82,16 +82,15 @@ export const WeeklyStreak = ({
     }, [days, habitsCount]);
 
     return (
-        <div className="glass-panel rounded-none shadow-neon-box relative overflow-hidden flex flex-col">
-            <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
+        <div className="bg-card-dark neo-border neo-shadow rounded relative overflow-hidden flex flex-col">
 
             {/* ── Header ── */}
-            <div className="relative z-10 flex justify-between items-center px-3 pt-2 pb-1.5 border-b border-[#00a375]/30 shrink-0">
-                <h3 className="text-xs font-bold text-white font-mono-tech tracking-wider flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#e66b00] animate-pulse" />
+            <div className="relative z-10 flex justify-between items-center px-3 pt-2 pb-1.5 border-b-2 border-[#224949] shrink-0">
+                <h3 className="text-xs font-bold text-white tracking-wider flex items-center gap-2 uppercase">
+                    <span className="w-1.5 h-1.5 bg-[#25f4f4] rounded-full" />
                     STREAK_MONITOR
                 </h3>
-                <span className="text-[9px] font-mono-tech text-gray-500">
+                <span className="text-[9px] text-slate-500">
                     [{format(days[0].date, "dd/MM")} — {format(days[6].date, "dd/MM")}]
                 </span>
             </div>
@@ -105,8 +104,8 @@ export const WeeklyStreak = ({
                 >
                     <defs>
                         <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#00a375" stopOpacity="0.30" />
-                            <stop offset="100%" stopColor="#00a375" stopOpacity="0.01" />
+                            <stop offset="0%" stopColor="#25f4f4" stopOpacity="0.30" />
+                            <stop offset="100%" stopColor="#25f4f4" stopOpacity="0.01" />
                         </linearGradient>
                         <filter id="lineglow">
                             <feGaussianBlur stdDeviation="2.5" result="blur" />
@@ -130,7 +129,7 @@ export const WeeklyStreak = ({
                             <line
                                 x1={PAD_L} y1={py(pct)}
                                 x2={VW - PAD_R} y2={py(pct)}
-                                stroke="rgba(0,163,117,0.3)"
+                                stroke="rgba(34,73,73,0.5)"
                                 strokeWidth="0.8"
                                 strokeDasharray="4 5"
                             />
@@ -138,9 +137,9 @@ export const WeeklyStreak = ({
                                 x={PAD_L - 4}
                                 y={py(pct) + 3}
                                 textAnchor="end"
-                                fill="#374151"
+                                fill="#3a6666"
                                 fontSize="7"
-                                fontFamily="monospace"
+                                fontFamily="Space Grotesk, sans-serif"
                             >
                                 {Math.round(pct * 100)}
                             </text>
@@ -153,7 +152,7 @@ export const WeeklyStreak = ({
                             key={i}
                             x1={px(i)} y1={PAD_T}
                             x2={px(i)} y2={PAD_T + PLOT_H}
-                            stroke="rgba(0,163,117,0.2)"
+                            stroke="rgba(34,73,73,0.3)"
                             strokeWidth="0.6"
                         />
                     ))}
@@ -162,7 +161,7 @@ export const WeeklyStreak = ({
                     <line
                         x1={PAD_L} y1={PAD_T + PLOT_H}
                         x2={VW - PAD_R} y2={PAD_T + PLOT_H}
-                        stroke="rgba(0,163,117,0.3)"
+                        stroke="rgba(34,73,73,0.5)"
                         strokeWidth="1"
                     />
 
@@ -173,7 +172,7 @@ export const WeeklyStreak = ({
                     <polyline
                         points={points}
                         fill="none"
-                        stroke="#00a375"
+                        stroke="#25f4f4"
                         strokeWidth="2"
                         strokeLinejoin="round"
                         strokeLinecap="round"
@@ -186,12 +185,12 @@ export const WeeklyStreak = ({
                         const cx = px(i);
                         const cy = py(day.completion);
                         const hasData = day.completion > 0;
-                        const dotColor = day.isToday ? "#e66b00" : "#00a375";
-                        const dotStroke = day.isToday ? "#e66b00" : day.isFuture ? "#1f2d3d" : "#00a375";
+                        const dotColor = day.isToday ? "#25f4f4" : "#25f4f4";
+                        const dotStroke = day.isToday ? "#25f4f4" : day.isFuture ? "#224949" : "#25f4f4";
                         const dotFill = day.isFuture
-                            ? "#070e1a"
+                            ? "#050e0e"
                             : day.completion === 0
-                                ? "#070e1a"
+                                ? "#050e0e"
                                 : dotColor;
 
                         return (
@@ -202,7 +201,7 @@ export const WeeklyStreak = ({
                                         cx={cx} cy={cy}
                                         r="7"
                                         fill="none"
-                                        stroke="#e66b00"
+                                        stroke="#25f4f4"
                                         strokeWidth="1"
                                         opacity="0.35"
                                     />
@@ -235,9 +234,9 @@ export const WeeklyStreak = ({
                                         x={cx}
                                         y={cy - 8}
                                         textAnchor="middle"
-                                        fill={day.isToday ? "#e66b00" : "#00a375"}
+                                        fill="#25f4f4"
                                         fontSize="7"
-                                        fontFamily="monospace"
+                                        fontFamily="Space Grotesk, sans-serif"
                                         opacity="0.85"
                                     >
                                         {Math.round(day.completion * 100)}%
@@ -249,9 +248,9 @@ export const WeeklyStreak = ({
                                     x={cx}
                                     y={PAD_T + PLOT_H + 10}
                                     textAnchor="middle"
-                                    fill={day.isToday ? "#e66b00" : "#4b5563"}
+                                    fill={day.isToday ? "#25f4f4" : "#4b5563"}
                                     fontSize="6"
-                                    fontFamily="monospace"
+                                    fontFamily="Space Grotesk, sans-serif"
                                     fontWeight={day.isToday ? "bold" : "normal"}
                                 >
                                     {day.label}
@@ -263,9 +262,9 @@ export const WeeklyStreak = ({
                                         x={cx}
                                         y={PAD_T + PLOT_H + 18}
                                         textAnchor="middle"
-                                        fill="#00a375"
+                                        fill="#25f4f4"
                                         fontSize="5"
-                                        fontFamily="monospace"
+                                        fontFamily="Space Grotesk, sans-serif"
                                     >
                                         NOW
                                     </text>
@@ -277,8 +276,8 @@ export const WeeklyStreak = ({
             </div>
 
             {/* ── Analyst Note ── */}
-            <div className="relative z-10 mx-3 mb-3 p-2.5 bg-[#00a375]/5 border border-[#00a375]/30">
-                <p className="text-[10px] font-mono-tech text-[#00a375] leading-relaxed">
+            <div className="relative z-10 mx-3 mb-3 p-2.5 border-2 border-dashed border-[#224949] rounded">
+                <p className="text-[10px] text-[#25f4f4] leading-relaxed">
                     {analystNote}
                 </p>
             </div>

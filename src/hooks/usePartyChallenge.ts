@@ -377,6 +377,44 @@ export const usePartyChallenge = () => {
         }
     });
 
+    const addHabitToParty = useMutation({
+        mutationFn: async ({ name, icon }: { name: string; icon: string }) => {
+            if (!challengeQuery.data) throw new Error("Sem party ativa");
+
+            // Parse hábitos atuais
+            let currentHabits: { name: string; icon: string }[] = [];
+            try {
+                const parsed = JSON.parse(challengeQuery.data.target_habit || "[]");
+                if (Array.isArray(parsed)) {
+                    currentHabits = parsed.map((h: any) => ({ name: h.name || h, icon: h.icon || "💪" }));
+                }
+            } catch {
+                currentHabits = [];
+            }
+
+            // Evitar duplicatas
+            if (currentHabits.some(h => h.name.toLowerCase() === name.toLowerCase())) {
+                throw new Error("Hábito já existe na party");
+            }
+
+            const updatedHabits = [...currentHabits, { name, icon }];
+
+            const { error } = await supabase
+                .from("challenges")
+                .update({ target_habit: JSON.stringify(updatedHabits) })
+                .eq("id", challengeQuery.data.id);
+
+            if (error) throw error;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["partyChallenge"] });
+            toast.success("Hábito adicionado à party!");
+        },
+        onError: (err: any) => {
+            toast.error(err?.message || "Erro ao adicionar hábito");
+        }
+    });
+
     const checkUserInParty = async (targetId: string) => {
         const { data, error } = await supabase
             .from("challenge_members")
@@ -398,6 +436,7 @@ export const usePartyChallenge = () => {
         inviteFriend,
         kickMember,
         leaveParty,
+        addHabitToParty,
         respondToInvite,
         checkUserInParty
     };

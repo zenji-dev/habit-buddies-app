@@ -144,7 +144,7 @@ const CalendarPage = () => {
                             {["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"].map((day) => (
                                 <div
                                     key={day}
-                                    className="flex-1 flex items-center justify-center text-2xl font-mono-tech uppercase font-bold border-r border-[#00a375]/30 last:border-r-0 py-3 text-[#00a375] tracking-widest"
+                                    className="flex-1 flex items-center justify-center text-2xl font-bold uppercase font-bold border-r border-[#25f4f4]/30 last:border-r-0 py-3 text-[#25f4f4] tracking-widest"
                                 >
                                     {day}
                                 </div>

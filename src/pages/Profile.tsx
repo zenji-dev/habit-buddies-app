@@ -269,35 +269,35 @@ const Profile = () => {
                 )}
 
                 {/* ===== PROFILE HEADER ===== */}
-                <div className="glass-panel rounded-none relative pb-4 shadow-neon-box grid-bg pt-[100px] mt-8">
+                <div className="glass-panel rounded relative pb-4 neo-shadow grid-bg pt-[100px] mt-8">
                     {/* Cover */}
-                    <div className="absolute top-0 left-0 w-full h-[120px] bg-[#050a14] overflow-hidden">
-                        <div className="absolute inset-0 bg-[#00a375] mix-blend-overlay opacity-5" />
+                    <div className="absolute top-0 left-0 w-full h-[120px] bg-background-dark overflow-hidden">
+                        <div className="absolute inset-0 bg-[#25f4f4] mix-blend-overlay opacity-5" />
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background-dark/90 to-background-dark" />
-                        <div className="absolute top-0 left-0 w-full h-px bg-[#00a375]/40 shadow-[0_0_10px_#00a375]" />
-                        <div className="absolute bottom-0 left-0 w-full h-px bg-[#00a375]/10" />
+                        <div className="absolute top-0 left-0 w-full h-px bg-[#25f4f4]/40 " />
+                        <div className="absolute bottom-0 left-0 w-full h-px bg-[#25f4f4]/10" />
                     </div>
 
                     {/* Stats box */}
-                    <div className="hidden md:flex absolute top-4 right-6 bg-background-dark/90 backdrop-blur-md rounded-none p-2 text-[#00a375] text-center gap-4 text-xs border border-[#00a375]/20 shadow-[0_0_10px_rgba(0,163,117,0.1)] z-20">
+                    <div className="hidden md:flex absolute top-4 right-6 bg-background-dark/90 backdrop-blur-md rounded p-2 text-[#25f4f4] text-center gap-4 text-xs border border-[#25f4f4]/20 neo-shadow z-20">
                         <div>
-                            <span className="block font-bold text-base font-mono-tech text-white">{checkIns.length}</span>
-                            <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Logs</span>
+                            <span className="block font-bold text-base font-bold text-white">{checkIns.length}</span>
+                            <span className="text-[#25f4f4] text-[9px] uppercase tracking-widest">Logs</span>
                         </div>
-                        <div className="w-px bg-[#00a375]/20" />
+                        <div className="w-px bg-[#25f4f4]/20" />
                         <div>
-                            <span className="block font-bold text-base font-mono-tech text-white">{habits.reduce((max, h) => Math.max(max, getStreak(h.id)), 0)}</span>
-                            <span className="text-[#e66b00] text-[9px] uppercase tracking-widest">Max Streak</span>
+                            <span className="block font-bold text-base font-bold text-white">{habits.reduce((max, h) => Math.max(max, getStreak(h.id)), 0)}</span>
+                            <span className="text-[#25f4f4] text-[9px] uppercase tracking-widest">Max Streak</span>
                         </div>
                     </div>
 
                     <div className="relative px-6 flex flex-col items-center">
                         {/* Avatar */}
                         <div className="absolute -top-[84px] left-1/2 transform -translate-x-1/2">
-                            <div className="w-24 h-24 rounded-none border-2 border-[#00a375] bg-background-dark p-1 shadow-[0_0_15px_rgba(0,163,117,0.4)] group relative">
+                            <div className="w-24 h-24 rounded border-2 border-[#25f4f4] bg-background-dark p-1 neo-shadow group relative">
                                 {uploading ? (
                                     <div className="w-full h-full flex items-center justify-center">
-                                        <Loader2 className="w-6 h-6 animate-spin text-[#00a375]" />
+                                        <Loader2 className="w-6 h-6 animate-spin text-[#25f4f4]" />
                                     </div>
                                 ) : (
                                     <>
@@ -309,7 +309,7 @@ const Profile = () => {
                                                 onError={(e) => e.currentTarget.style.display = 'none'}
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-[#00a375] text-3xl font-bold font-mono-tech">
+                                            <div className="w-full h-full flex items-center justify-center text-[#25f4f4] text-3xl font-bold font-bold">
                                                 {(isEditing ? editName : profile.name)?.charAt(0) || "?"}
                                             </div>
                                         )}
@@ -352,32 +352,32 @@ const Profile = () => {
                                         value={editName}
                                         onChange={e => setEditName(e.target.value)}
                                         placeholder="Nome de exibição"
-                                        className="text-center font-mono-tech bg-background-dark border-[#00a375]/50 text-white rounded-none"
+                                        className="text-center font-bold bg-background-dark border-[#25f4f4]/50 text-white rounded"
                                     />
                                     <Textarea
                                         value={editBio}
                                         onChange={e => setEditBio(e.target.value)}
                                         placeholder="System bio..."
-                                        className="bg-background-dark border-[#00a375]/50 text-white rounded-none min-h-[80px] text-sm font-mono-tech text-center"
+                                        className="bg-background-dark border-[#25f4f4]/50 text-white rounded min-h-[80px] text-sm font-bold text-center"
                                     />
 
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="relative">
-                                            <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00a375]" />
+                                            <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#25f4f4]" />
                                             <Input
                                                 value={editInstagram}
                                                 onChange={e => setEditInstagram(e.target.value)}
                                                 placeholder="Insta URI"
-                                                className="pl-9 text-xs font-mono-tech bg-background-dark border-[#00a375]/50 text-white rounded-none"
+                                                className="pl-9 text-xs font-bold bg-background-dark border-[#25f4f4]/50 text-white rounded"
                                             />
                                         </div>
                                         <div className="relative">
-                                            <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00a375]" />
+                                            <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#25f4f4]" />
                                             <Input
                                                 value={editTwitter}
                                                 onChange={e => setEditTwitter(e.target.value)}
                                                 placeholder="X URI"
-                                                className="pl-9 text-xs font-mono-tech bg-background-dark border-[#00a375]/50 text-white rounded-none"
+                                                className="pl-9 text-xs font-bold bg-background-dark border-[#25f4f4]/50 text-white rounded"
                                             />
                                         </div>
                                     </div>
@@ -386,24 +386,24 @@ const Profile = () => {
                                 <>
                                     <div className="mb-2">
                                         <h1 className="text-2xl font-bold text-white flex items-center justify-center gap-2 tracking-tight">
-                                            <span className="text-[#e66b00] font-mono-tech mr-1">&gt;</span>
+                                            <span className="text-[#25f4f4] font-bold mr-1">&gt;</span>
                                             {profile.name}
-                                            <span className="text-xl animate-pulse text-[#e66b00]">_</span>
+                                            <span className="text-xl animate-pulse text-[#25f4f4]">_</span>
                                         </h1>
                                         {profile.username && (
-                                            <p className="text-[#00a375]/70 font-mono-tech text-[10px] mt-1 uppercase tracking-widest">
+                                            <p className="text-[#25f4f4]/70 font-bold text-[10px] mt-1 uppercase tracking-widest">
                                                 [ @{profile.username} ]
                                             </p>
                                         )}
                                     </div>
                                     {profile.bio && (
-                                        <p className="text-gray-400 text-sm mt-3 leading-relaxed max-w-lg mx-auto font-mono-tech">
+                                        <p className="text-slate-400 text-sm mt-3 leading-relaxed max-w-lg mx-auto font-bold">
                                             {profile.bio}
                                         </p>
                                     )}
 
                                     <div className="flex justify-center mt-3">
-                                        <p className="text-[#00a375]/50 font-mono-tech text-[10px] flex items-center gap-1 uppercase tracking-widest">
+                                        <p className="text-[#25f4f4]/50 font-bold text-[10px] flex items-center gap-1 uppercase tracking-widest">
                                             <Calendar className="w-3 h-3" /> NODE_CREATED: {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                                         </p>
                                     </div>
@@ -412,12 +412,12 @@ const Profile = () => {
                                     {(profile.instagram_url || profile.twitter_url) && (
                                         <div className="flex gap-4 mt-4 justify-center">
                                             {profile.instagram_url && (
-                                                <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
+                                                <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://${profile.instagram_url}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded border border-[#224949] hover:border-[#25f4f4]  transition-all text-[#25f4f4] bg-card-dark">
                                                     <Instagram className="w-4 h-4" />
                                                 </a>
                                             )}
                                             {profile.twitter_url && (
-                                                <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-none border border-slate-800 hover:border-[#00a375] hover:shadow-[0_0_10px_rgba(0,163,117,0.3)] transition-all text-[#00a375] bg-card-dark">
+                                                <a href={profile.twitter_url.startsWith('http') ? profile.twitter_url : `https://${profile.twitter_url}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded border border-[#224949] hover:border-[#25f4f4]  transition-all text-[#25f4f4] bg-card-dark">
                                                     <Twitter className="w-4 h-4" />
                                                 </a>
                                             )}
@@ -432,32 +432,32 @@ const Profile = () => {
                             {isOwner ? (
                                 isEditing ? (
                                     <div className="flex gap-2">
-                                        <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 bg-[#00a375]/10 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/20 hover:shadow-[0_0_15px_rgba(0,163,117,0.3)] transition-all uppercase tracking-wider disabled:opacity-50 flex items-center gap-2">
+                                        <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 bg-[#25f4f4]/10 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold hover:bg-[#25f4f4]/20  transition-all uppercase tracking-wider disabled:opacity-50 flex items-center gap-2">
                                             <Save className="w-4 h-4" /> COMMIT
                                         </button>
-                                        <button onClick={() => setIsEditing(false)} className="px-6 py-2 border border-slate-700 text-gray-500 text-xs font-mono-tech hover:border-slate-500 hover:text-gray-300 transition-all uppercase tracking-wider">
+                                        <button onClick={() => setIsEditing(false)} className="px-6 py-2 border border-[#224949] text-slate-400 text-xs font-bold hover:border-[#25f4f4] hover:text-white transition-all uppercase tracking-wider">
                                             ABORT
                                         </button>
                                     </div>
                                 ) : (
-                                    <button onClick={() => setIsEditing(true)} className="px-6 py-2 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-2">
+                                    <button onClick={() => setIsEditing(true)} className="px-6 py-2 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold hover:bg-[#25f4f4]/10 hover:neo-shadow transition-all uppercase tracking-wider flex items-center gap-2">
                                         <Edit className="w-4 h-4" /> EDIT_SYS
                                     </button>
                                 )
                             ) : (
                                 !status ? (
-                                    <button onClick={() => addFriendById.mutate(id!)} className="px-6 py-2 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-2">
+                                    <button onClick={() => addFriendById.mutate(id!)} className="px-6 py-2 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold hover:bg-[#25f4f4]/10 hover:neo-shadow transition-all uppercase tracking-wider flex items-center gap-2">
                                         <UserPlus className="w-4 h-4" /> ADD_NODE
                                     </button>
                                 ) : status.status === "pending" ? (
                                     status.user_id === id ? (
                                         <div className="flex gap-2">
-                                            <button onClick={() => handleRequest.mutate({ requestId: status.id, status: "accepted" })} className="px-6 py-2 bg-[#00a375]/10 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/20 hover:shadow-[0_0_15px_rgba(0,163,117,0.3)] transition-all uppercase tracking-wider flex items-center gap-2">
+                                            <button onClick={() => handleRequest.mutate({ requestId: status.id, status: "accepted" })} className="px-6 py-2 bg-[#25f4f4]/10 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold hover:bg-[#25f4f4]/20  transition-all uppercase tracking-wider flex items-center gap-2">
                                                 ACCEPT_SYNC
                                             </button>
                                         </div>
                                     ) : (
-                                        <button disabled className="px-6 py-2 border border-[#e66b00]/50 text-[#e66b00] text-xs font-mono-tech bg-background-dark opacity-70 uppercase tracking-wider flex items-center gap-2">
+                                        <button disabled className="px-6 py-2 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold bg-background-dark opacity-70 uppercase tracking-wider flex items-center gap-2">
                                             <History className="w-4 h-4" /> SYNC_PENDING
                                         </button>
                                     )
@@ -466,7 +466,7 @@ const Profile = () => {
                                         {!targetInParty && (
                                             challenge ? (
                                                 <button
-                                                    className="px-6 py-2 border border-[#00a375]/50 text-[#00a375] text-xs font-mono-tech hover:bg-[#00a375]/10 hover:shadow-[0_0_10px_rgba(0,163,117,0.2)] transition-all uppercase tracking-wider flex items-center gap-2"
+                                                    className="px-6 py-2 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold hover:bg-[#25f4f4]/10 hover:neo-shadow transition-all uppercase tracking-wider flex items-center gap-2"
                                                     onClick={() => {
                                                         inviteFriend.mutate(id!, {
                                                             onSuccess: () => setTargetInParty(true)
@@ -477,7 +477,7 @@ const Profile = () => {
                                                 </button>
                                             ) : (
                                                 <button
-                                                    className="px-6 py-2 border border-[#e66b00]/50 text-[#e66b00] text-xs font-mono-tech hover:bg-[#e66b00]/10 hover:shadow-[0_0_10px_rgba(230,107,0,0.2)] transition-all uppercase tracking-wider flex items-center gap-2"
+                                                    className="px-6 py-2 border border-[#25f4f4]/50 text-[#25f4f4] text-xs font-bold hover:bg-[#25f4f4]/10 hover:neo-shadow transition-all uppercase tracking-wider flex items-center gap-2"
                                                     onClick={() => setIsInviteDialogOpen(true)}
                                                 >
                                                     <PartyPopper className="w-4 h-4" /> START_PARTY_WITH
@@ -486,13 +486,13 @@ const Profile = () => {
                                         )}
 
                                         {targetInParty && (
-                                            <div className="px-6 py-2 border border-gray-800 text-gray-600 text-[10px] font-mono-tech uppercase tracking-widest bg-background-dark/50 flex items-center gap-2">
+                                            <div className="px-6 py-2 border border-[#224949] text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-background-dark/50 flex items-center gap-2">
                                                 <History className="w-4 h-4" /> ALREADY_IN_PARTY
                                             </div>
                                         )}
 
                                         <button
-                                            className="px-6 py-2 border border-red-900/50 text-red-500 text-xs font-mono-tech hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-2"
+                                            className="px-6 py-2 border border-red-900/50 text-red-500 text-xs font-bold hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-2"
                                             onClick={() => unfriend.mutate(id!)}
                                         >
                                             <UserMinus className="w-4 h-4" /> DISCONNECT
@@ -506,7 +506,7 @@ const Profile = () => {
                     {/* Bio prompt for owner without bio */}
                     {!isEditing && isOwner && !profile.bio && (
                         <div className="relative mt-4 flex justify-center">
-                            <button onClick={() => setIsEditing(true)} className="text-[10px] text-[#00a375]/50 font-mono-tech uppercase tracking-widest hover:text-[#00a375] transition-colors">
+                            <button onClick={() => setIsEditing(true)} className="text-[10px] text-[#25f4f4]/50 font-bold uppercase tracking-widest hover:text-[#25f4f4] transition-colors">
                                 + ADD_SYSTEM_BIO
                             </button>
                         </div>

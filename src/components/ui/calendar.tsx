@@ -88,8 +88,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
                 type="button"
                 onClick={() => handleYearSelect(y)}
                 className={cn(
-                  "text-xs px-2 py-1 rounded text-white hover:bg-slate-800",
-                  y === viewMonth.getFullYear() ? "bg-[#00a375] text-black font-semibold" : ""
+                  "text-xs px-2 py-1 rounded text-white hover:bg-[#224949]",
+                  y === viewMonth.getFullYear() ? "bg-[#25f4f4] text-black font-semibold" : ""
                 )}
               >
                 {y}

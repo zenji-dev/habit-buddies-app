@@ -18,7 +18,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import CalendarPage from "./pages/Calendar";
 import { VerifyEmail } from "./pages/VerifyEmail";
-import { Starfield } from "@/components/Starfield";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,8 +36,8 @@ const queryClient = new QueryClient({
 const LoadingScreen = () => (
   <div className="min-h-screen flex items-center justify-center bg-background-dark">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-10 h-10 border-2 border-[#00a375] border-t-transparent animate-spin" />
-      <p className="text-[#00a37566] text-[10px] font-bold uppercase tracking-widest animate-pulse">&gt; LOADING_SYSTEM...</p>
+      <div className="w-10 h-10 border-2 border-[#25f4f4] border-t-transparent animate-spin rounded" />
+      <p className="text-[#25f4f4]/40 text-[10px] font-bold uppercase tracking-widest animate-pulse">&gt; LOADING_SYSTEM...</p>
     </div>
   </div>
 );
@@ -105,7 +105,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <Starfield />
+
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
